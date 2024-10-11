@@ -1,0 +1,30 @@
+#navbar {
+    position: "fixed";
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 20rem;
+    padding: 2rem 1rem;
+}
+
+#content-div {
+    margin-left: 1rem;
+    margin-right: 2rem;
+    padding: 2rem 1rem;
+}
+
+#main-content {
+    display: flex;
+}
+
+h1, footer {
+    margin: 1rem 1rem 1rem 1rem;
+}
+
+.viz-placeholder {
+    width: 850px;
+    height: 300px;
+    border: 2px solid black;
+    margin-bottom: 2rem;
+    padding: 1rem;
+}
