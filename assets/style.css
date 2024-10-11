@@ -1,10 +1,18 @@
+body {
+    font-size: 1.25rem;
+}
+
+hr {
+    border: 1px solid #555;
+}
 #navbar {
     position: "fixed";
     top: 0;
     left: 0;
     bottom: 0;
-    width: 20rem;
+    width: 25rem;
     padding: 2rem 1rem;
+    font-size: 1.5rem;
 }
 
 #content-div {
@@ -27,4 +35,8 @@ h1, footer {
     border: 2px solid black;
     margin-bottom: 2rem;
     padding: 1rem;
+}
+
+.download-button {
+    margin: .75rem .75rem .75rem .75rem;
 }

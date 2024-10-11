@@ -48,9 +48,27 @@ app.layout = html.Div(
               id="download-dataset",
               children=[
                 html.Header(html.H2("Download Data Here")),
-                html.P("Explanation text"),
-                html.Button("Download Text", id="btn-download-txt"),
-                dcc.Download(id="download-text")
+                html.Div(
+                  children=[
+                    html.P("Here is the data collected in this study, available as an Excel file or a VTK file."),
+                    dbc.Button("Download Excel Spreadsheet", id="btn-download-xlsx", className="download-button"),
+                    dcc.Download(id="download-xlsx"),
+                    dbc.Button("Download VTK File", id="btn-download-vtk", className="download-button"),
+                    dcc.Download(id="download-vtk")
+                  ]
+                ),
+                html.Hr(),
+                html.Div(
+                  children=[
+                    html.P(
+                      children=[
+                        "If you would like to visualize this data using the `ili spatial data mapping tool, open the ", 
+                        html.A("`ili website", href="http://ili.embl.de/"),
+                        ", select 'Volume', and drag and drop the following two files into the viewer:"
+                      ] 
+                    ),
+                  ]
+                )
               ]
             ),
           ]
@@ -61,12 +79,26 @@ app.layout = html.Div(
 )
 
 @callback(
-    Output("download-text", "data"),
-    Input("btn-download-txt", "n_clicks"),
+    Output("download-xlsx", "data"),
+    Input("btn-download-xlsx", "n_clicks"),
     prevent_initial_call=True,
 )
-def func(n_clicks):
-    return dict(content="Hello world!", filename="hello.txt")
+
+def download_xlsx(n_clicks):
+    return dcc.send_file(
+        "assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx"
+)
+
+@callback(
+    Output("download-vtk", "data"),
+    Input("btn-download-vtk", "n_clicks"),
+    prevent_initial_call=True,
+)
+
+def download_vtk(n_clicks):
+    return dcc.send_file(
+        "assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti"
+)
 
 if __name__ == "__main__":
   app.run_server(debug=True)
