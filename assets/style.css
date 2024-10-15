@@ -37,6 +37,11 @@ h1, footer {
     padding: 1rem;
 }
 
+.dcc-graph {
+    height: 700px;
+    width: 900px;
+}
+
 .download-button {
     margin: .75rem .75rem .75rem .75rem;
 }
