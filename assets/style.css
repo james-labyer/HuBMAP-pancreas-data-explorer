@@ -45,3 +45,19 @@ h1, footer {
 .download-button {
     margin: .75rem .75rem .75rem .75rem;
 }
+
+#opacity-div {
+    width: 80%;
+}
+
+#caps-div {
+    width: 40%
+}
+
+#color-scheme-div {
+    width: 40%
+}
+
+#caps-and-color-div {
+    display: flex;
+}
