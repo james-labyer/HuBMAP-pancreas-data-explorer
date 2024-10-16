@@ -11,6 +11,8 @@ LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
+D_PROTEIN = "INS"
+D_SCHEME = "Jet"
 
 C_SCHEMES = [
     "bluered",
@@ -60,7 +62,9 @@ def get_colors(df, protein):
     return colors
 
 
-def make_fig1(opacity=0.4, caps=True, colorscheme="Jet", protein="CYB5A", layer="All"):
+def make_fig1(
+    opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
+):
     df3 = select_layer(layer, cubes_df1)
 
     X = df3.loc[:, "X Center"]
@@ -94,7 +98,7 @@ def make_fig1(opacity=0.4, caps=True, colorscheme="Jet", protein="CYB5A", layer=
     return fig1
 
 
-def make_fig2(opacity=0.1, colorscheme="Jet", protein="CYB5A", layer="All"):
+def make_fig2(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"):
     df4 = select_layer(layer, points_df)
     X = df4.loc[:, "X Center"]
     Y = df4.loc[:, "Y Center"]
@@ -117,7 +121,7 @@ def make_fig2(opacity=0.1, colorscheme="Jet", protein="CYB5A", layer="All"):
     return fig2
 
 
-def make_fig3(cscheme="Jet", protein="CYB5A"):
+def make_fig3(cscheme=D_SCHEME, protein=D_PROTEIN):
     x = X_AXIS[:9]
     y = Y_AXIS[:5]
     z1 = [[35 for i in x] for j in y]
@@ -211,7 +215,7 @@ app.layout = html.Div(
                                 ),
                                 dcc.Dropdown(
                                     proteins,
-                                    "CYB5A",
+                                    D_PROTEIN,
                                     id="proteinsdd",
                                 ),
                                 html.P("Select a tissue layer to view"),
@@ -248,7 +252,7 @@ app.layout = html.Div(
                                                         ),
                                                         dcc.Dropdown(
                                                             C_SCHEMES,
-                                                            "Jet",
+                                                            D_SCHEME,
                                                             id="colorschemedd",
                                                         ),
                                                     ],
