@@ -12,7 +12,7 @@ X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
 D_PROTEIN = "INS"
-D_SCHEME = "Jet"
+D_SCHEME = "jet"
 
 C_SCHEMES = [
     "bluered",
@@ -225,42 +225,98 @@ def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
     return fig4
 
 
+def make_c_scheme_dd(id):
+    return [
+        html.P("Choose a color scheme:"),
+        dcc.Dropdown(
+            C_SCHEMES,
+            D_SCHEME,
+            id=id,
+        ),
+    ]
+
+
+def make_opacity_slider(id, default=0.4):
+    return [
+        html.P("Adjust the opacity of the model:"),
+        dcc.Slider(
+            0,
+            1,
+            0.2,
+            value=default,
+            id=id,
+        ),
+    ]
+
+
 app.layout = html.Div(
     children=[
         html.Header(
             children=[
-                html.H1("Spatial Proteome Map of a Single Human Islet Microenvironment")
+                html.Div(
+                    id="navbar",
+                    children=[
+                        dbc.Navbar(
+                            dbc.Stack(
+                                [
+                                    dbc.Row(
+                                        dbc.Col(
+                                            html.Div(
+                                                html.H1(
+                                                    "Spatial Proteome Map of a Single Human Islet Microenvironment",
+                                                    className="bg-primary text-light title w-100",
+                                                ),
+                                            ),
+                                            width=12,
+                                        )
+                                    ),
+                                    dbc.Row(
+                                        dbc.Col(
+                                            [
+                                                dbc.Nav(
+                                                    [
+                                                        dbc.NavLink(
+                                                            "Proteome Cross-Section",
+                                                            href="#cross-section",
+                                                            external_link=True,
+                                                            className="nav-link text-light sub-nav",
+                                                        ),
+                                                        dbc.NavLink(
+                                                            "Proteomics Scatter Plot",
+                                                            href="#scatter-plot",
+                                                            external_link=True,
+                                                            className="nav-link text-light",
+                                                        ),
+                                                        dbc.NavLink(
+                                                            "Download Data",
+                                                            href="#download-dataset",
+                                                            external_link=True,
+                                                            className="nav-link text-light",
+                                                        ),
+                                                    ],
+                                                    # horizontal="start",
+                                                    # fill=True,
+                                                    navbar=True,
+                                                    class_name="bg-primary",
+                                                ),
+                                            ],
+                                        )
+                                        # justify="start",
+                                    ),
+                                ]
+                            ),
+                            # ],
+                            color="primary",
+                            sticky="top",
+                        ),
+                    ],
+                ),
             ]
         ),
         html.Main(
             id="main-content",
             children=[
-                html.Div(
-                    id="navbar",
-                    children=[
-                        dbc.Nav(
-                            [
-                                dbc.NavLink(
-                                    "Proteome Cross-Section View",
-                                    href="#cross-section",
-                                    external_link=True,
-                                ),
-                                dbc.NavLink(
-                                    "Proteomics Scatter Plot",
-                                    href="#scatter-plot",
-                                    external_link=True,
-                                ),
-                                dbc.NavLink(
-                                    "Download Data",
-                                    href="#download-dataset",
-                                    external_link=True,
-                                ),
-                            ],
-                            vertical=True,
-                        )
-                    ],
-                ),
-                html.Div(
+                dbc.Container(
                     id="content-div",
                     children=[
                         html.Section(
@@ -268,30 +324,54 @@ app.layout = html.Div(
                             children=[
                                 html.Header(html.H2("Proteome Cross-Section View")),
                                 html.P(
-                                    "Here is a 3D cross-section of the tissue. Select a protein to view its concentrations throughout the tissue sample:"
+                                    "The following four charts show a 3D proteome mapping of single pancreatic islet microenvironment at 50–µm resolution."
                                 ),
-                                dcc.Dropdown(
-                                    proteins,
-                                    D_PROTEIN,
-                                    id="proteinsdd",
+                                dbc.Card(
+                                    dbc.CardBody(
+                                        dbc.Row(
+                                            [
+                                                dbc.Col(
+                                                    [
+                                                        html.P("Select a protein:"),
+                                                        dcc.Dropdown(
+                                                            proteins,
+                                                            D_PROTEIN,
+                                                            id="proteinsdd",
+                                                        ),
+                                                    ]
+                                                ),
+                                                dbc.Col(
+                                                    [
+                                                        html.P(
+                                                            "Select a tissue layer:"
+                                                        ),
+                                                        dcc.Dropdown(
+                                                            LAYERS,
+                                                            "All",
+                                                            id="layersdd",
+                                                        ),
+                                                    ]
+                                                ),
+                                            ],
+                                            justify="center",
+                                        ),
+                                    ),
+                                    color="light",
                                 ),
-                                html.P("Select a tissue layer to view"),
-                                dcc.Dropdown(
-                                    LAYERS,
-                                    "All",
-                                    id="layersdd",
+                                dbc.Row(
+                                    dbc.Col(
+                                        dcc.Graph(
+                                            figure=make_fig1(),
+                                            className="dcc-graph",
+                                            id="cross-section-graph",
+                                        ),
+                                    )
                                 ),
-                                dcc.Graph(
-                                    figure=make_fig1(),
-                                    className="dcc-graph",
-                                    id="cross-section-graph",
-                                ),
-                                html.Div(
-                                    children=[
-                                        html.Div(
-                                            id="caps-and-color-div",
+                                dbc.Card(
+                                    dbc.CardBody(
+                                        dbc.Row(
                                             children=[
-                                                html.Div(
+                                                dbc.Col(
                                                     children=[
                                                         html.P(
                                                             "Add or remove end caps:"
@@ -301,138 +381,102 @@ app.layout = html.Div(
                                                             value=False,
                                                         ),
                                                     ],
-                                                    id="caps-div",
+                                                    width=3,
                                                 ),
-                                                html.Div(
-                                                    children=[
-                                                        html.P(
-                                                            "Choose a color scheme:"
-                                                        ),
-                                                        dcc.Dropdown(
-                                                            C_SCHEMES,
-                                                            D_SCHEME,
-                                                            id="fig1colorschemedd",
-                                                        ),
-                                                    ],
-                                                    id="color-scheme-div",
+                                                dbc.Col(
+                                                    children=make_c_scheme_dd(
+                                                        "fig1colorschemedd"
+                                                    ),
+                                                    width=3,
+                                                ),
+                                                dbc.Col(
+                                                    children=make_opacity_slider(
+                                                        "fig1opacityslider"
+                                                    ),
+                                                    width=6,
                                                 ),
                                             ],
                                         ),
-                                        html.Div(
-                                            children=[
-                                                html.P(
-                                                    "Adjust the opacity of the model:"
-                                                ),
-                                                dcc.Slider(
-                                                    0,
-                                                    1,
-                                                    0.2,
-                                                    value=0.4,
-                                                    id="fig1opacityslider",
-                                                ),
-                                            ],
-                                            id="opacity-div",
-                                        ),
-                                    ],
-                                    id="cross-section-controls",
+                                    ),
+                                    color="light",
                                 ),
-                                html.Div(
-                                    children=[
+                                dbc.Row(
+                                    dbc.Col(
                                         dcc.Graph(
                                             figure=make_fig2(),
                                             className="dcc-graph",
                                             id="cross-section-graph2",
                                         ),
-                                    ]
+                                    )
                                 ),
-                                html.Div(
-                                    children=[
-                                        html.Div(
+                                dbc.Card(
+                                    dbc.CardBody(
+                                        dbc.Row(
                                             children=[
-                                                html.P("Choose a color scheme:"),
-                                                dcc.Dropdown(
-                                                    C_SCHEMES,
-                                                    D_SCHEME,
-                                                    id="fig2colorschemedd",
+                                                dbc.Col(
+                                                    children=make_c_scheme_dd(
+                                                        "fig2colorschemedd"
+                                                    )
+                                                ),
+                                                dbc.Col(
+                                                    children=make_opacity_slider(
+                                                        "fig2opacityslider"
+                                                    )
                                                 ),
                                             ],
-                                            id="fig2-color-scheme-div",
                                         ),
-                                        html.Div(
-                                            children=[
-                                                html.P(
-                                                    "Adjust the opacity of the model:"
-                                                ),
-                                                dcc.Slider(
-                                                    0,
-                                                    1,
-                                                    0.2,
-                                                    value=0.4,
-                                                    id="fig2opacityslider",
-                                                ),
-                                            ],
-                                            id="fig2-opacity-div",
-                                        ),
-                                    ],
-                                    id="fig2-cross-section-controls",
+                                    ),
+                                    color="light",
                                 ),
-                                html.Div(
-                                    children=[
+                                dbc.Row(
+                                    dbc.Col(
                                         dcc.Graph(
                                             figure=make_fig3(),
                                             className="dcc-graph",
                                             id="cross-section-graph3",
                                         ),
-                                    ]
+                                    )
                                 ),
-                                html.Div(
-                                    children=[
-                                        html.P("Choose a color scheme:"),
-                                        dcc.Dropdown(
-                                            C_SCHEMES,
-                                            D_SCHEME,
-                                            id="fig3colorschemedd",
+                                dbc.Card(
+                                    dbc.CardBody(
+                                        dbc.Row(
+                                            dbc.Col(
+                                                children=make_c_scheme_dd(
+                                                    "fig3colorschemedd"
+                                                )
+                                            )
                                         ),
-                                    ],
-                                    id="fig3-color-scheme-div",
-                                ),
-                                html.Div(
-                                    dcc.Graph(
-                                        figure=make_fig4(),
-                                        className="dcc-graph",
-                                        id="cross-section-graph4",
                                     ),
+                                    color="light",
                                 ),
-                                html.Div(
-                                    children=[
-                                        html.Div(
+                                dbc.Row(
+                                    dbc.Col(
+                                        dcc.Graph(
+                                            figure=make_fig4(),
+                                            className="dcc-graph",
+                                            id="cross-section-graph4",
+                                        ),
+                                    )
+                                ),
+                                dbc.Card(
+                                    dbc.CardBody(
+                                        dbc.Row(
                                             children=[
-                                                html.P("Choose a color scheme:"),
-                                                dcc.Dropdown(
-                                                    C_SCHEMES,
-                                                    D_SCHEME,
-                                                    id="fig4colorschemedd",
+                                                dbc.Col(
+                                                    children=make_c_scheme_dd(
+                                                        "fig4colorschemedd"
+                                                    )
+                                                ),
+                                                dbc.Col(
+                                                    # fig4opacityslider
+                                                    children=make_opacity_slider(
+                                                        "fig4opacityslider", 1
+                                                    )
                                                 ),
                                             ],
-                                            id="fig4-color-scheme-div",
                                         ),
-                                        html.Div(
-                                            children=[
-                                                html.P(
-                                                    "Adjust the opacity of the model:"
-                                                ),
-                                                dcc.Slider(
-                                                    0,
-                                                    1,
-                                                    0.2,
-                                                    value=1,
-                                                    id="fig4opacityslider",
-                                                ),
-                                            ],
-                                            id="fig4-opacity-div",
-                                        ),
-                                    ],
-                                    id="fig4-cross-section-controls",
+                                    ),
+                                    color="light",
                                 ),
                             ],
                         ),
