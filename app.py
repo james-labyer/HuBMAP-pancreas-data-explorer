@@ -5,7 +5,9 @@ import plotly.graph_objects as go
 import numpy as np
 import math
 
-app = Dash(external_stylesheets=[dbc.themes.LUMEN])
+app = Dash(
+    __name__, title="Islet Proteome Map", external_stylesheets=[dbc.themes.LUMEN]
+)
 
 LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
@@ -62,8 +64,8 @@ def get_colors(df, protein):
     return colors
 
 
-def make_sphere(x, y, z, radius, resolution=20):
-    """Return the coordinates for plotting a sphere centered at (x,y,z)"""
+def make_sphere(x, y, z, radius, resolution=5):
+    """Calculate the coordinates to plot a sphere with center at (x, y, z). Returns three Numpy ndarrays."""
     u, v = np.mgrid[0 : 2 * np.pi : resolution * 2j, 0 : np.pi : resolution * 1j]
     X = radius * np.cos(u) * np.sin(v) + x
     Y = radius * np.sin(u) * np.sin(v) + y
@@ -524,11 +526,24 @@ app.layout = html.Div(
                                                     "`ili website",
                                                     href="http://ili.embl.de/",
                                                 ),
-                                                ", select 'Volume', and drag and drop the following two files into the viewer:",
+                                                ", select 'Volume', and drag and drop the following two files into the viewer. Then click on the '3D' tab, and choose 'Lego' for Render Mode.",
                                             ]
                                         ),
+                                        dbc.Button(
+                                            "Download `ili Spreadsheet",
+                                            id="btn-download-ili-xlsx",
+                                            className="download-button",
+                                        ),
+                                        dcc.Download(id="download-ili-xlsx"),
+                                        dbc.Button(
+                                            "Download `ili Volume File",
+                                            id="btn-download-ili-volume",
+                                            className="download-button",
+                                        ),
+                                        dcc.Download(id="download-ili-volume"),
                                     ]
                                 ),
+                                html.Hr(),
                             ],
                         ),
                     ],
@@ -574,6 +589,7 @@ def update_output(
     fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
     fig3 = make_fig3(fig3colorschemedd, protein=proteinsdd)
     fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
+    print(fig1["data"][0])
     return fig1, fig2, fig3, fig4
 
 
@@ -587,12 +603,21 @@ def download_xlsx(n_clicks):
 
 
 @callback(
-    Output("download-vtk", "data"),
-    Input("btn-download-vtk", "n_clicks"),
+    Output("download-ili-xlsx", "data"),
+    Input("btn-download-ili-xlsx", "n_clicks"),
     prevent_initial_call=True,
 )
-def download_vtk(n_clicks):
-    return dcc.send_file("assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
+def download_ili_xlsx(n_clicks):
+    return dcc.send_file("assets/HuBMAP_ili_data10-11-24.csv")
+
+
+@callback(
+    Output("download-ili-volume", "data"),
+    Input("btn-download-ili-volume", "n_clicks"),
+    prevent_initial_call=True,
+)
+def download_ili_volume(n_clicks):
+    return dcc.send_file("assets/ili_vol_template.nrrd")
 
 
 if __name__ == "__main__":
