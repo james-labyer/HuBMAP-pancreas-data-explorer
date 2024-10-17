@@ -62,6 +62,15 @@ def get_colors(df, protein):
     return colors
 
 
+def make_sphere(x, y, z, radius, resolution=20):
+    """Return the coordinates for plotting a sphere centered at (x,y,z)"""
+    u, v = np.mgrid[0 : 2 * np.pi : resolution * 2j, 0 : np.pi : resolution * 1j]
+    X = radius * np.cos(u) * np.sin(v) + x
+    Y = radius * np.sin(u) * np.sin(v) + y
+    Z = radius * np.cos(v) + z
+    return (X, Y, Z)
+
+
 def make_fig1(
     opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
 ):
@@ -168,6 +177,54 @@ def make_fig3(cscheme=D_SCHEME, protein=D_PROTEIN):
     return fig
 
 
+def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
+    res = 5
+    data = []
+    cmin = math.floor(protein_df.loc[0, protein])
+    cmax = math.ceil(protein_df.loc[1, protein])
+    for k in points_df.index:
+        s_color = points_df.loc[k, protein]
+        if not np.isnan(s_color):
+            (X, Y, Z) = make_sphere(
+                x=points_df.loc[k, "X Center"],
+                y=points_df.loc[k, "Y Center"],
+                z=points_df.loc[k, "Z Center"],
+                radius=16,
+                resolution=res,
+            )
+            c = [[s_color.item() for i in range(res)] for j in range(res * 2)]
+            if k == 1:
+                data.append(
+                    go.Surface(
+                        x=X,
+                        y=Y,
+                        z=Z,
+                        surfacecolor=c,
+                        colorscale=cscheme,
+                        cmin=cmin,
+                        cmax=cmax,
+                        opacity=opacity,
+                    )
+                )
+            else:
+                data.append(
+                    go.Surface(
+                        x=X,
+                        y=Y,
+                        z=Z,
+                        surfacecolor=c,
+                        colorscale=cscheme,
+                        cmin=cmin,
+                        cmax=cmax,
+                        showscale=False,
+                        opacity=opacity,
+                    )
+                )
+
+    fig4 = go.Figure(data=data)
+    return fig4
+
+
 app.layout = html.Div(
     children=[
         html.Header(
@@ -240,7 +297,8 @@ app.layout = html.Div(
                                                             "Add or remove end caps:"
                                                         ),
                                                         dbc.Switch(
-                                                            id="capswitch", value=False
+                                                            id="fig1capswitch",
+                                                            value=False,
                                                         ),
                                                     ],
                                                     id="caps-div",
@@ -253,7 +311,7 @@ app.layout = html.Div(
                                                         dcc.Dropdown(
                                                             C_SCHEMES,
                                                             D_SCHEME,
-                                                            id="colorschemedd",
+                                                            id="fig1colorschemedd",
                                                         ),
                                                     ],
                                                     id="color-scheme-div",
@@ -270,7 +328,7 @@ app.layout = html.Div(
                                                     1,
                                                     0.2,
                                                     value=0.4,
-                                                    id="opacityslider",
+                                                    id="fig1opacityslider",
                                                 ),
                                             ],
                                             id="opacity-div",
@@ -289,12 +347,92 @@ app.layout = html.Div(
                                 ),
                                 html.Div(
                                     children=[
+                                        html.Div(
+                                            children=[
+                                                html.P("Choose a color scheme:"),
+                                                dcc.Dropdown(
+                                                    C_SCHEMES,
+                                                    D_SCHEME,
+                                                    id="fig2colorschemedd",
+                                                ),
+                                            ],
+                                            id="fig2-color-scheme-div",
+                                        ),
+                                        html.Div(
+                                            children=[
+                                                html.P(
+                                                    "Adjust the opacity of the model:"
+                                                ),
+                                                dcc.Slider(
+                                                    0,
+                                                    1,
+                                                    0.2,
+                                                    value=0.4,
+                                                    id="fig2opacityslider",
+                                                ),
+                                            ],
+                                            id="fig2-opacity-div",
+                                        ),
+                                    ],
+                                    id="fig2-cross-section-controls",
+                                ),
+                                html.Div(
+                                    children=[
                                         dcc.Graph(
                                             figure=make_fig3(),
                                             className="dcc-graph",
                                             id="cross-section-graph3",
                                         ),
                                     ]
+                                ),
+                                html.Div(
+                                    children=[
+                                        html.P("Choose a color scheme:"),
+                                        dcc.Dropdown(
+                                            C_SCHEMES,
+                                            D_SCHEME,
+                                            id="fig3colorschemedd",
+                                        ),
+                                    ],
+                                    id="fig3-color-scheme-div",
+                                ),
+                                html.Div(
+                                    dcc.Graph(
+                                        figure=make_fig4(),
+                                        className="dcc-graph",
+                                        id="cross-section-graph4",
+                                    ),
+                                ),
+                                html.Div(
+                                    children=[
+                                        html.Div(
+                                            children=[
+                                                html.P("Choose a color scheme:"),
+                                                dcc.Dropdown(
+                                                    C_SCHEMES,
+                                                    D_SCHEME,
+                                                    id="fig4colorschemedd",
+                                                ),
+                                            ],
+                                            id="fig4-color-scheme-div",
+                                        ),
+                                        html.Div(
+                                            children=[
+                                                html.P(
+                                                    "Adjust the opacity of the model:"
+                                                ),
+                                                dcc.Slider(
+                                                    0,
+                                                    1,
+                                                    0.2,
+                                                    value=1,
+                                                    id="fig4opacityslider",
+                                                ),
+                                            ],
+                                            id="fig4-opacity-div",
+                                        ),
+                                    ],
+                                    id="fig4-cross-section-controls",
                                 ),
                             ],
                         ),
@@ -362,17 +500,37 @@ app.layout = html.Div(
     Output("cross-section-graph", "figure"),
     Output("cross-section-graph2", "figure"),
     Output("cross-section-graph3", "figure"),
-    Input("opacityslider", "value"),
-    Input("capswitch", "value"),
-    Input("colorschemedd", "value"),
+    Output("cross-section-graph4", "figure"),
+    Input("fig1opacityslider", "value"),
+    Input("fig1capswitch", "value"),
+    Input("fig1colorschemedd", "value"),
+    Input("fig2opacityslider", "value"),
+    Input("fig2colorschemedd", "value"),
+    Input("fig3colorschemedd", "value"),
+    Input("fig4opacityslider", "value"),
+    Input("fig4colorschemedd", "value"),
     Input("proteinsdd", "value"),
     Input("layersdd", "value"),
 )
-def update_output(opacityslider, capswitch, colorschemedd, proteinsdd, layersdd):
-    fig1 = make_fig1(opacityslider, capswitch, colorschemedd, proteinsdd, layersdd)
-    fig2 = make_fig2(opacityslider, colorschemedd, proteinsdd, layersdd)
-    fig3 = make_fig3(colorschemedd, proteinsdd)
-    return fig1, fig2, fig3
+def update_output(
+    fig1opacityslider,
+    fig1capswitch,
+    fig1colorschemedd,
+    fig2opacityslider,
+    fig2colorschemedd,
+    fig3colorschemedd,
+    fig4opacityslider,
+    fig4colorschemedd,
+    proteinsdd,
+    layersdd,
+):
+    fig1 = make_fig1(
+        fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd, layersdd
+    )
+    fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
+    fig3 = make_fig3(fig3colorschemedd, protein=proteinsdd)
+    fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
+    return fig1, fig2, fig3, fig4
 
 
 @callback(
