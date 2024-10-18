@@ -4,6 +4,8 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
 import math
+import skimage
+from dash_slicer import VolumeSlicer
 
 app = Dash(
     __name__, title="Islet Proteome Map", external_stylesheets=[dbc.themes.LUMEN]
@@ -227,6 +229,13 @@ def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
     return fig4
 
 
+def make_fig5():
+    vol = skimage.io.imread("assets/P2-13A INS 488 tile 25um stack1.ome.tiff")
+    slicer = VolumeSlicer(app, vol)
+    slicer.graph.config["scrollZoom"] = False
+    return [slicer.graph, slicer.slider, *slicer.stores]
+
+
 def make_c_scheme_dd(id):
     return [
         html.P("Choose a color scheme:"),
@@ -284,8 +293,8 @@ app.layout = html.Div(
                                                             className="nav-link text-light sub-nav",
                                                         ),
                                                         dbc.NavLink(
-                                                            "Proteomics Scatter Plot",
-                                                            href="#scatter-plot",
+                                                            "3D Pancreas Viewer",
+                                                            href="#3d-view",
                                                             external_link=True,
                                                             className="nav-link text-light",
                                                         ),
@@ -296,18 +305,14 @@ app.layout = html.Div(
                                                             className="nav-link text-light",
                                                         ),
                                                     ],
-                                                    # horizontal="start",
-                                                    # fill=True,
                                                     navbar=True,
                                                     class_name="bg-primary",
                                                 ),
                                             ],
                                         )
-                                        # justify="start",
                                     ),
                                 ]
                             ),
-                            # ],
                             color="primary",
                             sticky="top",
                         ),
@@ -470,7 +475,6 @@ app.layout = html.Div(
                                                     )
                                                 ),
                                                 dbc.Col(
-                                                    # fig4opacityslider
                                                     children=make_opacity_slider(
                                                         "fig4opacityslider", 1
                                                     )
@@ -483,14 +487,11 @@ app.layout = html.Div(
                             ],
                         ),
                         html.Section(
-                            id="scatter-plot",
+                            id="3D-view",
                             children=[
-                                html.Header(html.H2("Proteomics Scatter Plot")),
+                                html.Header(html.H2("3D Pancreas View")),
                                 html.P("Explanation text"),
-                                html.Div(
-                                    "Visualization placeholder",
-                                    className="viz-placeholder",
-                                ),
+                                dbc.Row(dbc.Col(make_fig5())),
                             ],
                         ),
                         html.Section(
@@ -589,7 +590,6 @@ def update_output(
     fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
     fig3 = make_fig3(fig3colorschemedd, protein=proteinsdd)
     fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
-    print(fig1["data"][0])
     return fig1, fig2, fig3, fig4
 
 
@@ -621,4 +621,4 @@ def download_ili_volume(n_clicks):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=True, dev_tools_props_check=False)

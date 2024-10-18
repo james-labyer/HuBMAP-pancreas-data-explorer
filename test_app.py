@@ -3,6 +3,7 @@ from dash._callback_context import context_value
 from dash._utils import AttributeDict
 import pandas as pd
 import pytest
+import numpy as np
 
 from app import update_output
 
@@ -283,3 +284,119 @@ def test_uo_fig4cscheme():
         (0.8888888888888888, "#f7d13d"),
         (1.0, "#fcffa4"),
     )
+
+
+def test_uo_layer():
+    # test that z array contains expected values for each layer
+    figs1 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_PROTEIN,
+        D_LAYER,
+    )
+
+    figs2 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_PROTEIN,
+        "Layer 1",
+    )
+
+    figs3 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_PROTEIN,
+        "Layer 2",
+    )
+
+    figs4 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_PROTEIN,
+        "Layer 3",
+    )
+
+    figs5 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_PROTEIN,
+        "Layer 4",
+    )
+
+    assert np.isin(35, figs1[0]["data"][0]["z"])
+    assert np.isin(70, figs1[0]["data"][0]["z"])
+    assert np.isin(105, figs1[0]["data"][0]["z"])
+    assert np.isin(139.999, figs1[0]["data"][0]["z"])
+    assert np.isin(17.5, figs1[1]["data"][0]["z"])
+    assert np.isin(52.5, figs1[1]["data"][0]["z"])
+    assert np.isin(87.5, figs1[1]["data"][0]["z"])
+    assert np.isin(122.5, figs1[1]["data"][0]["z"])
+
+    assert np.isin(34.999, figs2[0]["data"][0]["z"])
+    assert not np.isin(70, figs2[0]["data"][0]["z"])
+    assert np.isin(17.5, figs2[1]["data"][0]["z"])
+    assert not np.isin(87.5, figs2[1]["data"][0]["z"])
+
+    assert np.isin(69.999, figs3[0]["data"][0]["z"])
+    assert not np.isin(105, figs3[0]["data"][0]["z"])
+    assert np.isin(52.5, figs3[1]["data"][0]["z"])
+    assert not np.isin(87.5, figs3[1]["data"][0]["z"])
+
+    assert np.isin(104.999, figs4[0]["data"][0]["z"])
+    assert not np.isin(140, figs4[0]["data"][0]["z"])
+    assert np.isin(87.5, figs4[1]["data"][0]["z"])
+    assert not np.isin(17.5, figs4[1]["data"][0]["z"])
+
+    assert np.isin(139.999, figs5[0]["data"][0]["z"])
+    assert not np.isin(70, figs5[0]["data"][0]["z"])
+    assert np.isin(122.5, figs5[1]["data"][0]["z"])
+    assert not np.isin(17.5, figs5[1]["data"][0]["z"])
+
+
+def test_uo_protein():
+    # test that max and min values for the specified protein are as expected
+    figs1 = update_output(
+        D_OPACITY,
+        D_CAPS,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        D_SCHEME,
+        D_OPACITY,
+        D_SCHEME,
+        "GCG",
+        D_LAYER,
+    )
+
+    assert min(figs1[0]["data"][0]["value"]) == protein_df.loc[0, "GCG"]
+    assert max(figs1[0]["data"][0]["value"]) == protein_df.loc[1, "GCG"]
