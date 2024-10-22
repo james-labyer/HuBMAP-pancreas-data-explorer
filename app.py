@@ -4,8 +4,9 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
 import math
-import skimage
 from dash_slicer import VolumeSlicer
+from bioio import BioImage
+import bioio_czi
 
 app = Dash(
     __name__, title="Islet Proteome Map", external_stylesheets=[dbc.themes.LUMEN]
@@ -17,7 +18,6 @@ Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
 D_PROTEIN = "INS"
 D_SCHEME = "jet"
-
 C_SCHEMES = [
     "bluered",
     "deep",
@@ -40,6 +40,9 @@ cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
+slices_img = BioImage(
+    "assets/P2-13A INS 488 tile 25um stack.czi", reader=bioio_czi.Reader
+)
 
 
 def select_layer(zlayer, df):
@@ -230,7 +233,7 @@ def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
 
 
 def make_fig5():
-    vol = skimage.io.imread("assets/P2-13A INS 488 tile 25um stack1.ome.tiff")
+    vol = slices_img.data[0][0]
     slicer = VolumeSlicer(app, vol)
     slicer.graph.config["scrollZoom"] = False
     return [slicer.graph, slicer.slider, *slicer.stores]
