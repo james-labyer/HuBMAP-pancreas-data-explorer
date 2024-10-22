@@ -9,9 +9,12 @@ from bioio import BioImage
 import bioio_czi
 
 app = Dash(
-    __name__, title="Islet Proteome Map", external_stylesheets=[dbc.themes.LUMEN]
+    __name__,
+    title="Islet Proteome Map",
+    external_stylesheets=[dbc.themes.LUMEN],
 )
 
+server = app.server
 LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
@@ -490,10 +493,9 @@ app.layout = html.Div(
                             ],
                         ),
                         html.Section(
-                            id="3D-view",
+                            id="slice-view",
                             children=[
                                 html.Header(html.H2("3D Pancreas View")),
-                                html.P("Explanation text"),
                                 dbc.Row(dbc.Col(make_fig5())),
                             ],
                         ),
@@ -554,7 +556,7 @@ app.layout = html.Div(
                 ),
             ],
         ),
-        html.Footer("This site made possible by the Texas Advanced Computing Center."),
+        html.Footer("Copyright 2024, Texas Advanced Computing Center"),
     ]
 )
 
@@ -624,4 +626,8 @@ def download_ili_volume(n_clicks):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, dev_tools_props_check=False)
+    app.run_server(
+        host="0.0.0.0",
+        port="8050",
+        dev_tools_props_check=False,
+    )

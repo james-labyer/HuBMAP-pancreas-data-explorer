@@ -39,3 +39,8 @@ footer {
 .download-button {
     margin: .75rem .75rem .75rem .75rem;
 }
+
+#slice-view {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
