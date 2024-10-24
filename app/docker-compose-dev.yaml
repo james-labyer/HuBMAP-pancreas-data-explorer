@@ -1,0 +1,14 @@
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: "./Dockerfile-dev"
+    ports:
+      - "8050:8050"
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: ./
+        target: /project
+

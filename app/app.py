@@ -478,7 +478,7 @@ app.layout = html.Div(
                         html.Section(
                             id="slice-view",
                             children=[
-                                html.Header(html.H2("3D Pancreas View")),
+                                html.Header(html.H2("Block Slice View")),
                                 dbc.Row(dbc.Col(make_fig5())),
                             ],
                         ),
@@ -615,5 +615,6 @@ if __name__ == "__main__":
     app.run_server(
         host="0.0.0.0",
         port="8050",
+        # debug=True,
         dev_tools_props_check=False,
     )
