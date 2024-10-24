@@ -20,7 +20,7 @@ X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
 D_PROTEIN = "INS"
-D_SCHEME = "jet"
+D_SCHEME = "haline"
 C_SCHEMES = [
     "bluered",
     "deep",
@@ -353,18 +353,6 @@ app.layout = html.Div(
                                                         ),
                                                     ]
                                                 ),
-                                                dbc.Col(
-                                                    [
-                                                        html.P(
-                                                            "Select a tissue layer:"
-                                                        ),
-                                                        dcc.Dropdown(
-                                                            LAYERS,
-                                                            "All",
-                                                            id="layersdd",
-                                                        ),
-                                                    ]
-                                                ),
                                             ],
                                             justify="center",
                                         ),
@@ -391,7 +379,7 @@ app.layout = html.Div(
                                                         ),
                                                         dbc.Switch(
                                                             id="fig1capswitch",
-                                                            value=False,
+                                                            value=True,
                                                         ),
                                                     ],
                                                     width=3,
@@ -478,11 +466,6 @@ app.layout = html.Div(
                                                 dbc.Col(
                                                     children=make_c_scheme_dd(
                                                         "fig4colorschemedd"
-                                                    )
-                                                ),
-                                                dbc.Col(
-                                                    children=make_opacity_slider(
-                                                        "fig4opacityslider", 1
                                                     )
                                                 ),
                                             ],
@@ -572,10 +555,10 @@ app.layout = html.Div(
     Input("fig2opacityslider", "value"),
     Input("fig2colorschemedd", "value"),
     Input("fig3colorschemedd", "value"),
-    Input("fig4opacityslider", "value"),
+    # Input("fig4opacityslider", "value"),
     Input("fig4colorschemedd", "value"),
     Input("proteinsdd", "value"),
-    Input("layersdd", "value"),
+    # Input("layersdd", "value"),
 )
 def update_output(
     fig1opacityslider,
@@ -584,17 +567,20 @@ def update_output(
     fig2opacityslider,
     fig2colorschemedd,
     fig3colorschemedd,
-    fig4opacityslider,
+    # fig4opacityslider,
     fig4colorschemedd,
     proteinsdd,
-    layersdd,
+    # layersdd,
 ):
-    fig1 = make_fig1(
-        fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd, layersdd
-    )
-    fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
+    # fig1 = make_fig1(
+    #     fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd, layersdd
+    # )
+    # fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
+    fig1 = make_fig1(fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd)
+    fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd)
     fig3 = make_fig3(fig3colorschemedd, protein=proteinsdd)
-    fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
+    # fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
+    fig4 = make_fig4(cscheme=fig4colorschemedd, protein=proteinsdd)
     return fig1, fig2, fig3, fig4
 
 
