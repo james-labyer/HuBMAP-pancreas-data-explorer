@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 import numpy as np
 
-from app import update_output
+from app.app import update_output
 
 D_PROTEIN = "INS"
 D_SCHEME = "jet"
