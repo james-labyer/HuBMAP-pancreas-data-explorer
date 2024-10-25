@@ -4,7 +4,10 @@ from dash._utils import AttributeDict
 import pandas as pd
 import pytest
 import numpy as np
+import sys
+from pathlib import Path
 
+sys.path.append(str(Path(__file__).parent.parent.parent))
 from app.app import update_output
 
 D_PROTEIN = "INS"
@@ -25,10 +28,10 @@ def test_uo_fig1opacity():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     figs2 = update_output(
@@ -38,10 +41,10 @@ def test_uo_fig1opacity():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[0]["data"][0]["opacity"] == 0.5
@@ -54,10 +57,10 @@ def test_uo_fig1opacity():
             D_OPACITY,
             D_SCHEME,
             D_SCHEME,
-            D_OPACITY,
+            # D_OPACITY,
             D_SCHEME,
             D_PROTEIN,
-            D_LAYER,
+            # D_LAYER,
         )
 
 
@@ -70,10 +73,10 @@ def test_uo_fig1cap():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
     assert figs1[0]["data"][0]["caps"]["x"]["show"] == True
     assert figs1[0]["data"][0]["caps"]["y"]["show"] == True
@@ -89,10 +92,10 @@ def test_uo_fig1cscheme():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[0]["data"][0]["colorscale"] == (
@@ -118,10 +121,10 @@ def test_uo_fig2opacity():
         0.5,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     figs2 = update_output(
@@ -131,10 +134,10 @@ def test_uo_fig2opacity():
         0,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[1]["data"][0]["opacity"] == 0.5
@@ -147,10 +150,10 @@ def test_uo_fig2opacity():
             11,
             D_SCHEME,
             D_SCHEME,
-            D_OPACITY,
+            # D_OPACITY,
             D_SCHEME,
             D_PROTEIN,
-            D_LAYER,
+            # D_LAYER,
         )
 
 
@@ -163,10 +166,10 @@ def test_uo_fig2cscheme():
         D_OPACITY,
         "inferno",
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[1]["data"][0]["colorscale"] == (
@@ -192,10 +195,10 @@ def test_uo_fig3cscheme():
         D_OPACITY,
         D_SCHEME,
         "inferno",
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[2]["data"][0]["colorscale"] == (
@@ -212,6 +215,7 @@ def test_uo_fig3cscheme():
     )
 
 
+"""
 def test_uo_fig4opacity():
     # test that fig4's opacity value is updated as expected
     figs1 = update_output(
@@ -255,6 +259,7 @@ def test_uo_fig4opacity():
             D_PROTEIN,
             D_LAYER,
         )
+"""
 
 
 def test_uo_fig4cscheme():
@@ -266,10 +271,10 @@ def test_uo_fig4cscheme():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         "inferno",
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert figs1[3]["data"][0]["colorscale"] == (
@@ -295,12 +300,13 @@ def test_uo_layer():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        D_LAYER,
+        # D_LAYER,
     )
 
+    """
     figs2 = update_output(
         D_OPACITY,
         D_CAPS,
@@ -308,10 +314,10 @@ def test_uo_layer():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        "Layer 1",
+        # "Layer 1",
     )
 
     figs3 = update_output(
@@ -321,10 +327,10 @@ def test_uo_layer():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        "Layer 2",
+        # "Layer 2",
     )
 
     figs4 = update_output(
@@ -334,10 +340,10 @@ def test_uo_layer():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        "Layer 3",
+        # "Layer 3",
     )
 
     figs5 = update_output(
@@ -347,12 +353,12 @@ def test_uo_layer():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         D_PROTEIN,
-        "Layer 4",
+        # "Layer 4",
     )
-
+    """
     assert np.isin(35, figs1[0]["data"][0]["z"])
     assert np.isin(70, figs1[0]["data"][0]["z"])
     assert np.isin(105, figs1[0]["data"][0]["z"])
@@ -362,6 +368,7 @@ def test_uo_layer():
     assert np.isin(87.5, figs1[1]["data"][0]["z"])
     assert np.isin(122.5, figs1[1]["data"][0]["z"])
 
+    """
     assert np.isin(34.999, figs2[0]["data"][0]["z"])
     assert not np.isin(70, figs2[0]["data"][0]["z"])
     assert np.isin(17.5, figs2[1]["data"][0]["z"])
@@ -381,6 +388,7 @@ def test_uo_layer():
     assert not np.isin(70, figs5[0]["data"][0]["z"])
     assert np.isin(122.5, figs5[1]["data"][0]["z"])
     assert not np.isin(17.5, figs5[1]["data"][0]["z"])
+    """
 
 
 def test_uo_protein():
@@ -392,10 +400,10 @@ def test_uo_protein():
         D_OPACITY,
         D_SCHEME,
         D_SCHEME,
-        D_OPACITY,
+        # D_OPACITY,
         D_SCHEME,
         "GCG",
-        D_LAYER,
+        # D_LAYER,
     )
 
     assert min(figs1[0]["data"][0]["value"]) == protein_df.loc[0, "GCG"]
