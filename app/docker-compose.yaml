@@ -6,3 +6,4 @@ services:
     stdin_open: true
     tty: true
     restart: on-failure:5
+    image: jlabyer/hubmap-pancreas-data-explorer:01
