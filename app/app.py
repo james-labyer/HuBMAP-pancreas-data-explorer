@@ -38,6 +38,7 @@ C_SCHEMES = [
     "ylgnbu",
     "ylorrd",
 ]
+greens = ['#{:02x}{:02x}{:02x}'.format(0, i, 0) for i in range(0, 256, 1)]
 
 cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
@@ -46,6 +47,12 @@ proteins = protein_df.columns.tolist()
 slices_img = BioImage(
     "assets/P2-13A INS 488 tile 25um stack.czi", reader=bioio_czi.Reader
 )
+
+vol = slices_img.data[0][0]
+slicer = VolumeSlicer(app, vol)
+slicer.graph.config["scrollZoom"] = False
+
+
 
 
 def select_layer(zlayer, df):
@@ -233,13 +240,6 @@ def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
 
     fig4 = go.Figure(data=data)
     return fig4
-
-
-def make_fig5():
-    vol = slices_img.data[0][0]
-    slicer = VolumeSlicer(app, vol)
-    slicer.graph.config["scrollZoom"] = False
-    return [slicer.graph, slicer.slider, *slicer.stores]
 
 
 def make_c_scheme_dd(id):
@@ -479,7 +479,7 @@ app.layout = html.Div(
                             id="slice-view",
                             children=[
                                 html.Header(html.H2("Block Slice View")),
-                                dbc.Row(dbc.Col(make_fig5())),
+                                dbc.Row(dbc.Col([slicer.graph, slicer.slider, *slicer.stores,])),
                             ],
                         ),
                         html.Section(
@@ -583,6 +583,12 @@ def update_output(
     fig4 = make_fig4(cscheme=fig4colorschemedd, protein=proteinsdd)
     return fig1, fig2, fig3, fig4
 
+@app.callback(
+    Output(slicer.overlay_data.id, "data"),
+    Input(slicer.slider, "value")
+)
+def apply_levels(level):
+    return slicer.create_overlay_data(vol, greens)
 
 @callback(
     Output("download-xlsx", "data"),
