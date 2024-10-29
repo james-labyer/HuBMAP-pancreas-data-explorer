@@ -6,9 +6,11 @@ import pytest
 import numpy as np
 import sys
 from pathlib import Path
+from dash import Dash
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
-from app.app import update_output
+import app.app
+from app.pages.proteomics import update_output
 
 D_PROTEIN = "INS"
 D_SCHEME = "jet"
