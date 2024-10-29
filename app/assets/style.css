@@ -14,10 +14,12 @@ hr {
 
 .title {
     padding: 1rem 1rem 1rem 1rem;
+    margin-right: 0px;
 }
 
-.sub-nav {
-    margin-left: .6rem;
+.all-data {
+    margin-left: 20px;
+    margin-right: 10px;
 }
 
 .dcc-graph {
@@ -28,14 +30,6 @@ footer {
     margin: 1rem 1rem 1rem 1rem;
 }
 
-.viz-placeholder {
-    width: 850px;
-    height: 300px;
-    border: 2px solid black;
-    margin-bottom: 2rem;
-    padding: 1rem;
-}
-
 .download-button {
     margin: .75rem .75rem .75rem .75rem;
 }
@@ -44,3 +38,14 @@ footer {
     margin-top: 2rem;
     margin-bottom: 2rem;
 }
+
+#block-table {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+p {
+    margin-bottom: 0;
+    text-align : left;
+    font-family: 'Source Sans Pro';
+ }

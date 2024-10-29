@@ -1,0 +1,11 @@
+﻿Order,Block ID,Anatomical region,Optical clearing,GeoMX,Proteomics
+1,P1-3,Pancreatic head, , , 
+2,P1-4A,Pancreatic head,[View data](https://www.google.com),[View data](https://www.google.com), 
+3,P1-7A,Pancreatic neck,[View data](https://www.google.com), , 
+4,P1-9,Pancreatic neck, ,[View data](https://www.google.com), 
+5,P1-14A,Pancreatic body,[View data](https://www.google.com), , 
+6,P1-19A,Pancreatic tail,[View data](https://www.google.com), , 
+7,P1-20A,Pancreatic tail, , , 
+8,P1-20B,Pancreatic tail, , , 
+9,P1-20C,Pancreatic tail, , ,[View data](/proteomics)
+10,P1-21,Pancreatic tail, ,[View data](https://www.google.com), 
