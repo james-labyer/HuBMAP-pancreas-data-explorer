@@ -33,7 +33,7 @@ C_SCHEMES = [
     "ylgnbu",
     "ylorrd",
 ]
-greens = ['#{:02x}{:02x}{:02x}'.format(0, i, 0) for i in range(0, 256, 1)]
+greens = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]
 
 cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
@@ -47,6 +47,7 @@ vol = slices_img.data[0][0]
 slicer = VolumeSlicer(get_app(), vol)
 slicer.graph.config["scrollZoom"] = False
 slicer.create_overlay_data(vol, greens)
+
 
 def select_layer(zlayer, df):
     if zlayer == "All":
@@ -270,7 +271,11 @@ layout = html.Div(
                         html.Section(
                             id="cross-section",
                             children=[
-                                html.Header(html.H2("Spatial Proteome Map of a Single Islet Microenvironment from Pancreas Block P1-20C")),
+                                html.Header(
+                                    html.H2(
+                                        "Spatial Proteome Map of a Single Islet Microenvironment from Pancreas Block P1-20C"
+                                    )
+                                ),
                                 html.P(
                                     "The following four charts show a 3D proteome mapping of a single pancreatic islet microenvironment at 50–µm resolution."
                                 ),
@@ -467,7 +472,15 @@ layout = html.Div(
                             id="slice-view",
                             children=[
                                 html.Header(html.H2("Block Slice View")),
-                                dbc.Row(dbc.Col([slicer.graph, slicer.slider, *slicer.stores,])),
+                                dbc.Row(
+                                    dbc.Col(
+                                        [
+                                            slicer.graph,
+                                            slicer.slider,
+                                            *slicer.stores,
+                                        ]
+                                    )
+                                ),
                             ],
                         ),
                     ],
@@ -521,10 +534,11 @@ def update_output(
 @callback(
     Output(slicer.overlay_data.id, "data"),
     Input("slice-view", "children"),
-    Input(slicer.slider, "value")
+    Input(slicer.slider, "value"),
 )
 def apply_levels(level, children):
     return slicer.create_overlay_data(vol, greens)
+
 
 @callback(
     Output("download-xlsx", "data"),

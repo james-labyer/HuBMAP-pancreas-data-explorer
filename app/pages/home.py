@@ -1,32 +1,28 @@
 import pandas as pd
-from dash import html, dash_table, register_page
+from dash import html, register_page
 import dash_bootstrap_components as dbc
+import dash_ag_grid as dag
 
-register_page(__name__, path='/', title="HuBMAP Pancreas Data Explorer")
+register_page(__name__, path="/", title="HuBMAP Pancreas Data Explorer")
 
 blocks = pd.read_csv("assets/block-data.csv")
 
-block_table = dash_table.DataTable(
-    data=blocks.to_dict('records'),
-    columns=[{'id': c, 'name': c, 'presentation': 'markdown'} if c == 'Optical clearing' or c == 'GeoMX' or c =='Proteomics' else {'id': c, 'name': c} for c in blocks.columns],
-    style_as_list_view=True,
-    style_cell={
-        'textAlign': 'left',
-        'font-family': 'Source Sans Pro',
-        'padding': '8px 10px 8px 10px'
-        },
-    style_data_conditional=[
-        {
-            'if': {'row_index': 'odd'},
-            'backgroundColor': '#fafafa',
-        }
-    ],
-    style_header={
-        'backgroundColor': '#f0f0f0',
-        'color': 'black',
-        'fontWeight': 'bold'
-    },
-    id="block-table"
+columns = [
+    {"field": "Order"},
+    {"field": "Block ID"},
+    {"field": "Anatomical region"},
+    {"field": "Optical clearing", "cellRenderer": "dsLink"},
+    {"field": "GeoMX", "cellRenderer": "dsLink"},
+    {"field": "Proteomics", "cellRenderer": "dsLink"},
+]
+
+grid = dag.AgGrid(
+    id="blocks-df",
+    rowData=blocks.to_dict("records"),
+    columnDefs=columns,
+    className="ag-theme-alpine block-grid",
+    columnSize="sizeToFit",
+    style={"height": 490},
 )
 
 layout = html.Div(
@@ -38,10 +34,7 @@ layout = html.Div(
                     id="content-div",
                     children=[
                         html.Section(
-                            [
-                                html.Header(html.H2("Pancreas 1 Datasets")),
-                                block_table
-                            ]
+                            [html.Header(html.H2("Pancreas 1 Datasets")), grid]
                         ),
                     ],
                 ),

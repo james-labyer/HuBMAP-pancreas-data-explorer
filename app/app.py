@@ -1,11 +1,7 @@
 from dash import Dash, html, page_container
 import dash_bootstrap_components as dbc
 
-app = Dash(
-    __name__,
-    external_stylesheets=[dbc.themes.LUMEN],
-    use_pages=True
-)
+app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
 
 server = app.server
 
@@ -21,35 +17,34 @@ app.layout = html.Div(
                                 dbc.Container(
                                     dbc.Row(
                                         [
-                                        dbc.Col(
-                                            html.H1(
-                                                "HuBMAP Pancreas Data Explorer",
-                                                className="bg-primary text-light title",
+                                            dbc.Col(
+                                                html.H1(
+                                                    "HuBMAP Pancreas Data Explorer",
+                                                    className="bg-primary text-light title",
+                                                ),
+                                                width=True,
                                             ),
-                                            width=True,
-                                        ),
-                                        dbc.Col(
+                                            dbc.Col(
                                                 dbc.Button(
                                                     "View All Datasets",
                                                     href="/",
                                                     external_link=False,
                                                     color="secondary",
-                                                    className="all-data"
+                                                    className="all-data",
                                                 ),
                                                 width=3,
-                                                xl=2
-                                        ),
+                                                xl=2,
+                                            ),
                                         ],
                                         align="center",
                                         justify="between",
-                                        class_name="w-100"
+                                        class_name="w-100",
                                     ),
-                                    fluid=True
+                                    fluid=True,
                                 )
                             ],
                             color="primary",
                             sticky="top",
-
                         ),
                     ],
                 ),
