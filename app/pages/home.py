@@ -32,6 +32,7 @@ layout = html.Div(
             children=[
                 dbc.Container(
                     id="content-div",
+                    class_name="main-div",
                     children=[
                         html.Section(
                             [html.Header(html.H2("Pancreas 1 Datasets")), grid]

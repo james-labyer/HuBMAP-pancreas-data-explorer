@@ -1,12 +1,9 @@
 import pandas as pd
-from dash import dcc, html, callback, Input, Output, get_app, register_page
+from dash import dcc, html, callback, Input, Output, register_page
 import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
 import math
-from dash_slicer import VolumeSlicer
-from bioio import BioImage
-import bioio_czi
 
 register_page(__name__, title="Block P1-20C Proteomics")
 
@@ -40,6 +37,7 @@ points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
 
+"""
 slices_img = BioImage(
     "assets/P2-13A INS 488 tile 25um stack.czi", reader=bioio_czi.Reader
 )
@@ -47,6 +45,7 @@ vol = slices_img.data[0][0]
 slicer = VolumeSlicer(get_app(), vol)
 slicer.graph.config["scrollZoom"] = False
 slicer.create_overlay_data(vol, greens)
+"""
 
 
 def select_layer(zlayer, df):
@@ -266,7 +265,7 @@ layout = html.Div(
             id="main-content",
             children=[
                 dbc.Container(
-                    id="content-div",
+                    class_name="main-div",
                     children=[
                         html.Section(
                             id="cross-section",
@@ -468,21 +467,6 @@ layout = html.Div(
                                 html.Hr(),
                             ],
                         ),
-                        html.Section(
-                            id="slice-view",
-                            children=[
-                                html.Header(html.H2("Block Slice View")),
-                                dbc.Row(
-                                    dbc.Col(
-                                        [
-                                            slicer.graph,
-                                            slicer.slider,
-                                            *slicer.stores,
-                                        ]
-                                    )
-                                ),
-                            ],
-                        ),
                     ],
                 ),
             ],
@@ -531,6 +515,7 @@ def update_output(
     return fig1, fig2, fig3, fig4
 
 
+"""
 @callback(
     Output(slicer.overlay_data.id, "data"),
     Input("slice-view", "children"),
@@ -538,6 +523,7 @@ def update_output(
 )
 def apply_levels(level, children):
     return slicer.create_overlay_data(vol, greens)
+"""
 
 
 @callback(

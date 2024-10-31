@@ -6,10 +6,9 @@ hr {
     border: 1px solid #555;
 }
 
-#content-div {
-    margin-left: 1rem;
-    margin-right: 2rem;
-    padding: 2rem 1rem;
+.main-div {
+    margin-top: 2rem;
+    width: 100%;
 }
 
 .title {
@@ -24,6 +23,21 @@ hr {
 
 .dcc-graph {
     height: 600px;
+}
+
+.ag-theme-alpine.large {
+    --ag-row-height: 120px;
+}
+
+.thumbnail {
+    height: 110px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0px;
+}
+
+.slicer-card {
+    margin: 20px;
 }
 
 .ag-theme-alpine.block-grid div {
@@ -54,3 +68,9 @@ p {
     text-align : left;
     font-family: 'Source Sans Pro';
  }
+
+ .viz-placeholder {
+    border: 2px solid black;
+    margin-bottom: 2rem;
+    padding: 1rem;
+}
