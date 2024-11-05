@@ -1,8 +1,11 @@
-from dash import html, callback, Input, Output, get_app, register_page
+from dash import html, dcc, callback, Input, Output, get_app, register_page
 import dash_bootstrap_components as dbc
 from dash_slicer import VolumeSlicer
 from bioio import BioImage
 import bioio_czi
+
+slices_img = BioImage("assets/optical-clearing-czi/P1_14A1_KRT green stack.czi", reader=bioio_czi.Reader)
+vols = slices_img.data[0]
 txt2 =register_page(
     __name__,
     path="/P1-14A-optical-clearing/P1-14A-optical-clearing-8",
@@ -13,17 +16,16 @@ breadcrumb = dbc.Breadcrumb(
         {"label": "Home", "href": "/", "external_link": False},
        {
             "label": "P1-14A optical clearing",
-            "href": "/layout2",
+            "href": "/p1-14a-optical-clearing-files",
             "external_link": True,
         },
         {"label": "P1-14A optical clearing #8", "active": True},
     ],
 )
 colors = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]
-slices_img = BioImage("assets/optical-clearing-czi/P1_14A1_KRT green stack.czi", reader=bioio_czi.Reader)
-vol = slices_img.data[0][0]
-slicer1 = VolumeSlicer(get_app(), vol)
-slicer1.graph.config["scrollZoom"] = False
+vol0 = vols[0]
+slicer0 = VolumeSlicer(get_app(), vol0)
+slicer0.graph.config["scrollZoom"] = False
 layout = [
     breadcrumb,
     html.Section(
@@ -31,21 +33,48 @@ layout = [
         className="slicer-card",
         children=[
             html.Header(html.H2("View P1-14A optical clearing #8")),
-            html.Header(html.P("P1_14A1_KRT green stack.czi")),
+            html.P("P1_14A1_KRT green stack.czi"),
+            html.Div(
+                [
+                    html.Div(
+                        children=[
+                            slicer0.graph,
+                            slicer0.slider,
+                            *slicer0.stores,
+                        ],
+                        className="slicer",
+                    ),
+                ]
+            ),
             html.Div(
                 children=[
-                    slicer1.graph,
-                    slicer1.slider,
-                    *slicer1.stores,
-                ],
+                    html.H2("Download file"),
+                    html.P(
+                        "The easiest way to open this file is to use Fiji with the Bio-Formats plugin installed."
+                    ),
+                    dbc.Button(
+                        "Download .czi",
+                        id="btn-download-P1-14A-optical-clearing-8",
+                        className="download-button",
+                    ),
+                    dcc.Download(id="download-P1-14A-optical-clearing-8"),
+                ]
             ),
         ],
     ),
 ]
 @callback(
-    Output(slicer1.overlay_data.id, "data"),
+    Output(slicer0.overlay_data.id, "data"),
     Input("P1-14A-optical-clearing-8", "children"),
-    Input(slicer1.slider, "value"),
+    Input(slicer0.slider, "value"),
 )
 def apply_levels(level, children):
-    return slicer1.create_overlay_data(vol, colors)
+    return slicer0.create_overlay_data(vol0, colors)
+@callback(
+    Output("download-P1-14A-optical-clearing-8", "data"),
+    Input("btn-download-P1-14A-optical-clearing-8", "n_clicks"),
+    prevent_initial_call=True,
+)
+def download_czi(n_clicks):
+    return dcc.send_file(
+        "assets/optical-clearing-czi/P1_14A1_KRT green stack.czi"    )

@@ -33,7 +33,9 @@ hr {
     height: 110px;
     align-items: center;
     justify-content: center;
-    margin-left: 0px;
+    margin: 0px;
+    padding: 5px;
+    border-radius: 10px;
 }
 
 .slicer-card {
@@ -74,3 +76,25 @@ p {
     margin-bottom: 2rem;
     padding: 1rem;
 }
+
+.loader-wrapper > div {
+    visibility: visible !important;
+}
+
+.slicer {
+    margin: 40px;
+}
+
+.center-aligned-header .ag-header-cell-label {
+    justify-content: center;
+}
+
+.center-aligned-cell {
+    text-align: center;
+    justify-content: center;
+}
+
+.ag-row .ag-cell {
+    display: flex;
+    align-items: center;
+  }
