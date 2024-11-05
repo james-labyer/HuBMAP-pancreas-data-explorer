@@ -6,6 +6,8 @@ COPY ./app.py \
      ./
 COPY ./assets \
      ./assets
+COPY ./pages \
+     ./pages
 RUN pip install -r ./requirements.txt
 RUN chmod +rx ./app.py
 ENV PATH="/app:$PATH"
