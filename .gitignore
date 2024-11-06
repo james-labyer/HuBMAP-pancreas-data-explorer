@@ -3,3 +3,26 @@ venv/*
 .pytest_cache*
 __pycache__*
 .coverage
+
+# files that are too large
+**/P1_14A1_ KRT19 green INS white stack.czi
+**/P1_14A1_ KRT19 green INS white stack.tif
+**/P1_14A1_KRT green INS white stack higher res.czi
+**/P1_14A1_KRT green INS white stack higher res.tif
+**/P1_14A1_KRT green INS white stack_Stitch.czi
+**/P1_14A2_CD31 red INS white stack high res 2x.czi
+**/P1_14A2_CD31 red INS white stack high res 2x.tif
+**/P1_14A2_CD31 red INS white stack high res.czi
+**/P1_14A2_CD31 red INS white stack high res.tif
+
+# auto-generated pages that require large files
+**/P1-14A-optical-clearing-2
+**/P1-14A-optical-clearing-5
+**/P1-14A-optical-clearing-7
+**/P1-14A-optical-clearing-10
+**/P1-14A-optical-clearing-12
+
+# script depots
+**/scripts/t-in
+**/scripts/t-out
+**/scripts/output
