@@ -8,47 +8,55 @@ server = app.server
 app.layout = html.Div(
     children=[
         html.Header(
-            children=[
-                html.Div(
-                    id="navbar",
-                    children=[
-                        dbc.Navbar(
+            dbc.Container(
+                dbc.Navbar(
+                    [
+                        dbc.Row(
                             [
-                                dbc.Container(
-                                    dbc.Row(
+                                dbc.Col(
+                                    html.H1(
+                                        "HuBMAP Pancreas Data Explorer",
+                                        className="bg-primary text-light title",
+                                    ),
+                                    width=True,
+                                ),
+                                dbc.Col(
+                                    dbc.Nav(
                                         [
-                                            dbc.Col(
-                                                html.H1(
-                                                    "HuBMAP Pancreas Data Explorer",
-                                                    className="bg-primary text-light title",
-                                                ),
-                                                width=True,
-                                            ),
-                                            dbc.Col(
-                                                dbc.Button(
-                                                    "View All Datasets",
+                                            dbc.NavItem(
+                                                dbc.NavLink(
+                                                    "All Datasets",
                                                     href="/",
-                                                    external_link=False,
-                                                    color="secondary",
-                                                    className="all-data",
-                                                ),
-                                                width=3,
-                                                xl=2,
+                                                    class_name="text-light",
+                                                )
+                                            ),
+                                            dbc.NavItem(
+                                                dbc.NavLink(
+                                                    "3D Model",
+                                                    href="/3d",
+                                                    class_name="text-light",
+                                                )
                                             ),
                                         ],
-                                        align="center",
-                                        justify="between",
-                                        class_name="w-100",
+                                        pills=True,
+                                        horizontal="end",
+                                        navbar=True,
                                     ),
-                                    fluid=True,
-                                )
+                                    width=3,
+                                ),
                             ],
-                            color="primary",
-                            sticky="top",
+                            justify="between",
+                            class_name="w-100",
+                            align="center",
                         ),
                     ],
+                    class_name="bg-primary text-light w-100",
+                    color="primary",
+                    sticky="top",
                 ),
-            ]
+                fluid=True,
+                class_name="px-0",
+            ),
         ),
         html.Div(id="my-output"),
         page_container,

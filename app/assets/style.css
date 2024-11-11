@@ -11,18 +11,51 @@ hr {
     width: 100%;
 }
 
+.model-page {
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-right: 20px;
+    width: 100%;
+}
+
+/*.centered-graph {
+    margin-left: auto;
+    margin-right: auto;
+}*/
+
 .title {
     padding: 1rem 1rem 1rem 1rem;
     margin-right: 0px;
 }
 
 .all-data {
-    margin-left: 20px;
-    margin-right: 10px;
+    /* margin-left: 20px;
+    margin-right: 10px;*/
+    margin: 5px 5px 5px 5px;
+}
+
+#navbar-simple {
+    color: #f6f6f6;
+    /*padding: 0rem .5rem .5rem 0rem;*/
+    padding-left: 0px;
+    margin-left: 0px;
+}
+
+#navbar-simple a {
+    color: #f6f6f6;
+}
+
+#navbar-simple a.navbar-brand {
+    font-size: 2.25rem;
+    margin-left: 0;
 }
 
 .dcc-graph {
     height: 600px;
+}
+
+.block-card {
+    height: 100%;
 }
 
 .ag-theme-alpine.large {

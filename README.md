@@ -10,12 +10,21 @@ Docker/ Docker Compose
 ```
 git clone https://github.com/james-labyer/HuBMAP-pancreas-data-explorer.git
 ```
-2. Build the image
+2. Some of the files in this project are too large to check into GitHub. The GitHub repo includes representative examples that use smaller files. If you want to view the larger files, download them and move them into:
 ```
-cd app
+app/assets/optical-clearing-czi
+```
+3. If you added larger files, generate the pages that rely on them
+```
+cd scripts && python make-slicers.py 
+mv ./output/* ../app/pages/P1-14A-optical-clearing
+```
+4. Build the image
+```
+cd ../app
 docker compose -f docker-compose-dev.yaml build
 ```
-3. Run the image
+5. Run the image
 ```
 docker compose -f docker-compose-dev.yaml up
 ```
@@ -27,16 +36,25 @@ Run pytest within a development container:
 docker exec {container_name} pytest --cov=app tests
 ```
 
-## Preparing the production image
+## Running on production
 1. Log into the server and clone this repo
 ```
 git clone https://github.com/james-labyer/HuBMAP-pancreas-data-explorer.git
 ```
-2. Build the image
+2. If there are new large files that cannot be checked into GitHub, download them and move them into:
+```
+app/assets/optical-clearing-czi
+```
+3. Generate pages that rely on large files
+```
+cd scripts && python make-slicers.py 
+mv ./output/* ../app/pages/P1-14A-optical-clearing
+```
+4. Build the image
 ```
 docker compose -f docker-compose.yaml build
 ```
-3. Run the image
+5. Run the image
 ```
 docker compose -f docker-compose.yaml up
 ```
