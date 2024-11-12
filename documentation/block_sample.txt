@@ -1,0 +1,8 @@
+CenterID	DonorID	OrganID	SuborganID	BlockID	Label	X	Y	Z	deltaX	deltaY	deltaZ
+TMCPNNL	P1	Pancreas	Head	4A	na	434.5	-113	318	257.5	-286	106
+TMCPNNL	P1	Pancreas	Neck	7A	na	456.5	-81	636	261.5	-324.5	106
+TMCPNNL	P1	Pancreas	Neck	9	na	234	-81	848	490	-637	106
+TMCPNNL	P1	Pancreas	Body	14A	na	338	-136	1484	381	-267	106
+TMCPNNL	P1	Pancreas	Tail	19A	na	557.5	-108	1908	235.5	-317.5	106
+TMCPNNL	P1	Pancreas	Tail	20C	na	324	-431.5	2014	236.5	-318.5	106
+TMCPNNL	P1	Pancreas	Tail	21	na	462	-252	2120	332	-494	106

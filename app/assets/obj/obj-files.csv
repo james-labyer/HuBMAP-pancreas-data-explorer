@@ -1,13 +1,13 @@
-﻿pancreas,name,file,color
-1,Body,./assets/obj/Case1_20211205_pancreas_rs1_v2_smooth200_body.obj,cyan
-1,Neck,./assets/obj/Case1_20211205_pancreas_rs1_v2_smooth200_neck.obj,lime
-1,Head,./assets/obj/Case1_20211205_pancreas_rs1_v2_smooth200_head.obj,fuchsia
-1,Tail,./assets/obj/Case1_20211205_pancreas_rs1_v2_smooth200_tail.obj,yellow
-1,P1-4A,./assets/obj/P1_Pancreas_Head_4A.obj,blue
-1,P1-7A,./assets/obj/P1_Pancreas_Neck_7A.obj,blue
-1,P1-9,./assets/obj/P1_Pancreas_Neck_9.obj,blue
-1,P1-14A,./assets/obj/P1_Pancreas_Body_14A.obj,blue
-1,P1-19A,./assets/obj/P1_Pancreas_Tail_19A.obj,blue
-1,P1-20C,./assets/obj/P1_Pancreas_Tail_20C.obj,blue
-1,P1-21,./assets/obj/P1_Pancreas_Tail_21.obj,blue
-1,P1-4A proteomics subsection,./assets/obj/P1_20c_subselection.obj,blue
+﻿pancreas,name,file,color,opacity
+1,Body,./assets/obj/body_invert.obj,#EC8728,1
+1,Neck,./assets/obj/neck_invert.obj,#EF9846,1
+1,Head,./assets/obj/head_invert.obj,#F6AA63,1
+1,Tail,./assets/obj/tail_invert.obj,#ED780B,1
+1,P1-4A,./assets/obj/P1_Pancreas_Head_4A.obj,#067BC2,0.6
+1,P1-7A,./assets/obj/P1_Pancreas_Neck_7A.obj,#067BC2,0.6
+1,P1-9,./assets/obj/P1_Pancreas_Neck_9.obj,#067BC2,0.6
+1,P1-14A,./assets/obj/P1_Pancreas_Body_14A.obj,#067BC2,0.6
+1,P1-19A,./assets/obj/P1_Pancreas_Tail_19A.obj,#067BC2,0.6
+1,P1-20C,./assets/obj/P1_Pancreas_Tail_20C.obj,#067BC2,0.6
+1,P1-21,./assets/obj/P1_Pancreas_Tail_21.obj,#067BC2,0.6
+1,P1-4A proteomics subsection,./assets/obj/P1_20c_subselection.obj,#067BC2,0.6
