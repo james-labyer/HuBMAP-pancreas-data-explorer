@@ -3,13 +3,14 @@ import pandas as pd
 img_data = pd.read_csv("imgs.csv")
 
 for i in range(img_data.shape[0]):
+    fname = img_data.at[i, "fname"]
     volume = img_data.at[i, "volume"]
     description = img_data.at[i, "description"]
     filename = img_data.at[i, "filename"]
     dname = img_data.at[i, "download"]
     folder = f"assets/optical-clearing-czi/"
     dataset = "P1-14A optical clearing"
-    output_file = f"./output/{volume}.py"
+    output_file = f"./output/{fname}.py"
     channel_colors = [img_data.at[i, "color1"], img_data.at[i, "color2"]]
 
     line_test = ""
@@ -75,7 +76,7 @@ for i in range(img_data.shape[0]):
         f'        {{"label": "Home", "href": "/", "external_link": False}},\n'
         f"       {{\n"
         f'            "label": "{dataset}",\n'
-        f'            "href": "/p1-14a-optical-clearing-files",\n'
+        f'            "href": "/p1-14a-optical-clearing",\n'
         f'            "external_link": True,\n'
         f"        }},\n"
         f'        {{"label": "{description}", "active": True}},\n'
@@ -175,7 +176,7 @@ for i in range(img_data.shape[0]):
             lines7 += f'    Input("{volume}", "children"),\n'
             lines7 += f'    Input(slicer{j}.slider, "value"),\n'
             lines7 += f")\n"
-            lines7 += f"def apply_levels(level, children):\n"
+            lines7 += f"def apply_overlay(level, children):\n"
             lines7 += f"    return slicer{j}.create_overlay_data(vol{j}, colors)\n"
     lines8 = (
         f"@callback(\n"

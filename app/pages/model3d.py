@@ -24,9 +24,8 @@ def make_mesh_settings(
     color="cyan",
     opacity=1,
 ):
-
     x, y, z = vertices.T
-    I, J, K = faces.T
+    L, M, N = faces.T
 
     mesh = {
         "type": "mesh3d",
@@ -39,9 +38,9 @@ def make_mesh_settings(
         "color": color,
         "flatshading": False,
         "opacity": opacity,
-        "i": I,
-        "j": J,
-        "k": K,
+        "i": L,
+        "j": M,
+        "k": N,
         "name": "Pancreas",
         "showscale": None,
         "lighting": {
@@ -67,7 +66,6 @@ def make_mesh_data(name, file, color=None, opacity=1):
 
 
 def make_mesh_fig(pancreas=1):
-
     pancreas_traces = traces.loc[traces["pancreas"] == pancreas]
     for i in range(pancreas_traces.shape[0]):
         if i == 0:

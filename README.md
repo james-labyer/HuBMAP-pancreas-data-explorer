@@ -33,7 +33,7 @@ Running the image starts the app at localhost:8050. Hot reloading within the Doc
 ## Running tests locally
 Run pytest within a development container:
 ```
-docker exec {container_name} pytest --cov=app tests
+docker exec {container_name} pytest --cov-report term-missing --cov
 ```
 
 ## Running on production

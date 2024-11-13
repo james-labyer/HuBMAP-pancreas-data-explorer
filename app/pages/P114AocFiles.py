@@ -3,7 +3,11 @@ from dash import html, register_page
 import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
 
-register_page(__name__, title="P1-14A Optical Clearing Files")
+register_page(
+    __name__,
+    path="/p1-14a-optical-clearing",
+    title="P1-14A Optical Clearing Files",
+)
 
 data = pd.read_csv("assets/P1_14A_Optical_Clearing_imgs.csv")
 

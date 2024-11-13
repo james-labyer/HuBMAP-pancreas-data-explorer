@@ -20,7 +20,7 @@ breadcrumb = dbc.Breadcrumb(
         {"label": "Home", "href": "/", "external_link": False},
        {
             "label": "P1-14A optical clearing",
-            "href": "/p1-14a-optical-clearing-files",
+            "href": "/p1-14a-optical-clearing",
             "external_link": True,
         },
         {"label": "P1-14A optical clearing #11", "active": True},
@@ -83,7 +83,7 @@ layout = [
     Input("P1-14A-optical-clearing-11", "children"),
     Input(slicer1.slider, "value"),
 )
-def apply_levels(level, children):
+def apply_overlay(level, children):
     return slicer1.create_overlay_data(vol1, colors)
 @callback(
     Output("download-P1-14A-optical-clearing-11", "data"),
