@@ -1,11 +1,30 @@
 from dash import Dash, html, page_container
 import dash_bootstrap_components as dbc
+import argparse
+import logging
+import socket
 
-app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
 
-server = app.server
+def handle_args():
+    parser = argparse.ArgumentParser()
 
-app.layout = html.Div(
+    parser.add_argument(
+        "-l",
+        "--loglevel",
+        type=str,
+        required=False,
+        default="WARNING",
+        help="set log level to DEBUG, INFO, WARNING, ERROR, or CRITICAL",
+    )
+
+    args = parser.parse_args()
+
+    format_str = f"[%(asctime)s {socket.gethostname()}] %(filename)s:%(funcName)s:%(lineno)s - %(levelname)s: %(message)s"
+
+    logging.basicConfig(level=args.loglevel, format=format_str)
+
+
+layout = html.Div(
     children=[
         html.Header(
             dbc.Container(
@@ -66,9 +85,17 @@ app.layout = html.Div(
 
 
 if __name__ == "__main__":
+    handle_args()
+    app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
+    server = app.server
+    app.layout = layout
     app.run_server(
         host="0.0.0.0",
         port="8050",
         debug=True,
         dev_tools_props_check=False,
     )
+else:
+    app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
+    server = app.server
+    app.layout = layout

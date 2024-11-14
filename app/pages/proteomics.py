@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import numpy as np
 import math
+import logging
 
 register_page(__name__, title="Block P1-20C Proteomics")
 
@@ -36,16 +37,6 @@ cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
-
-"""
-slices_img = BioImage(
-    "assets/P2-13A INS 488 tile 25um stack.czi", reader=bioio_czi.Reader
-)
-vol = slices_img.data[0][0]
-slicer = VolumeSlicer(get_app(), vol)
-slicer.graph.config["scrollZoom"] = False
-slicer.create_overlay_data(vol, greens)
-"""
 
 
 def select_layer(zlayer, df):
@@ -81,9 +72,10 @@ def make_sphere(x, y, z, radius, resolution=5):
     return (X, Y, Z)
 
 
-def make_fig1(
+def make_cube_fig(
     opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
 ):
+    """Create figure for cube view of proteomics data"""
     df3 = select_layer(layer, cubes_df1)
 
     X = df3.loc[:, "X Center"]
@@ -114,10 +106,12 @@ def make_fig1(
             zaxis=dict(tickvals=Z_AXIS),
         )
     )
+    logging.info("Added cube view to proteomics page")
     return fig1
 
 
-def make_fig2(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"):
+def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"):
+    """Create figure for point view of proteomics data"""
     df4 = select_layer(layer, points_df)
     X = df4.loc[:, "X Center"]
     Y = df4.loc[:, "Y Center"]
@@ -137,10 +131,12 @@ def make_fig2(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All")
             surface_count=21,
         )
     )
+    logging.info("Added point view to proteomics page")
     return fig2
 
 
-def make_fig3(cscheme=D_SCHEME, protein=D_PROTEIN):
+def make_layer_fig(cscheme=D_SCHEME, protein=D_PROTEIN):
+    """Create figure for layer view of proteomics data"""
     x = X_AXIS[:9]
     y = Y_AXIS[:5]
     z1 = [[35 for i in x] for j in y]
@@ -183,11 +179,12 @@ def make_fig3(cscheme=D_SCHEME, protein=D_PROTEIN):
             ),
         ]
     )
-
+    logging.info("Added layer view to proteomics page")
     return fig
 
 
-def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
+def make_sphere_fig(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
+    """Create figure for sphere view of proteomics data"""
     res = 5
     data = []
     cmin = math.floor(protein_df.loc[0, protein])
@@ -232,6 +229,7 @@ def make_fig4(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
                 )
 
     fig4 = go.Figure(data=data)
+    logging.info("Added sphere view to proteomics page")
     return fig4
 
 
@@ -301,7 +299,7 @@ layout = html.Div(
                                 dbc.Row(
                                     dbc.Col(
                                         dcc.Graph(
-                                            figure=make_fig1(),
+                                            figure=make_cube_fig(),
                                             className="dcc-graph",
                                             id="cross-section-graph",
                                         ),
@@ -343,7 +341,7 @@ layout = html.Div(
                                 dbc.Row(
                                     dbc.Col(
                                         dcc.Graph(
-                                            figure=make_fig2(),
+                                            figure=make_point_fig(),
                                             className="dcc-graph",
                                             id="cross-section-graph2",
                                         ),
@@ -371,7 +369,7 @@ layout = html.Div(
                                 dbc.Row(
                                     dbc.Col(
                                         dcc.Graph(
-                                            figure=make_fig3(),
+                                            figure=make_layer_fig(),
                                             className="dcc-graph",
                                             id="cross-section-graph3",
                                         ),
@@ -392,7 +390,7 @@ layout = html.Div(
                                 dbc.Row(
                                     dbc.Col(
                                         dcc.Graph(
-                                            figure=make_fig4(),
+                                            figure=make_sphere_fig(),
                                             className="dcc-graph",
                                             id="cross-section-graph4",
                                         ),
@@ -507,23 +505,14 @@ def update_output(
     #     fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd, layersdd
     # )
     # fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
-    fig1 = make_fig1(fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd)
-    fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd)
-    fig3 = make_fig3(fig3colorschemedd, protein=proteinsdd)
+    fig1 = make_cube_fig(
+        fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd
+    )
+    fig2 = make_point_fig(fig2opacityslider, fig2colorschemedd, proteinsdd)
+    fig3 = make_layer_fig(fig3colorschemedd, protein=proteinsdd)
     # fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
-    fig4 = make_fig4(cscheme=fig4colorschemedd, protein=proteinsdd)
+    fig4 = make_sphere_fig(cscheme=fig4colorschemedd, protein=proteinsdd)
     return fig1, fig2, fig3, fig4
-
-
-"""
-@callback(
-    Output(slicer.overlay_data.id, "data"),
-    Input("slice-view", "children"),
-    Input(slicer.slider, "value"),
-)
-def apply_levels(level, children):
-    return slicer.create_overlay_data(vol, greens)
-"""
 
 
 @callback(
@@ -532,6 +521,7 @@ def apply_levels(level, children):
     prevent_initial_call=True,
 )
 def download_xlsx(n_clicks):
+    logging.info("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx")
     return dcc.send_file("assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx")
 
 
@@ -541,6 +531,7 @@ def download_xlsx(n_clicks):
     prevent_initial_call=True,
 )
 def download_ili_xlsx(n_clicks):
+    logging.info("Sending assets/HuBMAP_ili_data10-11-24.csv")
     return dcc.send_file("assets/HuBMAP_ili_data10-11-24.csv")
 
 
@@ -550,4 +541,5 @@ def download_ili_xlsx(n_clicks):
     prevent_initial_call=True,
 )
 def download_ili_volume(n_clicks):
+    logging.info("Sending assets/ili_vol_template.nrrd")
     return dcc.send_file("assets/ili_vol_template.nrrd")

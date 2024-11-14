@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 import numpy as np
 from pywavefront import Wavefront
 import plotly.graph_objects as go
+import logging
 
 register_page(__name__, path="/3d", title="3D Pancreas Model")
 
@@ -15,6 +16,9 @@ def read_obj(file):
     pancreas = Wavefront(file, collect_faces=True)
     matrix_vertices = np.array(pancreas.vertices)
     faces = np.array(pancreas.mesh_list[0].faces)
+    logging.debug(
+        f"Read {file} and found vertices ndarray of shape {matrix_vertices.shape} and faces ndarray of shape {faces.shape}"
+    )
     return matrix_vertices, faces
 
 
@@ -76,6 +80,8 @@ def make_mesh_fig(pancreas=1):
                 pancreas_traces.at[i, "opacity"],
             )
             fig = go.Figure(data1)
+            name = data1[0]["name"]
+            logging.info(f"Added trace for {name} to 3D Model of Pancreas {pancreas}")
         else:
             data = make_mesh_data(
                 pancreas_traces.at[i, "name"],
@@ -84,6 +90,8 @@ def make_mesh_fig(pancreas=1):
                 pancreas_traces.at[i, "opacity"],
             )
             fig.add_trace(go.Mesh3d(data[0]))
+            name = data[0]["name"]
+            logging.info(f"Added trace for {name} to 3D Model of Pancreas {pancreas}")
     fig.update_layout(
         height=500,
         scene=dict(
@@ -145,6 +153,8 @@ def display_click_data(click_data):
             blocks["Block ID"]
             == traces.loc[click_data["points"][0]["curveNumber"], "name"]
         ]
+        block_name = row.iloc[0]["Block ID"]
+        logging.info(f"Displaying click data for {block_name}")
         item_data = [
             {"label": "Block ", "value": row.iloc[0]["Block ID"]},
             {"label": "Anatomical region: ", "value": row.iloc[0]["Anatomical region"]},

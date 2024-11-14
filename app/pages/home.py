@@ -2,10 +2,13 @@ import pandas as pd
 from dash import html, register_page
 import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
+import logging
 
 register_page(__name__, path="/", title="HuBMAP Pancreas Data Explorer")
 
 blocks = pd.read_csv("assets/block-data.csv")
+
+logging.debug(f"Data columns imported for home page grid:\n{blocks.columns}")
 
 columns = [
     {"field": "Order"},
@@ -24,6 +27,7 @@ grid = dag.AgGrid(
     columnSize="sizeToFit",
     style={"height": 490},
 )
+
 
 layout = html.Div(
     children=[
