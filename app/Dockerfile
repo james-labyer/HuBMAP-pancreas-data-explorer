@@ -8,8 +8,11 @@ COPY ./assets \
      ./assets
 COPY ./pages \
      ./pages
+COPY ./prep \
+     ./prep
 RUN pip install -r ./requirements.txt
-RUN chmod +rx ./app.py
+RUN chmod +rx ./app.py ./prep/make-slicers.sh ./prep/make-slicers.py
+RUN ./prep/make-slicers.sh
 ENV PATH="/app:$PATH"
 ENV PORT=8050
 EXPOSE 8050
