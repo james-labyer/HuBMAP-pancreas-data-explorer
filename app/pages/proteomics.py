@@ -1,6 +1,6 @@
-import pandas as pd
-from dash import dcc, html, callback, Input, Output, register_page
 import dash_bootstrap_components as dbc
+from dash import Input, Output, html, dcc, register_page, callback
+import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 import math
@@ -8,12 +8,16 @@ import logging
 
 register_page(__name__, title="Block P1-20C Proteomics")
 
+"""
+Constants and Datasets
+"""
+
+D_PROTEIN = "INS"
+D_SCHEME = "haline"
 LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
-D_PROTEIN = "INS"
-D_SCHEME = "haline"
 C_SCHEMES = [
     "bluered",
     "deep",
@@ -31,12 +35,15 @@ C_SCHEMES = [
     "ylgnbu",
     "ylorrd",
 ]
-greens = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]
 
 cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
+
+"""
+Helper Functions
+"""
 
 
 def select_layer(zlayer, df):
@@ -72,6 +79,11 @@ def make_sphere(x, y, z, radius, resolution=5):
     return (X, Y, Z)
 
 
+"""
+Layout and Figure Creation Functions
+"""
+
+
 def make_cube_fig(
     opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
 ):
@@ -96,6 +108,7 @@ def make_cube_fig(
             slices_z=dict(show=True, locations=[0.4]),
             caps=dict(x_show=caps, y_show=caps, z_show=caps, x_fill=1),
             colorscale=colorscheme,
+            name="Cube View",
         )
     )
 
@@ -129,13 +142,14 @@ def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="
             opacity=opacity,
             colorscale=colorscheme,
             surface_count=21,
+            name="Point View",
         )
     )
     logging.info("Added point view to proteomics page")
     return fig2
 
 
-def make_layer_fig(cscheme=D_SCHEME, protein=D_PROTEIN):
+def make_layer_fig(colorscheme=D_SCHEME, protein=D_PROTEIN):
     """Create figure for layer view of proteomics data"""
     x = X_AXIS[:9]
     y = Y_AXIS[:5]
@@ -152,30 +166,40 @@ def make_layer_fig(cscheme=D_SCHEME, protein=D_PROTEIN):
 
     fig = go.Figure(
         data=[
-            go.Surface(x=x, y=y, z=z1, colorscale=cscheme, surfacecolor=color_sets[0]),
+            go.Surface(
+                x=x,
+                y=y,
+                z=z1,
+                colorscale=colorscheme,
+                surfacecolor=color_sets[0],
+                name="Layer 1",
+            ),
             go.Surface(
                 x=x,
                 y=y,
                 z=z2,
                 showscale=False,
-                colorscale=cscheme,
+                colorscale=colorscheme,
                 surfacecolor=color_sets[1],
+                name="Layer 2",
             ),
             go.Surface(
                 x=x,
                 y=y,
                 z=z3,
                 showscale=False,
-                colorscale=cscheme,
+                colorscale=colorscheme,
                 surfacecolor=color_sets[2],
+                name="Layer 3",
             ),
             go.Surface(
                 x=x,
                 y=y,
                 z=z4,
                 showscale=False,
-                colorscale=cscheme,
+                colorscale=colorscheme,
                 surfacecolor=color_sets[3],
+                name="Layer 4",
             ),
         ]
     )
@@ -183,7 +207,7 @@ def make_layer_fig(cscheme=D_SCHEME, protein=D_PROTEIN):
     return fig
 
 
-def make_sphere_fig(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
+def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN):
     """Create figure for sphere view of proteomics data"""
     res = 5
     data = []
@@ -207,10 +231,11 @@ def make_sphere_fig(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
                         y=Y,
                         z=Z,
                         surfacecolor=c,
-                        colorscale=cscheme,
+                        colorscale=colorscheme,
                         cmin=cmin,
                         cmax=cmax,
                         opacity=opacity,
+                        name=f"val:\n{s_color.item()}",
                     )
                 )
             else:
@@ -220,11 +245,12 @@ def make_sphere_fig(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
                         y=Y,
                         z=Z,
                         surfacecolor=c,
-                        colorscale=cscheme,
+                        colorscale=colorscheme,
                         cmin=cmin,
                         cmax=cmax,
                         showscale=False,
                         opacity=opacity,
+                        name=f"val:\n{s_color.item()}",
                     )
                 )
 
@@ -233,286 +259,291 @@ def make_sphere_fig(opacity=1, cscheme=D_SCHEME, protein=D_PROTEIN):
     return fig4
 
 
-def make_c_scheme_dd(id):
-    return [
-        html.P("Choose a color scheme:"),
-        dcc.Dropdown(
-            C_SCHEMES,
-            D_SCHEME,
-            id=id,
-        ),
-    ]
-
-
-def make_opacity_slider(id, default=0.4):
+def make_opacity_slider(id, opacity):
     return [
         html.P("Adjust the opacity of the model:"),
         dcc.Slider(
             0,
             1,
             0.2,
-            value=default,
+            value=opacity,
             id=id,
         ),
     ]
 
 
-layout = html.Div(
-    children=[
-        html.Main(
-            id="main-content",
-            children=[
-                dbc.Container(
-                    class_name="main-div",
-                    children=[
-                        html.Section(
-                            id="cross-section",
-                            children=[
-                                html.Header(
-                                    html.H2(
-                                        "Spatial Proteome Map of a Single Islet Microenvironment from Pancreas Block P1-20C"
-                                    )
-                                ),
-                                html.P(
-                                    "The following four charts show a 3D proteome mapping of a single pancreatic islet microenvironment at 50–µm resolution."
-                                ),
-                                dbc.Card(
-                                    dbc.CardBody(
-                                        dbc.Row(
-                                            [
-                                                dbc.Col(
-                                                    [
-                                                        html.P("Select a protein:"),
-                                                        dcc.Dropdown(
-                                                            proteins,
-                                                            D_PROTEIN,
-                                                            id="proteinsdd",
-                                                        ),
-                                                    ]
-                                                ),
-                                            ],
-                                            justify="center",
-                                        ),
-                                    ),
-                                    color="light",
-                                ),
-                                dbc.Row(
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=make_cube_fig(),
-                                            className="dcc-graph",
-                                            id="cross-section-graph",
-                                        ),
-                                    )
-                                ),
-                                dbc.Card(
-                                    dbc.CardBody(
-                                        dbc.Row(
-                                            children=[
-                                                dbc.Col(
-                                                    children=[
-                                                        html.P(
-                                                            "Add or remove end caps:"
-                                                        ),
-                                                        dbc.Switch(
-                                                            id="fig1capswitch",
-                                                            value=True,
-                                                        ),
-                                                    ],
-                                                    width=3,
-                                                ),
-                                                dbc.Col(
-                                                    children=make_c_scheme_dd(
-                                                        "fig1colorschemedd"
-                                                    ),
-                                                    width=3,
-                                                ),
-                                                dbc.Col(
-                                                    children=make_opacity_slider(
-                                                        "fig1opacityslider"
-                                                    ),
-                                                    width=6,
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    color="light",
-                                ),
-                                dbc.Row(
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=make_point_fig(),
-                                            className="dcc-graph",
-                                            id="cross-section-graph2",
-                                        ),
-                                    )
-                                ),
-                                dbc.Card(
-                                    dbc.CardBody(
-                                        dbc.Row(
-                                            children=[
-                                                dbc.Col(
-                                                    children=make_c_scheme_dd(
-                                                        "fig2colorschemedd"
-                                                    )
-                                                ),
-                                                dbc.Col(
-                                                    children=make_opacity_slider(
-                                                        "fig2opacityslider"
-                                                    )
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    color="light",
-                                ),
-                                dbc.Row(
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=make_layer_fig(),
-                                            className="dcc-graph",
-                                            id="cross-section-graph3",
-                                        ),
-                                    )
-                                ),
-                                dbc.Card(
-                                    dbc.CardBody(
-                                        dbc.Row(
-                                            dbc.Col(
-                                                children=make_c_scheme_dd(
-                                                    "fig3colorschemedd"
-                                                )
-                                            )
-                                        ),
-                                    ),
-                                    color="light",
-                                ),
-                                dbc.Row(
-                                    dbc.Col(
-                                        dcc.Graph(
-                                            figure=make_sphere_fig(),
-                                            className="dcc-graph",
-                                            id="cross-section-graph4",
-                                        ),
-                                    )
-                                ),
-                                dbc.Card(
-                                    dbc.CardBody(
-                                        dbc.Row(
-                                            children=[
-                                                dbc.Col(
-                                                    children=make_c_scheme_dd(
-                                                        "fig4colorschemedd"
-                                                    )
-                                                ),
-                                            ],
-                                        ),
-                                    ),
-                                    color="light",
-                                ),
-                            ],
+"""
+Layout Components
+"""
+
+filters = dbc.Card(
+    dbc.CardBody(
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        html.P("Select a protein:", className="card-text"),
+                        dcc.Dropdown(
+                            proteins,
+                            D_PROTEIN,
+                            id="proteinsdd",
                         ),
-                        html.Section(
-                            id="download-dataset",
-                            children=[
-                                html.Header(html.H2("Download Data Here")),
-                                html.Div(
-                                    children=[
-                                        html.P(
-                                            "Here is the data collected in this study, available as an Excel file or a VTK file."
-                                        ),
-                                        dbc.Button(
-                                            "Download Excel Spreadsheet",
-                                            id="btn-download-xlsx",
-                                            className="download-button",
-                                        ),
-                                        dcc.Download(id="download-xlsx"),
-                                        dbc.Button(
-                                            "Download VTK File",
-                                            id="btn-download-vtk",
-                                            className="download-button",
-                                        ),
-                                        dcc.Download(id="download-vtk"),
-                                    ]
-                                ),
-                                html.Hr(),
-                                html.Div(
-                                    children=[
-                                        html.P(
-                                            children=[
-                                                "If you would like to visualize this data using the `ili spatial data mapping tool, open the ",
-                                                html.A(
-                                                    "`ili website",
-                                                    href="http://ili.embl.de/",
-                                                ),
-                                                ", select 'Volume', and drag and drop the following two files into the viewer. Then click on the '3D' tab, and choose 'Lego' for Render Mode.",
-                                            ]
-                                        ),
-                                        dbc.Button(
-                                            "Download `ili Spreadsheet",
-                                            id="btn-download-ili-xlsx",
-                                            className="download-button",
-                                        ),
-                                        dcc.Download(id="download-ili-xlsx"),
-                                        dbc.Button(
-                                            "Download `ili Volume File",
-                                            id="btn-download-ili-volume",
-                                            className="download-button",
-                                        ),
-                                        dcc.Download(id="download-ili-volume"),
-                                    ]
-                                ),
-                                html.Hr(),
-                            ],
+                    ]
+                ),
+                dbc.Col(
+                    [
+                        html.P("Choose a color scheme:", className="card-text"),
+                        dcc.Dropdown(
+                            C_SCHEMES,
+                            D_SCHEME,
+                            id="cschemedd",
+                        ),
+                    ]
+                ),
+            ],
+            justify="center",
+        ),
+    ),
+    color="light",
+    class_name="proteomics-filter",
+)
+
+proteomics_fig = dbc.Row(
+    dbc.Col(
+        dcc.Loading(
+            dcc.Graph(
+                figure=make_cube_fig(),
+                className="dcc-graph",
+                id="proteomics-graph",
+            ),
+            style={
+                "visibility": "visible",
+                "backgroundColor": "transparent",
+                "opacity": 0.7,
+            },
+            type="dot",
+            parent_className="loader-wrapper",
+        ),
+    )
+)
+
+tab_content = dbc.Card(
+    [
+        dbc.CardHeader(
+            dbc.Tabs(
+                [
+                    dbc.Tab(label="Cube View", tab_id="cube-tab"),
+                    dbc.Tab(label="Point View", tab_id="point-tab"),
+                    dbc.Tab(label="Layer View", tab_id="layer-tab"),
+                    dbc.Tab(label="Sphere View", tab_id="sphere-tab"),
+                ],
+                id="tabs",
+                active_tab="cube-tab",
+            )
+        ),
+        dbc.CardBody(
+            [
+                proteomics_fig,
+                html.Div(id="extra-filters"),
+            ]
+        ),
+    ]
+)
+
+cube_controls = dbc.Card(
+    dbc.CardBody(
+        dbc.Row(
+            children=[
+                dbc.Col(
+                    children=[
+                        html.P("Add or remove end caps:"),
+                        dbc.Switch(
+                            id="cubecapswitch",
+                            value=True,
                         ),
                     ],
+                    width=3,
                 ),
+                dbc.Col(
+                    children=make_opacity_slider("cubeslider", 0.4),
+                    width=9,
+                ),
+            ],
+        ),
+    ),
+    color="light",
+)
+
+point_controls = dbc.Card(
+    dbc.CardBody(
+        dbc.Row(
+            dbc.Col(
+                children=make_opacity_slider("pointslider", 0.1),
+                width=12,
+            ),
+        ),
+    ),
+    color="light",
+)
+
+study_downloads = html.Div(
+    children=[
+        html.P(
+            "Here is the data collected in this study, available as an Excel file or a VTK file."
+        ),
+        dbc.Button(
+            "Download Excel Spreadsheet",
+            id="btn-download-xlsx",
+            className="download-button",
+        ),
+        dcc.Download(id="download-xlsx"),
+        dbc.Button(
+            "Download VTK File",
+            id="btn-download-vtk",
+            className="download-button",
+        ),
+        dcc.Download(id="download-vtk"),
+    ]
+)
+
+ili_downloads = html.Div(
+    children=[
+        html.P(
+            children=[
+                "If you would like to visualize this data using the `ili spatial data mapping tool, open the ",
+                html.A(
+                    "`ili website",
+                    href="http://ili.embl.de/",
+                ),
+                ", select 'Volume', and drag and drop the following two files into the viewer. Then click on the '3D' tab, and choose 'Lego' for Render Mode.",
+            ]
+        ),
+        dbc.Button(
+            "Download `ili Spreadsheet",
+            id="btn-download-ili-xlsx",
+            className="download-button",
+        ),
+        dcc.Download(id="download-ili-xlsx"),
+        dbc.Button(
+            "Download `ili Volume File",
+            id="btn-download-ili-volume",
+            className="download-button",
+        ),
+        dcc.Download(id="download-ili-volume"),
+    ]
+)
+
+"""
+Layout
+"""
+
+layout = html.Div(
+    children=[
+        html.Section(
+            id="cross-section",
+            children=[
+                html.Header(
+                    html.H2(
+                        "Spatial Proteome Map of a Single Islet Microenvironment from Pancreas Block P1-20C"
+                    )
+                ),
+                html.P(
+                    "These charts show a 3D proteome mapping of a single pancreatic islet microenvironment at 50–µm resolution."
+                ),
+                filters,
+                html.Div(id="current-filters"),
+                tab_content,
+                dcc.Store(id="protein-store"),
+                dcc.Store(id="color-store"),
+                dcc.Store(id="cap-store"),
+                dcc.Store(id="cube-opacity-store"),
+                dcc.Store(id="point-opacity-store"),
+            ],
+        ),
+        html.Section(
+            id="download-dataset",
+            children=[
+                html.Header(html.H2("Download Data Here")),
+                study_downloads,
+                html.Hr(),
+                ili_downloads,
+                html.Hr(),
             ],
         ),
     ]
 )
 
+"""
+Callbacks
+"""
+
 
 @callback(
-    Output("cross-section-graph", "figure"),
-    Output("cross-section-graph2", "figure"),
-    Output("cross-section-graph3", "figure"),
-    Output("cross-section-graph4", "figure"),
-    Input("fig1opacityslider", "value"),
-    Input("fig1capswitch", "value"),
-    Input("fig1colorschemedd", "value"),
-    Input("fig2opacityslider", "value"),
-    Input("fig2colorschemedd", "value"),
-    Input("fig3colorschemedd", "value"),
-    # Input("fig4opacityslider", "value"),
-    Input("fig4colorschemedd", "value"),
-    Input("proteinsdd", "value"),
-    # Input("layersdd", "value"),
+    Output("extra-filters", "children"),
+    Input("tabs", "active_tab"),
 )
-def update_output(
-    fig1opacityslider,
-    fig1capswitch,
-    fig1colorschemedd,
-    fig2opacityslider,
-    fig2colorschemedd,
-    fig3colorschemedd,
-    # fig4opacityslider,
-    fig4colorschemedd,
-    proteinsdd,
-    # layersdd,
-):
-    # fig1 = make_fig1(
-    #     fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd, layersdd
-    # )
-    # fig2 = make_fig2(fig2opacityslider, fig2colorschemedd, proteinsdd, layersdd)
-    fig1 = make_cube_fig(
-        fig1opacityslider, fig1capswitch, fig1colorschemedd, proteinsdd
-    )
-    fig2 = make_point_fig(fig2opacityslider, fig2colorschemedd, proteinsdd)
-    fig3 = make_layer_fig(fig3colorschemedd, protein=proteinsdd)
-    # fig4 = make_fig4(fig4opacityslider, fig4colorschemedd, proteinsdd)
-    fig4 = make_sphere_fig(cscheme=fig4colorschemedd, protein=proteinsdd)
-    return fig1, fig2, fig3, fig4
+def update_controls(at):
+    if at == "cube-tab":
+        return cube_controls
+    elif at == "point-tab":
+        return point_controls
+
+
+@callback(
+    Output("proteomics-graph", "figure"),
+    Input("tabs", "active_tab"),
+    Input("color-store", "data"),
+    Input("protein-store", "data"),
+    Input("cap-store", "data"),
+    Input("cube-opacity-store", "data"),
+    Input("point-opacity-store", "data"),
+)
+def update_fig(tab, color, protein, cap, cubeopacity, pointopacity):
+    props = [color, protein, cap, cubeopacity, pointopacity]
+    settings = [D_SCHEME, D_PROTEIN, True, 0.4, 0.1]
+    for i in range(5):
+        if props[i] is not None:
+            settings[i] = props[i]
+    if tab == "cube-tab":
+        return make_cube_fig(
+            colorscheme=settings[0],
+            protein=settings[1],
+            caps=settings[2],
+            opacity=settings[3],
+        )
+    elif tab == "point-tab":
+        return make_point_fig(
+            colorscheme=settings[0], protein=settings[1], opacity=settings[4]
+        )
+    elif tab == "layer-tab":
+        return make_layer_fig(colorscheme=settings[0], protein=settings[1])
+    elif tab == "sphere-tab":
+        return make_sphere_fig(colorscheme=settings[0], protein=settings[1])
+
+
+@callback(Output("protein-store", "data"), Input("proteinsdd", "value"))
+def save_protein_filter(value):
+    return value
+
+
+@callback(Output("color-store", "data"), Input("cschemedd", "value"))
+def save_color_scheme(value):
+    return value
+
+
+@callback(Output("cap-store", "data"), Input("cubecapswitch", "value"))
+def save_cap_setting(value):
+    return value
+
+
+@callback(Output("cube-opacity-store", "data"), Input("cubeslider", "value"))
+def save_cube_opacity(value):
+    return value
+
+
+@callback(Output("point-opacity-store", "data"), Input("pointslider", "value"))
+def save_point_opacity(value):
+    return value
 
 
 @callback(

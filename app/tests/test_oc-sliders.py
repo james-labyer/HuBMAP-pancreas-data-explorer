@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from dash import dcc, Dash, page_registry
+from dash import dcc, Dash
 
 from dash_slicer import VolumeSlicer
 
@@ -11,16 +11,6 @@ from app.pages.P114Aopticalclearing import (
     P114Aopticalclearing3,
     P114Aopticalclearing8,
 )
-
-
-def test_links():
-    # get relative paths in page registry
-    relative_paths = []
-    for page in page_registry.values():
-        relative_paths.append(page["relative_path"])
-    # check that breadcrumb links exist in page registry
-    for i in range(len(P114Aopticalclearing1.breadcrumb.items) - 1):
-        assert P114Aopticalclearing1.breadcrumb.items[i]["href"] in relative_paths
 
 
 def test_make_vol():

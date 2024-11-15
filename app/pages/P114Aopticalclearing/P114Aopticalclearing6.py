@@ -5,49 +5,31 @@ import logging
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage(
-    "assets/optical-clearing-czi/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi",
-    reader=bioio_czi.Reader,
-)
+slices_img = BioImage("assets/optical-clearing-czi/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi", reader=bioio_czi.Reader)
 vols = slices_img.data[0]
-txt2 = register_page(
+txt2 =register_page(
     __name__,
-    path="/P1-14A-optical-clearing/P1-14A-optical-clearing-6",
+    path="/p1-14a-optical-clearing/p1-14a-optical-clearing-6",
     title="P1-14A optical clearing #6",
-)
-breadcrumb = dbc.Breadcrumb(
-    items=[
-        {"label": "Home", "href": "/", "external_link": False},
-        {
-            "label": "P1-14A optical clearing",
-            "href": "/p1-14a-optical-clearing",
-            "external_link": True,
-        },
-        {"label": "P1-14A optical clearing #6", "active": True},
-    ],
 )
 vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
 logging.debug(
-    f"Added slicer0 with {slicer0.nslices} slices to P1-14A-optical-clearing-6"
+    f'Added slicer0 with {slicer0.nslices} slices to P1-14A-optical-clearing-6'
 )
 vol1 = vols[1]
 slicer1 = VolumeSlicer(get_app(), vol1)
 slicer1.graph.config["scrollZoom"] = False
 logging.debug(
-    f"Added slicer1 with {slicer1.nslices} slices to P1-14A-optical-clearing-6"
+    f'Added slicer1 with {slicer1.nslices} slices to P1-14A-optical-clearing-6'
 )
 layout = [
-    breadcrumb,
     html.Section(
         id="P1-14A-optical-clearing-6",
-        className="slicer-card",
         children=[
             html.Header(html.H2("View P1-14A optical clearing #6")),
-            html.P(
-                "P1_14A1_KRT green INS white stack_Maximum intensity projection.czi"
-            ),
+            html.P("P1_14A1_KRT green INS white stack_Maximum intensity projection.czi"),
             html.Div(
                 [
                     html.Div(
@@ -85,8 +67,6 @@ layout = [
         ],
     ),
 ]
-
-
 @callback(
     Output("download-P1-14A-optical-clearing-6", "data"),
     Input("btn-download-P1-14A-optical-clearing-6", "n_clicks"),

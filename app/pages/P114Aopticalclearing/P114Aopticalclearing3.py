@@ -5,37 +5,22 @@ import logging
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage(
-    "assets/optical-clearing-czi/P1_14A1_INS tile_Stitch.czi", reader=bioio_czi.Reader
-)
+slices_img = BioImage("assets/optical-clearing-czi/P1_14A1_INS tile_Stitch.czi", reader=bioio_czi.Reader)
 vols = slices_img.data[0]
-txt2 = register_page(
+txt2 =register_page(
     __name__,
-    path="/P1-14A-optical-clearing/P1-14A-optical-clearing-3",
+    path="/p1-14a-optical-clearing/p1-14a-optical-clearing-3",
     title="P1-14A optical clearing #3",
-)
-breadcrumb = dbc.Breadcrumb(
-    items=[
-        {"label": "Home", "href": "/", "external_link": False},
-        {
-            "label": "P1-14A optical clearing",
-            "href": "/p1-14a-optical-clearing",
-            "external_link": True,
-        },
-        {"label": "P1-14A optical clearing #3", "active": True},
-    ],
 )
 vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
 logging.debug(
-    f"Added slicer0 with {slicer0.nslices} slices to P1-14A-optical-clearing-3"
+    f'Added slicer0 with {slicer0.nslices} slices to P1-14A-optical-clearing-3'
 )
 layout = [
-    breadcrumb,
     html.Section(
         id="P1-14A-optical-clearing-3",
-        className="slicer-card",
         children=[
             html.Header(html.H2("View P1-14A optical clearing #3")),
             html.P("P1_14A1_INS tile_Stitch.czi"),
@@ -68,13 +53,15 @@ layout = [
         ],
     ),
 ]
-
-
 @callback(
     Output("download-P1-14A-optical-clearing-3", "data"),
     Input("btn-download-P1-14A-optical-clearing-3", "n_clicks"),
     prevent_initial_call=True,
 )
 def download_czi(n_clicks):
-    logging.info("Sending P1_14A1_INS tile_Stitch.czi")
-    return dcc.send_file("assets/optical-clearing-czi/P1_14A1_INS tile_Stitch.czi")
+    logging.info(
+        "Sending P1_14A1_INS tile_Stitch.czi"
+    )
+    return dcc.send_file(
+        "assets/optical-clearing-czi/P1_14A1_INS tile_Stitch.czi"
+    )

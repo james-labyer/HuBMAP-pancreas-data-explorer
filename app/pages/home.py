@@ -1,6 +1,5 @@
 import pandas as pd
 from dash import html, register_page
-import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
 import logging
 
@@ -29,21 +28,4 @@ grid = dag.AgGrid(
 )
 
 
-layout = html.Div(
-    children=[
-        html.Main(
-            id="main-content",
-            children=[
-                dbc.Container(
-                    id="content-div",
-                    class_name="main-div",
-                    children=[
-                        html.Section(
-                            [html.Header(html.H2("Pancreas 1 Datasets")), grid]
-                        ),
-                    ],
-                ),
-            ],
-        ),
-    ]
-)
+layout = html.Section([html.Header(html.H2("Pancreas 1 Datasets")), grid])

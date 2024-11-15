@@ -105,22 +105,20 @@ def make_mesh_fig(pancreas=1):
 
 
 def make_graph_layout(pancreas=1):
-    container = dbc.Container(
+    container = html.Section(
         [
-            dbc.Row(
-                dbc.Col(
-                    html.H2(f"3D Model of Pancreas {pancreas}"),
-                )
-            ),
+            dbc.Row(dbc.Col(html.Header(html.H2(f"3D Model of Pancreas {pancreas}")))),
             dbc.Row(
                 [
                     dbc.Col(
                         [
-                            dcc.Graph(
-                                id="pancreas-graph",
-                                figure=make_mesh_fig(pancreas),
-                                config={"scrollZoom": False},
-                                className="centered-graph",
+                            dbc.Card(
+                                dcc.Graph(
+                                    id="pancreas-graph",
+                                    figure=make_mesh_fig(pancreas),
+                                    config={"scrollZoom": False},
+                                    className="centered-graph",
+                                )
                             )
                         ],
                         width=9,
@@ -134,11 +132,9 @@ def make_graph_layout(pancreas=1):
                         width=3,
                     ),
                 ],
-                className="g-2",
+                className="g-3",
             ),
         ],
-        fluid=True,
-        class_name="model-page",
     )
     return container
 

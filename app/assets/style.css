@@ -29,14 +29,21 @@ hr {
 }
 
 .all-data {
-    /* margin-left: 20px;
-    margin-right: 10px;*/
     margin: 5px 5px 5px 5px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+}
+
+.header-img {
+    height: 40px;
+    padding-left: 20px;
 }
 
 #navbar-simple {
     color: #f6f6f6;
-    /*padding: 0rem .5rem .5rem 0rem;*/
     padding-left: 0px;
     margin-left: 0px;
 }
@@ -71,21 +78,25 @@ hr {
     border-radius: 10px;
 }
 
-.slicer-card {
-    margin: 20px;
-}
-
 .ag-theme-alpine.block-grid div {
     font-size: 1rem;
     font-family: 'Source Sans Pro'
 }
 
 footer {
-    margin: 1rem 1rem 1rem 1rem;
+    margin: 3rem 1rem 0rem 1rem;
+    text-align: center;
+    font-size: .9rem;
+}
+
+section header {
+    margin-bottom: 1.6rem;
 }
 
 .download-button {
-    margin: .75rem .75rem .75rem .75rem;
+    margin-top: .75rem;
+    margin-right: .75rem;
+    margin-bottom: .75rem;
 }
 
 #slice-view {
@@ -114,6 +125,11 @@ p {
     visibility: visible !important;
 }
 
+.proteomics-filter {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 .slicer {
     margin: 40px;
 }
@@ -131,3 +147,10 @@ p {
     display: flex;
     align-items: center;
   }
+
+#download-dataset {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-left: 17px;
+    padding-right: 17px;
+}

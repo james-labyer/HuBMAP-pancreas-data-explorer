@@ -1,6 +1,5 @@
 import pandas as pd
 from dash import html, register_page
-import dash_bootstrap_components as dbc
 import dash_ag_grid as dag
 import logging
 
@@ -31,21 +30,14 @@ grid = dag.AgGrid(
     rowData=data.to_dict("records"),
     columnDefs=columns,
     className="ag-theme-alpine block-grid large",
-    style={"height": 700, "width": 1050},
+    style={"height": 700},
 )
 
 layout = html.Div(
-    children=[
-        html.Main(
-            children=[
-                dbc.Container(
-                    class_name="main-div",
-                    children=[
-                        html.Header(html.H2("P1-14A Optical Clearing Files")),
-                        grid,
-                    ],
-                ),
-            ],
-        ),
-    ]
+    html.Section(
+        children=[
+            html.Header(html.H2("P1-14A Optical Clearing Files")),
+            grid,
+        ],
+    )
 )

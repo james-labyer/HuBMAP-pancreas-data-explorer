@@ -1,4 +1,4 @@
-from dash import Dash, html, page_container
+from dash import Dash, html, dcc, page_container, page_registry, callback, Output, Input
 import dash_bootstrap_components as dbc
 import argparse
 import logging
@@ -24,64 +24,111 @@ def handle_args():
     logging.basicConfig(level=args.loglevel, format=format_str)
 
 
+footer = "\u00a9" + " 2024, Texas Advanced Computing Center"
+
 layout = html.Div(
     children=[
+        dcc.Location(id="url"),
         html.Header(
             dbc.Container(
-                dbc.Navbar(
-                    [
-                        dbc.Row(
-                            [
-                                dbc.Col(
-                                    html.H1(
-                                        "HuBMAP Pancreas Data Explorer",
-                                        className="bg-primary text-light title",
-                                    ),
-                                    width=True,
-                                ),
-                                dbc.Col(
-                                    dbc.Nav(
+                [
+                    dbc.Navbar(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
                                         [
-                                            dbc.NavItem(
-                                                dbc.NavLink(
-                                                    "All Datasets",
-                                                    href="/",
-                                                    class_name="text-light",
-                                                )
+                                            html.Img(
+                                                src="assets/magnifying-glass-chart-solid.svg",
+                                                className="text-light header-img",
                                             ),
-                                            dbc.NavItem(
-                                                dbc.NavLink(
-                                                    "3D Model",
-                                                    href="/3d",
-                                                    class_name="text-light",
-                                                )
+                                            html.H1(
+                                                [
+                                                    "HuBMAP Pancreas Data Explorer",
+                                                ],
+                                                className="bg-primary text-light title",
                                             ),
                                         ],
-                                        pills=True,
-                                        horizontal="end",
-                                        navbar=True,
+                                        width=True,
+                                        class_name="title-group",
                                     ),
-                                    width=3,
-                                ),
-                            ],
-                            justify="between",
-                            class_name="w-100",
-                            align="center",
-                        ),
-                    ],
-                    class_name="bg-primary text-light w-100",
-                    color="primary",
-                    sticky="top",
-                ),
+                                    dbc.Col(
+                                        dbc.Nav(
+                                            [
+                                                dbc.NavItem(
+                                                    dbc.NavLink(
+                                                        "All Datasets",
+                                                        href="/",
+                                                        class_name="text-light",
+                                                    )
+                                                ),
+                                                dbc.NavItem(
+                                                    dbc.NavLink(
+                                                        "3D Model",
+                                                        href="/3d",
+                                                        class_name="text-light",
+                                                    )
+                                                ),
+                                            ],
+                                            pills=True,
+                                            horizontal="end",
+                                            navbar=True,
+                                        ),
+                                        width=3,
+                                    ),
+                                ],
+                                justify="between",
+                                class_name="w-100",
+                                align="center",
+                            ),
+                        ],
+                        class_name="bg-primary text-light w-100",
+                        color="primary",
+                        sticky="top",
+                    ),
+                    html.Div(id="breadcrumb"),
+                ],
                 fluid=True,
                 class_name="px-0",
             ),
         ),
-        html.Div(id="my-output"),
-        page_container,
-        html.Footer("Copyright 2024, Texas Advanced Computing Center"),
+        html.Main(
+            dbc.Container(
+                page_container,
+                id="content-div",
+                class_name="main-div",
+            )
+        ),
+        html.Footer(footer),
     ]
 )
+
+
+@callback(Output("breadcrumb", "children"), [Input("url", "pathname")])
+def render_breadcrumb(pathname):
+    if "-optical-clearing-" in pathname:
+        # find the current page in the page registry
+        this_page = {}
+        for page in page_registry.values():
+            if page["relative_path"] == pathname:
+                this_page = page
+                break
+        # break out the parts of the path
+        parts = pathname.split("/")
+        bc = dbc.Breadcrumb(
+            items=[
+                {"label": "Home", "href": "/", "external_link": False},
+                {
+                    "label": "P1-14A optical clearing",
+                    "href": f"/{parts[1]}",
+                    "external_link": False,
+                },
+                {"label": f"{this_page['title']}", "active": True},
+            ],
+        )
+        return bc
+    else:
+        pass
 
 
 if __name__ == "__main__":
@@ -96,6 +143,10 @@ if __name__ == "__main__":
         dev_tools_props_check=False,
     )
 else:
-    app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
+    app = Dash(
+        __name__,
+        external_stylesheets=[dbc.themes.LUMEN],
+        use_pages=True,
+    )
     server = app.server
     app.layout = layout

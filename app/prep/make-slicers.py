@@ -64,19 +64,8 @@ for i in range(img_data.shape[0]):
     lines2 = (
         f"txt2 =register_page(\n"
         f"    __name__,\n"
-        f'    path="/P1-14A-optical-clearing/{volume}",\n'
+        f'    path="/p1-14a-optical-clearing/{volume.lower()}",\n'
         f'    title="{description}",\n'
-        f")\n"
-        f"breadcrumb = dbc.Breadcrumb(\n"
-        f"    items=[\n"
-        f'        {{"label": "Home", "href": "/", "external_link": False}},\n'
-        f"       {{\n"
-        f'            "label": "{dataset}",\n'
-        f'            "href": "/p1-14a-optical-clearing",\n'
-        f'            "external_link": True,\n'
-        f"        }},\n"
-        f'        {{"label": "{description}", "active": True}},\n'
-        f"    ],\n"
         f")\n"
     )
 
@@ -101,10 +90,8 @@ for i in range(img_data.shape[0]):
 
     lines5 = (
         f"layout = [\n"
-        f"    breadcrumb,\n"
         f"    html.Section(\n"
         f'        id="{volume}",\n'
-        f'        className="slicer-card",\n'
         f"        children=[\n"
         f'            html.Header(html.H2("View {description}")),\n'
         f'            html.P("{dname}"),\n'
