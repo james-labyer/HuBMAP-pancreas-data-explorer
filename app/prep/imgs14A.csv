@@ -1,0 +1,13 @@
+﻿fname,volume,description,filename,slices,channels,color1,color2,format,loading1,loading2,download
+P114Aopticalclearing1,P1-14A-optical-clearing-1,P1-14A optical clearing #1,P1_14A1_ KRT19 green INS white stack_Maximum intensity projection.tif,1,2,white,green,tif,no,no,P1_14A1_ KRT19 green INS white stack_Maximum intensity projection.czi
+P114Aopticalclearing2,P1-14A-optical-clearing-2,P1-14A optical clearing #2,P1_14A1_ KRT19 green INS white stack.tif,14,2,white,green,tif,no,yes,P1_14A1_ KRT19 green INS white stack.czi
+P114Aopticalclearing3,P1-14A-optical-clearing-3,P1-14A optical clearing #3,P1_14A1_INS tile_Stitch.czi,1,1,white,,czi,no,no,P1_14A1_INS tile_Stitch.czi
+P114Aopticalclearing4,P1-14A-optical-clearing-4,P1-14A optical clearing #4,P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.tif,1,2,white,green,tif,no,no,P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.czi
+P114Aopticalclearing5,P1-14A-optical-clearing-5,P1-14A optical clearing #5,P1_14A1_KRT green INS white stack higher res.tif,10,2,white,green,tif,no,yes,P1_14A1_KRT green INS white stack higher res.czi
+P114Aopticalclearing6,P1-14A-optical-clearing-6,P1-14A optical clearing #6,P1_14A1_KRT green INS white stack_Maximum intensity projection.czi,1,2,white,white,czi,no,no,P1_14A1_KRT green INS white stack_Maximum intensity projection.czi
+P114Aopticalclearing7,P1-14A-optical-clearing-7,P1-14A optical clearing #7,P1_14A1_KRT green INS white stack_Stitch.czi,5,2,white,white,czi,no,no,P1_14A1_KRT green INS white stack_Stitch.czi
+P114Aopticalclearing8,P1-14A-optical-clearing-8,P1-14A optical clearing #8,P1_14A1_KRT green stack.czi,99,1,green,,czi,no,no,P1_14A1_KRT green stack.czi
+P114Aopticalclearing9,P1-14A-optical-clearing-9,P1-14A optical clearing #9,P1_14A2_CD31 red INS white stack high res 2x_Maximum intensity projection.tif,1,2,white,red,tif,no,no,P1_14A2_CD31 red INS white stack high res 2x_Maximum intensity projection.czi
+P114Aopticalclearing10,P1-14A-optical-clearing-10,P1-14A optical clearing #10,P1_14A2_CD31 red INS white stack high res 2x.tif,14,2,white,red,tif,no,yes,P1_14A2_CD31 red INS white stack high res 2x.czi
+P114Aopticalclearing11,P1-14A-optical-clearing-11,P1-14A optical clearing #11,P1_14A2_CD31 red INS white stack high res_Maximum intensity projection.tif,1,2,white,red,tif,no,no,P1_14A2_CD31 red INS white stack high res_Maximum intensity projection.czi
+P114Aopticalclearing12,P1-14A-optical-clearing-12,P1-14A optical clearing #12,P1_14A2_CD31 red INS white stack high res.tif,12,2,white,red,tif,no,yes,P1_14A2_CD31 red INS white stack high res.czi

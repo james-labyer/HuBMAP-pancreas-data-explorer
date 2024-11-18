@@ -14,6 +14,12 @@ __pycache__*
 **/P1_14A2_CD31 red INS white stack high res 2x.tif
 **/P1_14A2_CD31 red INS white stack high res.czi
 **/P1_14A2_CD31 red INS white stack high res.tif
+**/P1_19A1 KRT green INS white stack 2x.czi
+**/P1_19A1 KRT green INS white stack 2x.tif
+**/P1_19A1 KRT green INS white stack.czi
+**/P1_19A1 KRT green INS white stack.tif
+**/P1_19A2 CD31 red INS white stack.czi
+**/P1_19A2 CD31 red INS white stack.tif
 
 # auto-generated pages that require large files
 **/P1-14A-optical-clearing-2.py
@@ -26,6 +32,9 @@ __pycache__*
 **/P114Aopticalclearing7.py
 **/P114Aopticalclearing10.py
 **/P114Aopticalclearing12.py
+**/P119Aopticalclearing4.py
+**/P119Aopticalclearing5.py
+**/P119Aopticalclearing5.py
 
 # script depots
 **/scripts/t-in

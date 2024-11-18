@@ -6,7 +6,7 @@ import numpy as np
 import imageio.v3 as iio
 
 im = iio.imread(
-'assets/optical-clearing-czi/P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.tif'
+'assets/optical-clearing-czi/P1-14A/P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.tif'
 )
 vols = []
 vols.append(np.expand_dims(im[0], axis=0))
@@ -90,5 +90,5 @@ def download_czi(n_clicks):
         "Sending P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.czi"
     )
     return dcc.send_file(
-        "assets/optical-clearing-czi/P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.czi"
+        "assets/optical-clearing-czi/P1-14A/P1_14A1_KRT green INS white stack higher res_Maximum intensity projection.czi"
     )

@@ -5,7 +5,7 @@ import logging
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage("assets/optical-clearing-czi/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi", reader=bioio_czi.Reader)
+slices_img = BioImage("assets/optical-clearing-czi/P1-14A/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi", reader=bioio_czi.Reader)
 vols = slices_img.data[0]
 txt2 =register_page(
     __name__,
@@ -77,5 +77,5 @@ def download_czi(n_clicks):
         "Sending P1_14A1_KRT green INS white stack_Maximum intensity projection.czi"
     )
     return dcc.send_file(
-        "assets/optical-clearing-czi/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi"
+        "assets/optical-clearing-czi/P1-14A/P1_14A1_KRT green INS white stack_Maximum intensity projection.czi"
     )

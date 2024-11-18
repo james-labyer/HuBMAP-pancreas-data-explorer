@@ -8,8 +8,8 @@ if [ "$OUTPUT" = "All checks passed!" ]
 pwd
 then
   ruff format output
-  mv ./prep/output/* ./pages/P114Aopticalclearing
-  echo "Files moved"
+  # mv ./prep/output/* ./pages/P114Aopticalclearing
+  # echo "Files moved"
 else
   echo $OUTPUT
 fi

@@ -15,19 +15,6 @@ D_CAPS = False
 
 protein_df = pd.read_csv("assets/protein_labels.csv")
 
-# update_fig(tab, color, protein, cap, cubeopacity, pointopacity)
-# "cube-tab"
-# "point-tab"
-# "layer-tab"
-# "sphere-tab"
-
-# "haline" "jet"
-# 'INS'
-
-# def make_cube_fig(
-#     opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
-# )
-
 
 def test_uf_cube_opacity():
     # test that fig1's opacity value is updated as expected
