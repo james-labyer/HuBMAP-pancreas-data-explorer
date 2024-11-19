@@ -5,9 +5,12 @@ from dash_slicer import VolumeSlicer
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage("assets/optical-clearing-czi/P1-7A/P1_7A2_tile scan CD31 INS.czi", reader=bioio_czi.Reader)
+slices_img = BioImage(
+    "assets/optical-clearing-czi/P1-7A/P1_7A2_tile scan CD31 INS.czi",
+    reader=bioio_czi.Reader,
+)
 vols = slices_img.data[0]
-txt2 =register_page(
+txt2 = register_page(
     __name__,
     path="/p1-7a-optical-clearing/p1-7a-optical-clearing-11",
     title="P1-7A optical clearing #11",
@@ -16,13 +19,13 @@ vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-11'
+    f"Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-11"
 )
 vol1 = vols[1]
 slicer1 = VolumeSlicer(get_app(), vol1)
 slicer1.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-11'
+    f"Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-11"
 )
 layout = [
     html.Section(
@@ -34,7 +37,7 @@ layout = [
                 [
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer0.graph,
                                 slicer0.slider,
                                 *slicer0.stores,
@@ -45,7 +48,7 @@ layout = [
                     ),
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer1.graph,
                                 slicer1.slider,
                                 *slicer1.stores,
@@ -73,15 +76,15 @@ layout = [
         ],
     ),
 ]
+
+
 @callback(
     Output("download-P1-7A-optical-clearing-11", "data"),
     Input("btn-download-P1-7A-optical-clearing-11", "n_clicks"),
     prevent_initial_call=True,
 )
 def download_file(n_clicks):
-    logging.info(
-        "Sending P1_7A2_tile scan CD31 INS.czi"
-    )
+    logging.info("Sending P1_7A2_tile scan CD31 INS.czi")
     return dcc.send_file(
         "assets/optical-clearing-czi/P1-7A/P1_7A2_tile scan CD31 INS.czi"
     )

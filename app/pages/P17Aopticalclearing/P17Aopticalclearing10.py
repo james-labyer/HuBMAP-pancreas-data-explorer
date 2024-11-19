@@ -5,9 +5,12 @@ from dash_slicer import VolumeSlicer
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage("assets/optical-clearing-czi/P1-7A/P1_7A2_stack NY KRT CD31 INS stack.czi", reader=bioio_czi.Reader)
+slices_img = BioImage(
+    "assets/optical-clearing-czi/P1-7A/P1_7A2_stack NY KRT CD31 INS stack.czi",
+    reader=bioio_czi.Reader,
+)
 vols = slices_img.data[0]
-txt2 =register_page(
+txt2 = register_page(
     __name__,
     path="/p1-7a-optical-clearing/p1-7a-optical-clearing-10",
     title="P1-7A optical clearing #10",
@@ -17,19 +20,19 @@ vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-10'
+    f"Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-10"
 )
 vol1 = vols[1]
 slicer1 = VolumeSlicer(get_app(), vol1)
 slicer1.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-10'
+    f"Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-10"
 )
 vol2 = vols[2]
 slicer2 = VolumeSlicer(get_app(), vol2)
 slicer2.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer2 with {slicer2.nslices} slices to P1-7A-optical-clearing-10'
+    f"Added slicer2 with {slicer2.nslices} slices to P1-7A-optical-clearing-10"
 )
 layout = [
     html.Section(
@@ -41,7 +44,7 @@ layout = [
                 [
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer0.graph,
                                 slicer0.slider,
                                 *slicer0.stores,
@@ -52,7 +55,7 @@ layout = [
                     ),
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer1.graph,
                                 slicer1.slider,
                                 *slicer1.stores,
@@ -63,7 +66,7 @@ layout = [
                     ),
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer2.graph,
                                 slicer2.slider,
                                 *slicer2.stores,
@@ -91,6 +94,8 @@ layout = [
         ],
     ),
 ]
+
+
 @callback(
     Output(slicer0.overlay_data.id, "data"),
     Input("P1-7A-optical-clearing-10", "children"),
@@ -99,6 +104,8 @@ layout = [
 def apply_overlay0(level, children):
     logging.info("Creating overlay on P1-7A-optical-clearing-10")
     return slicer0.create_overlay_data(vol0, greens)
+
+
 @callback(
     Output(slicer1.overlay_data.id, "data"),
     Input("P1-7A-optical-clearing-10", "children"),
@@ -107,6 +114,8 @@ def apply_overlay0(level, children):
 def apply_overlay1(level, children):
     logging.info("Creating overlay on P1-7A-optical-clearing-10")
     return slicer1.create_overlay_data(vol1, greens)
+
+
 @callback(
     Output(slicer2.overlay_data.id, "data"),
     Input("P1-7A-optical-clearing-10", "children"),
@@ -115,15 +124,15 @@ def apply_overlay1(level, children):
 def apply_overlay2(level, children):
     logging.info("Creating overlay on P1-7A-optical-clearing-10")
     return slicer2.create_overlay_data(vol2, greens)
+
+
 @callback(
     Output("download-P1-7A-optical-clearing-10", "data"),
     Input("btn-download-P1-7A-optical-clearing-10", "n_clicks"),
     prevent_initial_call=True,
 )
 def download_file(n_clicks):
-    logging.info(
-        "Sending P1_7A2_stack NY KRT CD31 INS stack.czi"
-    )
+    logging.info("Sending P1_7A2_stack NY KRT CD31 INS stack.czi")
     return dcc.send_file(
         "assets/optical-clearing-czi/P1-7A/P1_7A2_stack NY KRT CD31 INS stack.czi"
     )

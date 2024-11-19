@@ -5,9 +5,12 @@ from dash_slicer import VolumeSlicer
 from bioio import BioImage
 import bioio_czi
 
-slices_img = BioImage("assets/optical-clearing-czi/P1-7A/P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi", reader=bioio_czi.Reader)
+slices_img = BioImage(
+    "assets/optical-clearing-czi/P1-7A/P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi",
+    reader=bioio_czi.Reader,
+)
 vols = slices_img.data[0]
-txt2 =register_page(
+txt2 = register_page(
     __name__,
     path="/p1-7a-optical-clearing/p1-7a-optical-clearing-8",
     title="P1-7A optical clearing #8",
@@ -16,13 +19,13 @@ vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-8'
+    f"Added slicer0 with {slicer0.nslices} slices to P1-7A-optical-clearing-8"
 )
 vol1 = vols[1]
 slicer1 = VolumeSlicer(get_app(), vol1)
 slicer1.graph.config["scrollZoom"] = False
 logging.debug(
-    f'Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-8'
+    f"Added slicer1 with {slicer1.nslices} slices to P1-7A-optical-clearing-8"
 )
 layout = [
     html.Section(
@@ -34,7 +37,7 @@ layout = [
                 [
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer0.graph,
                                 slicer0.slider,
                                 *slicer0.stores,
@@ -45,7 +48,7 @@ layout = [
                     ),
                     dbc.Card(
                         dbc.CardBody(
-                             children=[
+                            children=[
                                 slicer1.graph,
                                 slicer1.slider,
                                 *slicer1.stores,
@@ -73,6 +76,8 @@ layout = [
         ],
     ),
 ]
+
+
 @callback(
     Output("download-P1-7A-optical-clearing-8", "data"),
     Input("btn-download-P1-7A-optical-clearing-8", "n_clicks"),

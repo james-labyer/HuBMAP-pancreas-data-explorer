@@ -1,6 +1,10 @@
 import pandas as pd
+import os
 
 blocks = [7, 14, 19]
+
+curpath = os.path.abspath(os.curdir)
+print(curpath)
 
 for m in range(len(blocks)):
     img_data = pd.read_csv(f"./prep/imgs1-{blocks[m]}A.csv")
@@ -13,7 +17,9 @@ for m in range(len(blocks)):
         dname = img_data.at[i, "download"]
         folder = f"assets/optical-clearing-czi/P1-{blocks[m]}A/"
         dataset = f"P1-{blocks[m]}A optical clearing"
-        output_file = f"./prep/output/{fname}.py"
+        output_file = (
+            f"{os.path.abspath(os.curdir)}/prep/output/P1-{blocks[m]}A/{fname}.py"
+        )
         slices = img_data.at[i, "slices"]
         channel_colors = []
         for n in range(img_data.at[i, "channels"]):
@@ -267,15 +273,30 @@ for m in range(len(blocks)):
             f"    )\n"
         )
 
-        with open(output_file, "a") as f:
-            f.write(lines0)
-            f.write(lines1)
-            f.write(lines2)
-            f.write(lines3)
-            f.write(lines4)
-            f.write(lines5)
-            f.write(lines6)
-            f.write(lines7)
-            f.write(lines8)
-            f.write(lines9)
-            f.write(lines10)
+        # with open(output_file, "a") as f:
+        #     f.write(lines0)
+        #     f.write(lines1)
+        #     f.write(lines2)
+        #     f.write(lines3)
+        #     f.write(lines4)
+        #     f.write(lines5)
+        #     f.write(lines6)
+        #     f.write(lines7)
+        #     f.write(lines8)
+        #     f.write(lines9)
+        #     f.write(lines10)
+        lines = (
+            lines0
+            + lines1
+            + lines2
+            + lines3
+            + lines4
+            + lines5
+            + lines6
+            + lines7
+            + lines8
+            + lines9
+            + lines10
+        )
+        with open(output_file, "w") as f:
+            f.write(lines)
