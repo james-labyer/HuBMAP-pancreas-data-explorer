@@ -1,7 +1,7 @@
-from dash import html, dcc, callback, Input, Output, get_app, register_page
 import dash_bootstrap_components as dbc
-from dash_slicer import VolumeSlicer
 import logging
+from dash import html, dcc, callback, Input, Output, get_app, register_page
+from dash_slicer import VolumeSlicer
 from bioio import BioImage
 import bioio_czi
 
@@ -26,24 +26,27 @@ layout = [
             html.P("P1_19A1 INS tile_Stitch.czi"),
             html.Div(
                 [
-                    html.Div(
-                        children=[
-                            slicer0.graph,
-                            slicer0.slider,
-                            *slicer0.stores,
-                        ],
-                        className="slicer",
+                    dbc.Card(
+                        dbc.CardBody(
+                             children=[
+                                slicer0.graph,
+                                slicer0.slider,
+                                *slicer0.stores,
+                            ],
+                            className="slicer",
+                        ),
+                        class_name="slicer-card",
                     ),
                 ]
             ),
             html.Div(
                 children=[
-                    html.H2("Download file"),
+                    html.H2("Download file", className="download-header"),
                     html.P(
                         "The easiest way to open this file is to use Fiji with the Bio-Formats plugin installed."
                     ),
                     dbc.Button(
-                        "Download .czi",
+                        "Download",
                         id="btn-download-P1-19A-optical-clearing-2",
                         className="download-button",
                     ),
@@ -58,7 +61,7 @@ layout = [
     Input("btn-download-P1-19A-optical-clearing-2", "n_clicks"),
     prevent_initial_call=True,
 )
-def download_czi(n_clicks):
+def download_file(n_clicks):
     logging.info(
         "Sending P1_19A1 INS tile_Stitch.czi"
     )

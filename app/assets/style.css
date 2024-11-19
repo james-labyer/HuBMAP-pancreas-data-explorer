@@ -42,6 +42,24 @@ hr {
     padding-left: 20px;
 }
 
+.slicer-card {
+    margin-top: 20px;
+}
+
+.custom-slicer-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-slicer-img {
+    padding-top: 20px;
+}
+
+.download-header {
+    margin-top: 20px;
+}
+
 #navbar-simple {
     color: #f6f6f6;
     padding-left: 0px;
@@ -130,9 +148,9 @@ p {
     margin-bottom: 20px;
 }
 
-.slicer {
+/* .slicer {
     margin: 40px;
-}
+} */
 
 .center-aligned-header .ag-header-cell-label {
     justify-content: center;

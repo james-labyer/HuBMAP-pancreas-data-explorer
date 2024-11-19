@@ -115,11 +115,13 @@ def render_breadcrumb(pathname):
                 break
         # break out the parts of the path
         parts = pathname.split("/")
+        # get first six characters of final path child and make them upper case
+        block = parts[1][:6].upper()
         bc = dbc.Breadcrumb(
             items=[
                 {"label": "Home", "href": "/", "external_link": False},
                 {
-                    "label": "P1-14A optical clearing",
+                    "label": f"{block} optical clearing",
                     "href": f"/{parts[1]}",
                     "external_link": False,
                 },
