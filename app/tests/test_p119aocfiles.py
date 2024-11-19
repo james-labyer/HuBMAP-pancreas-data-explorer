@@ -3,11 +3,11 @@ from pathlib import Path
 from dash import page_registry
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
-from app.pages.P114AocFiles import data
+from app.pages.P119AocFiles import data
 
 # some pages require files that are too large to check into GitHub, so they
 # must be skipped when this is run in the GitHub Action
-dev_pages = [2, 3, 6, 7, 8, 9, 10]
+dev_pages = [2, 3, 6, 7, 8, 10]
 
 
 def test_links():
