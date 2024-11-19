@@ -35,16 +35,12 @@ def make_thumbnail(imgs):
 
 img_sets = {}
 
-# obj.deepcopy()
-
 for i in range(img_data.shape[0]):
     if img_data.at[i, "parent"] in img_sets:
         img_sets[img_data.at[i, "parent"]].append(img_data.at[i, "filename"])
     else:
         img_sets[img_data.at[i, "parent"]] = []
         img_sets[img_data.at[i, "parent"]].append(img_data.at[i, "filename"])
-
-# print(img_sets)
 
 for set in img_sets:
     set_len = len(img_sets[set])
@@ -57,43 +53,3 @@ for set in img_sets:
             imgs.append(Image.open(f"t-in/{img_sets[set][j]}"))
         im = make_thumbnail(imgs)
         ImageOps.cover(im, FINAL_SIZE).save(f"t-out/{set}_thumbnail.png", optimize=True)
-
-
-# parent = ""
-# children = []
-# imgs = []
-# for i in range(img_data.shape[0]):
-#     if parent == "":
-#         parent = img_data.at[i, "parent"]
-#         children.append(img_data.at[i, "filename"])
-#         if i == img_data.shape[0] - 1:
-#             im = Image.open(f"t-in/{children[0]}")
-#             ImageOps.contain(im, FINAL_SIZE).save(
-#                 f"t-out/{parent}_thumbnail.png", optimize=True
-#             )
-#     elif parent != "" and img_data.at[i, "parent"] == parent:
-#         children.append(img_data.at[i, "filename"])
-#         for j in range(len(children)):
-#             imgs.append(Image.open(f"t-in/{children[j]}"))
-#         im = make_thumbnail(imgs[0], imgs[1])
-#         ImageOps.contain(im, FINAL_SIZE).save(
-#             f"t-out/{parent}_thumbnail.png", optimize=True
-#         )
-#         parent = ""
-#         children = []
-#         imgs = []
-#     elif parent != "" and img_data.at[i, "parent"] != parent:
-#         # previous img was from a one-channel image, process it
-#         im = Image.open(f"t-in/{children[0]}")
-#         ImageOps.contain(im, FINAL_SIZE).save(
-#             f"t-out/{parent}_thumbnail.png", optimize=True
-#         )
-#         # set up this one for processing
-#         children = []
-#         parent = img_data.at[i, "parent"]
-#         children.append(img_data.at[i, "filename"])
-#         if i == img_data.shape[0] - 1:
-#             im = Image.open(f"t-in/{children[0]}")
-#             ImageOps.contain(im, FINAL_SIZE).save(
-#                 f"t-out/{parent}_thumbnail.png", optimize=True
-#             )
