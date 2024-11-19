@@ -1,6 +1,6 @@
 import pandas as pd
 
-blocks = [14, 19]
+blocks = [7, 14, 19]
 
 for m in range(len(blocks)):
     img_data = pd.read_csv(f"./prep/imgs1-{blocks[m]}A.csv")
@@ -14,9 +14,12 @@ for m in range(len(blocks)):
         folder = f"assets/optical-clearing-czi/P1-{blocks[m]}A/"
         dataset = f"P1-{blocks[m]}A optical clearing"
         output_file = f"./prep/output/{fname}.py"
-        channel_colors = [img_data.at[i, "color1"], img_data.at[i, "color2"]]
         slices = img_data.at[i, "slices"]
+        channel_colors = []
+        for n in range(img_data.at[i, "channels"]):
+            channel_colors.append(img_data.at[i, f"color{n + 1}"])
 
+        # print("block:", blocks[m], "row:", i, "channel colors:", channel_colors)
         lines0 = "import dash_bootstrap_components as dbc\n" "import logging\n"
 
         if img_data.at[i, "format"] == "czi":
@@ -80,12 +83,12 @@ for m in range(len(blocks)):
             f")\n"
         )
 
+        lines3 = ""
+
         if "green" in channel_colors:
-            lines3 = 'colors = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]\n'
-        elif "red" in channel_colors:
-            lines3 = 'colors = ["#{:02x}{:02x}{:02x}".format(i, 0, 0) for i in range(0, 256, 1)]\n'
-        else:
-            lines3 = ""
+            lines3 += 'greens = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]\n'
+        if "red" in channel_colors:
+            lines3 += 'reds = ["#{:02x}{:02x}{:02x}".format(i, 0, 0) for i in range(0, 256, 1)]\n'
 
         lines4 = ""
 
@@ -238,11 +241,17 @@ for m in range(len(blocks)):
                     lines9 += f'    Input("{volume}", "children"),\n'
                     lines9 += f'    Input(slicer{j}.slider, "value"),\n'
                     lines9 += ")\n"
-                    lines9 += "def apply_overlay(level, children):\n"
+                    lines9 += f"def apply_overlay{j}(level, children):\n"
                     lines9 += f'    logging.info("Creating overlay on {volume}")\n'
-                    lines9 += (
-                        f"    return slicer{j}.create_overlay_data(vol{j}, colors)\n"
-                    )
+                    if channel_colors[j] == "red":
+                        lines9 += (
+                            f"    return slicer{j}.create_overlay_data(vol{j}, reds)\n"
+                        )
+                        lines9 += "\n"
+                    elif channel_colors[j] == "green":
+                        lines9 += f"    return slicer{j}.create_overlay_data(vol{j}, greens)\n"
+                        lines9 += "\n"
+
         lines10 = (
             f"@callback(\n"
             f'    Output("download-{volume}", "data"),\n'

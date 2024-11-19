@@ -15,7 +15,7 @@ txt2 = register_page(
     path="/p1-14a-optical-clearing/p1-14a-optical-clearing-8",
     title="P1-14A optical clearing #8",
 )
-colors = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]
+greens = ["#{:02x}{:02x}{:02x}".format(0, i, 0) for i in range(0, 256, 1)]
 vol0 = vols[0]
 slicer0 = VolumeSlicer(get_app(), vol0)
 slicer0.graph.config["scrollZoom"] = False
@@ -67,9 +67,9 @@ layout = [
     Input("P1-14A-optical-clearing-8", "children"),
     Input(slicer0.slider, "value"),
 )
-def apply_overlay(level, children):
+def apply_overlay0(level, children):
     logging.info("Creating overlay on P1-14A-optical-clearing-8")
-    return slicer0.create_overlay_data(vol0, colors)
+    return slicer0.create_overlay_data(vol0, greens)
 
 
 @callback(

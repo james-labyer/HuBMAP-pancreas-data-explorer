@@ -2,61 +2,98 @@ import os
 from PIL import Image, ImageOps, ImageDraw
 import pandas as pd
 
-img_data = pd.read_csv("thumbnails1-19A.csv")
+img_data = pd.read_csv("thumbnails1-7A.csv")
 
 FINAL_SIZE = (220, 110)
+TILE = (110, 110)
 
 
-def make_thumbnail(img1, img2):
-    w = img1.size[0] + img2.size[0]
-    h = max(img1.size[1], img2.size[1])
-    im = Image.new("RGB", (w, h))
-    im.paste(img1)
-    im.paste(img2, (img1.size[0], 0))
+def make_thumbnail(imgs):
+    w = 0
+    h = 0
+    for k in range(len(imgs)):
+        w += imgs[k].size[0]
+        if imgs[k].size[1] > h:
+            h = imgs[k].size[1]
+    im = Image.new("RGB", (len(imgs) * 110, 110))
+    offset = 0
     draw = ImageDraw.Draw(im)
-    draw.line(
-        [(img1.size[0], 0), (img1.size[0], h)],
-        fill=(255, 255, 255, 255),
-        width=10,
-    )
+    for m in range(len(imgs)):
+        new_im = ImageOps.cover(imgs[m], TILE)
+        if m == 0:
+            im.paste(new_im)
+        else:
+            offset += 110
+            im.paste(new_im, (offset, 0))
+            draw.line(
+                [(offset, 0), (offset, h)],
+                fill=(255, 255, 255, 255),
+                width=2,
+            )
     return im
 
 
-parent = ""
-children = []
-imgs = []
+img_sets = {}
+
+# obj.deepcopy()
+
 for i in range(img_data.shape[0]):
-    if parent == "":
-        parent = img_data.at[i, "parent"]
-        children.append(img_data.at[i, "filename"])
-        if i == img_data.shape[0] - 1:
-            im = Image.open(f"t-in/{children[0]}")
-            ImageOps.contain(im, FINAL_SIZE).save(
-                f"t-out/{parent}_thumbnail.png", optimize=True
-            )
-    elif parent != "" and img_data.at[i, "parent"] == parent:
-        children.append(img_data.at[i, "filename"])
-        for j in range(len(children)):
-            imgs.append(Image.open(f"t-in/{children[j]}"))
-        im = make_thumbnail(imgs[0], imgs[1])
-        ImageOps.contain(im, FINAL_SIZE).save(
-            f"t-out/{parent}_thumbnail.png", optimize=True
-        )
-        parent = ""
-        children = []
+    if img_data.at[i, "parent"] in img_sets:
+        img_sets[img_data.at[i, "parent"]].append(img_data.at[i, "filename"])
+    else:
+        img_sets[img_data.at[i, "parent"]] = []
+        img_sets[img_data.at[i, "parent"]].append(img_data.at[i, "filename"])
+
+# print(img_sets)
+
+for set in img_sets:
+    set_len = len(img_sets[set])
+    if set_len == 1:
+        im = Image.open(f"t-in/{img_sets[set][0]}")
+        ImageOps.cover(im, FINAL_SIZE).save(f"t-out/{set}_thumbnail.png", optimize=True)
+    else:
         imgs = []
-    elif parent != "" and img_data.at[i, "parent"] != parent:
-        # previous img was from a one-channel image, process it
-        im = Image.open(f"t-in/{children[0]}")
-        ImageOps.contain(im, FINAL_SIZE).save(
-            f"t-out/{parent}_thumbnail.png", optimize=True
-        )
-        # set up this one for processing
-        children = []
-        parent = img_data.at[i, "parent"]
-        children.append(img_data.at[i, "filename"])
-        if i == img_data.shape[0] - 1:
-            im = Image.open(f"t-in/{children[0]}")
-            ImageOps.contain(im, FINAL_SIZE).save(
-                f"t-out/{parent}_thumbnail.png", optimize=True
-            )
+        for j in range(set_len):
+            imgs.append(Image.open(f"t-in/{img_sets[set][j]}"))
+        im = make_thumbnail(imgs)
+        ImageOps.cover(im, FINAL_SIZE).save(f"t-out/{set}_thumbnail.png", optimize=True)
+
+
+# parent = ""
+# children = []
+# imgs = []
+# for i in range(img_data.shape[0]):
+#     if parent == "":
+#         parent = img_data.at[i, "parent"]
+#         children.append(img_data.at[i, "filename"])
+#         if i == img_data.shape[0] - 1:
+#             im = Image.open(f"t-in/{children[0]}")
+#             ImageOps.contain(im, FINAL_SIZE).save(
+#                 f"t-out/{parent}_thumbnail.png", optimize=True
+#             )
+#     elif parent != "" and img_data.at[i, "parent"] == parent:
+#         children.append(img_data.at[i, "filename"])
+#         for j in range(len(children)):
+#             imgs.append(Image.open(f"t-in/{children[j]}"))
+#         im = make_thumbnail(imgs[0], imgs[1])
+#         ImageOps.contain(im, FINAL_SIZE).save(
+#             f"t-out/{parent}_thumbnail.png", optimize=True
+#         )
+#         parent = ""
+#         children = []
+#         imgs = []
+#     elif parent != "" and img_data.at[i, "parent"] != parent:
+#         # previous img was from a one-channel image, process it
+#         im = Image.open(f"t-in/{children[0]}")
+#         ImageOps.contain(im, FINAL_SIZE).save(
+#             f"t-out/{parent}_thumbnail.png", optimize=True
+#         )
+#         # set up this one for processing
+#         children = []
+#         parent = img_data.at[i, "parent"]
+#         children.append(img_data.at[i, "filename"])
+#         if i == img_data.shape[0] - 1:
+#             im = Image.open(f"t-in/{children[0]}")
+#             ImageOps.contain(im, FINAL_SIZE).save(
+#                 f"t-out/{parent}_thumbnail.png", optimize=True
+#             )

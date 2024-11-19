@@ -117,6 +117,8 @@ def render_breadcrumb(pathname):
         parts = pathname.split("/")
         # get first six characters of final path child and make them upper case
         block = parts[1][:6].upper()
+        if block[-1] == "-":
+            block = block[:5]
         bc = dbc.Breadcrumb(
             items=[
                 {"label": "Home", "href": "/", "external_link": False},

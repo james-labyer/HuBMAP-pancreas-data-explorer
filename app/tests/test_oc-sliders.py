@@ -38,8 +38,8 @@ def test_make_vol():
 
 
 def test_apply_overlay():
-    overlay1 = P114Aopticalclearing1.apply_overlay(0, 0)
+    overlay1 = P114Aopticalclearing1.apply_overlay1(0, 0)
     assert isinstance(overlay1, list)
 
-    overlay2 = P114Aopticalclearing8.apply_overlay(0, 0)
+    overlay2 = P114Aopticalclearing8.apply_overlay0(0, 0)
     assert isinstance(overlay2, list)

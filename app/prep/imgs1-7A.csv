@@ -1,0 +1,12 @@
+﻿fname,volume,description,filename,slices,channels,color1,color2,color3,format,loading1,loading2,loading3,download
+P17Aopticalclearing1,P1-7A-optical-clearing-1,P1-7A optical clearing #1,P1_7A2_CD31 INS tile and stack_Stitch.czi,5,2,white,white,,czi,no,no,,P1_7A2_CD31 INS tile and stack_Stitch.czi
+P17Aopticalclearing2,P1-7A-optical-clearing-2,P1-7A optical clearing #2,P1_7A2_KRT CD31 INS higher res_Stitch.tif,1,3,green,white,red,tif,yes,yes,yes,P1_7A2_KRT CD31 INS higher res_Stitch.czi
+P17Aopticalclearing3,P1-7A-optical-clearing-3,P1-7A optical clearing #3,P1_7A2_KRT CD31 INS tile 2_Stitch.tif,1,3,green,white,red,tif,no,no,no,P1_7A2_KRT CD31 INS tile 2_Stitch.czi
+P17Aopticalclearing4,P1-7A-optical-clearing-4,P1-7A optical clearing #4,P1_7A2_KRT CD31 INS tile 3_Stitch.tif,1,3,green,white,red,tif,no,no,no,P1_7A2_KRT CD31 INS tile 3_Stitch.czi
+P17Aopticalclearing5,P1-7A-optical-clearing-5,P1-7A optical clearing #5,P1_7A2_KRT CD31 INS tile stack higher res 2_Stitch.czi,4,3,green,green,green,czi,yes,yes,yes,P1_7A2_KRT CD31 INS tile stack higher res 2_Stitch.czi
+P17Aopticalclearing6,P1-7A-optical-clearing-6,P1-7A optical clearing #6,P1_7A2_KRT CD31 INS tile stack_Stitch.tif,1,3,green,white,red,tif,yes,yes,yes,P1_7A2_KRT CD31 INS tile stack_Stitch.czi
+P17Aopticalclearing7,P1-7A-optical-clearing-7,P1-7A optical clearing #7,P1_7A2_KRT CD31 INS tile_Stitch.tif,1,3,green,white,red,tif,no,no,no,P1_7A2_KRT CD31 INS tile_Stitch.czi
+P17Aopticalclearing8,P1-7A-optical-clearing-8,P1-7A optical clearing #8,P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi,1,2,white,white,,czi,no,no,,P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi
+P17Aopticalclearing9,P1-7A-optical-clearing-9,P1-7A optical clearing #9,P1_7A2_stack NY CD31 INS no KRT.czi,24,2,white,white,,czi,no,no,,P1_7A2_stack NY CD31 INS no KRT.czi
+P17Aopticalclearing10,P1-7A-optical-clearing-10,P1-7A optical clearing #10,P1_7A2_stack NY KRT CD31 INS stack.czi,24,3,green,green,green,czi,no,no,no,P1_7A2_stack NY KRT CD31 INS stack.czi
+P17Aopticalclearing11,P1-7A-optical-clearing-11,P1-7A optical clearing #11,P1_7A2_tile scan CD31 INS.czi,1,2,white,white,,czi,no,no,,P1_7A2_tile scan CD31 INS.czi
