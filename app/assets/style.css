@@ -54,6 +54,12 @@ hr {
 
 .custom-slicer-img {
     padding-top: 20px;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+.solo-slicer-img {
+    padding: 20px;
 }
 
 .download-header {
@@ -172,3 +178,9 @@ p {
     padding-left: 17px;
     padding-right: 17px;
 }
+
+@media (max-width: 980px) {
+    .solo-slicer-img {
+        width: 100%;
+    }
+  }

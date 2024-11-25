@@ -1,4 +1,14 @@
-from dash import Dash, html, dcc, page_container, page_registry, callback, Output, Input
+from dash import (
+    Dash,
+    html,
+    dcc,
+    page_container,
+    page_registry,
+    callback,
+    Output,
+    Input,
+    State,
+)
 import dash_bootstrap_components as dbc
 import argparse
 import logging
@@ -53,28 +63,40 @@ layout = html.Div(
                                         class_name="title-group",
                                     ),
                                     dbc.Col(
-                                        dbc.Nav(
-                                            [
-                                                dbc.NavItem(
-                                                    dbc.NavLink(
-                                                        "All Datasets",
-                                                        href="/",
-                                                        class_name="text-light",
-                                                    )
+                                        [
+                                            dbc.NavbarToggler(
+                                                id="navbar-toggler",
+                                                n_clicks=0,
+                                            ),
+                                            dbc.Collapse(
+                                                dbc.Nav(
+                                                    [
+                                                        dbc.NavItem(
+                                                            dbc.NavLink(
+                                                                "All Data",
+                                                                href="/",
+                                                                class_name="text-light",
+                                                            )
+                                                        ),
+                                                        dbc.NavItem(
+                                                            dbc.NavLink(
+                                                                "3D Model",
+                                                                href="/3d",
+                                                                class_name="text-light",
+                                                            )
+                                                        ),
+                                                    ],
+                                                    pills=True,
+                                                    horizontal="end",
+                                                    navbar=True,
                                                 ),
-                                                dbc.NavItem(
-                                                    dbc.NavLink(
-                                                        "3D Model",
-                                                        href="/3d",
-                                                        class_name="text-light",
-                                                    )
-                                                ),
-                                            ],
-                                            pills=True,
-                                            horizontal="end",
-                                            navbar=True,
-                                        ),
-                                        width=3,
+                                                id="navbar-collapse",
+                                                is_open=False,
+                                                navbar=True,
+                                            ),
+                                        ],
+                                        width=2,
+                                        md=3,
                                     ),
                                 ],
                                 justify="between",
@@ -84,6 +106,7 @@ layout = html.Div(
                         ],
                         class_name="bg-primary text-light w-100",
                         color="primary",
+                        dark=True,
                         sticky="top",
                     ),
                     html.Div(id="breadcrumb"),
@@ -102,6 +125,17 @@ layout = html.Div(
         html.Footer(footer),
     ]
 )
+
+
+@callback(
+    Output("navbar-collapse", "is_open"),
+    [Input("navbar-toggler", "n_clicks")],
+    [State("navbar-collapse", "is_open")],
+)
+def toggle_navbar_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
 
 
 @callback(Output("breadcrumb", "children"), [Input("url", "pathname")])
