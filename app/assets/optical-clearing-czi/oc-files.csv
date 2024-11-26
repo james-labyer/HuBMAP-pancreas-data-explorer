@@ -21,6 +21,8 @@ P1-19A,P1-19A-6,P1_19A2 CD31 red INS white stack 2_Maximum intensity projection.
 P1-19A,P1-19A-7,P1_19A2 CD31 red INS white stack.czi,P1_19A2 CD31 red INS white stack,3104,3104,11,2
 P1-19A,P1-19A-8,P1_19A2 CD31 red INS white stack_Maximum intensity projection.czi,P1_19A2 CD31 red INS white stack_Maximum intensity projection,3104,3104,1,2
 P1-19A,P1-19A-9,P1_19A2 INS tile scan_Stitch.czi,P1_19A2 INS tile scan_Stitch,474,589,1,1
+P1-19A,P1-19A-10,P1_19A AF_CD31.avi,P1_19A AF_CD31,512,512,60,1
+P1-19A,P1-19A-11,P1_19A2__z_stack__no_tiling__not_isotropic_dx_dy_dz_sampling.avi,P1_19A2__z_stack__no_tiling__not_isotropic_dx_dy_dz_sampling,512,512,60,1
 P1-4A,P1-4A-1,P1_4A2 top rows scan CD31 555 INS 680.czi,P1_4A2 top rows scan CD31 555 INS 680,244,588,1,2
 P1-4A,P1-4A-2,P1_4A2_CD31 555.czi,P1_4A2_CD31 555,512,512,1,1
 P1-4A,P1-4A-3,P1_4A2_CD31_555_INS_680 stack.czi,P1_4A2_CD31_555_INS_680 stack,1024,1024,22,2

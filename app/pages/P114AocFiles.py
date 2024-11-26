@@ -5,7 +5,7 @@ import logging
 
 register_page(
     __name__,
-    path="/p1-14a-optical-clearing",
+    path="/optical-clearing/P1/P1-14A",
     title="P1-14A Optical Clearing Files",
 )
 

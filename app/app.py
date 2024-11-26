@@ -3,7 +3,6 @@ from dash import (
     html,
     dcc,
     page_container,
-    page_registry,
     callback,
     Output,
     Input,
@@ -49,7 +48,7 @@ layout = html.Div(
                                     dbc.Col(
                                         [
                                             html.Img(
-                                                src="assets/magnifying-glass-chart-solid.svg",
+                                                src="./assets/magnifying-glass-chart-solid.svg",
                                                 className="text-light header-img",
                                             ),
                                             html.H1(
@@ -140,17 +139,11 @@ def toggle_navbar_collapse(n, is_open):
 
 @callback(Output("breadcrumb", "children"), [Input("url", "pathname")])
 def render_breadcrumb(pathname):
-    if "-optical-clearing-" in pathname:
-        # find the current page in the page registry
-        this_page = {}
-        for page in page_registry.values():
-            if page["relative_path"] == pathname:
-                this_page = page
-                break
+    if "/optical-clearing/P" in pathname and len(pathname) > 28:
         # break out the parts of the path
         parts = pathname.split("/")
         # get first six characters of final path child and make them upper case
-        block = parts[1][:6].upper()
+        block = parts[-1][:6].upper()
         if block[-1] == "-":
             block = block[:5]
         bc = dbc.Breadcrumb(
@@ -158,10 +151,10 @@ def render_breadcrumb(pathname):
                 {"label": "Home", "href": "/", "external_link": False},
                 {
                     "label": f"{block} optical clearing",
-                    "href": f"/{parts[1]}",
+                    "href": f"/{parts[-4]}/{parts[-3]}/{parts[-2]}",
                     "external_link": False,
                 },
-                {"label": f"{this_page['title']}", "active": True},
+                {"label": f"{block} optical clearing {parts[-1][-1]}", "active": True},
             ],
         )
         return bc

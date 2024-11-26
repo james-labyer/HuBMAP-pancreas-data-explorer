@@ -1,10 +1,10 @@
 ﻿Order,Block ID,Anatomical region,Optical clearing,GeoMX,Proteomics
 1,P1-3,Pancreatic head, , , 
 2,P1-4A,Pancreatic head,/,/, 
-3,P1-7A,Pancreatic neck,/p1-7a-optical-clearing, , 
+3,P1-7A,Pancreatic neck,/optical-clearing/P1/P1-7A, , 
 4,P1-9,Pancreatic neck, ,/, 
-5,P1-14A,Pancreatic body,/p1-14a-optical-clearing, , 
-6,P1-19A,Pancreatic tail,/p1-19a-optical-clearing, , 
+5,P1-14A,Pancreatic body,/optical-clearing/P1/P1-14A, , 
+6,P1-19A,Pancreatic tail,/optical-clearing/P1/P1-19A, , 
 7,P1-20A,Pancreatic tail, , , 
 8,P1-20B,Pancreatic tail, , , 
 9,P1-20C,Pancreatic tail, , ,/proteomics

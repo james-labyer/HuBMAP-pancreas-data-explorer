@@ -10,7 +10,10 @@ def title(oc=None, pancreas=None, block=None):
 
 
 register_page(
-    __name__, path_template="/optical-clearing/<pancreas>/<block>/<oc>", title=title
+    __name__,
+    path_template="/optical-clearing/<pancreas>/<block>/<oc>",
+    path="/optical-clearing/P1/P1-19A/P1-19A-1",
+    title=title,
 )
 
 oc_imgs = pd.read_csv("assets/optical-clearing-czi/oc-files.csv")
