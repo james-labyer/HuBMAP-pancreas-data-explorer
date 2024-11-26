@@ -1,8 +1,7 @@
-import os
 from PIL import Image, ImageOps, ImageDraw
 import pandas as pd
 
-img_data = pd.read_csv("thumbnails1-7A.csv")
+img_data = pd.read_csv("thumbnails1-4A.csv")
 
 FINAL_SIZE = (220, 110)
 TILE = (110, 110)
