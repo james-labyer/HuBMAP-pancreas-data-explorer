@@ -19,6 +19,10 @@ thumbnails = pd.read_csv("assets/optical-clearing-czi/oc-thumbnails.csv")
 
 
 def layout(block=None, **kwargs):
+    logging.debug(
+        f"Data columns imported for optical clearing file summary:\n{thumbnails.columns}"
+    )
+
     block_thumbnails = thumbnails.loc[thumbnails["Block"] == block]
 
     columns = [

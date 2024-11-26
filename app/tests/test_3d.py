@@ -131,7 +131,14 @@ def test_display_click_data():
         dbc.CardBody(
             [
                 html.P("Anatomical region: Pancreatic head"),
-                html.P([dcc.Link("View optical clearing data", href="/")]),
+                html.P(
+                    [
+                        dcc.Link(
+                            "View optical clearing data",
+                            href="/optical-clearing/P1/P1-4A",
+                        )
+                    ]
+                ),
                 html.P([dcc.Link("View GeoMX data", href="/")]),
             ]
         ),

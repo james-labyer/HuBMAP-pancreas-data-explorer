@@ -3,7 +3,9 @@ from pathlib import Path
 from dash import page_registry
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
+import app.app
 from app.pages.home import blocks
+from app.pages.ocfiles import thumbnails
 
 
 def test_links():
@@ -12,7 +14,8 @@ def test_links():
         relative_paths.append(page["relative_path"])
     for i in range(blocks["Optical clearing"].size):
         if blocks["Optical clearing"][i] != " ":
-            assert blocks["Optical clearing"][i] in relative_paths
+            block_name = blocks["Optical clearing"][i].split("/")[-1]
+            assert block_name in thumbnails["Block"].values
     for j in range(blocks["GeoMX"].size):
         if blocks["GeoMX"][j] != " ":
             assert blocks["GeoMX"][j] in relative_paths
