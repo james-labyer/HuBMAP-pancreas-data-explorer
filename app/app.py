@@ -146,15 +146,16 @@ def render_breadcrumb(pathname):
         block = parts[-1][:6].upper()
         if block[-1] == "-":
             block = block[:5]
+        oc = parts[-1].split("-")
         bc = dbc.Breadcrumb(
             items=[
                 {"label": "Home", "href": "/", "external_link": False},
                 {
                     "label": f"{block} optical clearing",
-                    "href": f"/{parts[-4]}/{parts[-3]}/{parts[-2]}",
+                    "href": f"/optical-clearing-files/{parts[-2]}",
                     "external_link": False,
                 },
-                {"label": f"{block} optical clearing {parts[-1][-1]}", "active": True},
+                {"label": f"{block} optical clearing {oc[-1]}", "active": True},
             ],
         )
         return bc

@@ -62,10 +62,11 @@ def make_tab_content(slider=False, points=0, channels=1):
     return dbc.Card(card_content, class_name="slicer-card")
 
 
-def make_download_section():
+def make_download_section(filename):
     return html.Div(
         children=[
             html.H2("Download original file", className="download-header"),
+            html.P(filename),
             dbc.Button(
                 "Download",
                 id="btn-download-oc",
@@ -93,8 +94,10 @@ def layout(oc=None, **kwargs):
         "height": img.at[img.index[0], "height"],
         "width": img.at[img.index[0], "width"],
     }
+    oc = img_dict["oc"].split("-")
     return html.Div(
         [
+            html.H2(f"{img_dict['block']} Optical Clearing {oc[-1]}"),
             make_tab_content(
                 (img_dict["slices"] > 1),
                 img_dict["slices"],
@@ -102,7 +105,7 @@ def layout(oc=None, **kwargs):
             ),
             dcc.Store(id="oc-slider-store"),
             dcc.Store(id="oc-file-store", data=img_dict),
-            make_download_section(),
+            make_download_section(img_dict["file"]),
         ]
     )
 

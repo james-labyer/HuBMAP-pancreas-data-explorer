@@ -135,7 +135,7 @@ def test_display_click_data():
                     [
                         dcc.Link(
                             "View optical clearing data",
-                            href="/optical-clearing/P1/P1-4A",
+                            href="/optical-clearing-files/P1-4A",
                         )
                     ]
                 ),
