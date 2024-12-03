@@ -40,8 +40,8 @@ Run pytest within a development container:
 docker exec {container_name} pytest --cov-report term-missing --cov
 ```
 
-## Running on production
-1. Log into the server and clone this repo
+## Setting up production for the first time
+1. Log into the server and clone this repo.
 
    ```
    git clone https://github.com/james-labyer/HuBMAP-pancreas-data-explorer.git
@@ -61,3 +61,7 @@ docker exec {container_name} pytest --cov-report term-missing --cov
    ```
    docker compose -f docker-compose.yaml up
    ```
+
+
+## Generating PNG file to display optical clearing data
+Follow the instructions in `scripts/convert-czi-to-png.ijm` to convert .czi files to a series of .png files for display on the site.

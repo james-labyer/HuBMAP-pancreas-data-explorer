@@ -1,8 +1,16 @@
 services:
-  web:
+  nginx-proxy:
+    build:
+      context: .
+      dockerfile: "./Dockerfile-dev-nginx"
+    ports:
+      - "80:80"
+    depends_on:
+      - dash-app
+  dash-app:
     build: 
       context: .
-      dockerfile: "./Dockerfile-dev"
+      dockerfile: "./Dockerfile-dev-dash"
     ports:
       - "8050:8050"
     stdin_open: true

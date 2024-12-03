@@ -1,8 +1,10 @@
-// This macro process .czi files and converts them to PNGs colored according to the LUTs stored in the .czi settings.
+// This macro processes .czi files and converts them to PNGs colored according to the LUTs stored in the .czi settings.
+// The resulting PNGs are served from assets/optical-clearing-czi
 // Before running the macro, create the input and output directories and add them to inpath and outpath in this script.
+// Run the macro by opening Fiji and selecting Plugins > Macros > Run... 
 
-inpath = "/Users/jlabyer/Projects/oc-input/"
-outpath = "/Users/jlabyer/Projects/oc-output/"
+inpath = ""
+outpath = ""
 
 f = File.open(outpath + "oc-dims.csv");
 print(f,"block,oc,file,basefile,height,width,slices,channels");
