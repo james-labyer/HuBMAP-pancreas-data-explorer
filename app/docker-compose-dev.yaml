@@ -2,11 +2,14 @@ services:
   nginx-proxy:
     build:
       context: .
-      dockerfile: "./Dockerfile-dev-nginx"
+      dockerfile: "./Dockerfile-nginx"
     ports:
       - "80:80"
     depends_on:
       - dash-app
+    networks:
+      - inside
+      - outside
   dash-app:
     build: 
       context: .
@@ -19,4 +22,9 @@ services:
       - type: bind
         source: ./
         target: /app
-
+    networks:
+      - inside
+networks:
+  inside:
+    internal: true
+  outside:

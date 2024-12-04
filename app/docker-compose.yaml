@@ -1,9 +1,25 @@
 services:
-  web:
+  nginx-proxy:
+    build:
+      context: .
+      dockerfile: "./Dockerfile-nginx"
+    ports:
+      - "80:80"
+    depends_on:
+      - dash-app
+    networks:
+      - inside
+      - outside
+  dash-app:
     build: .
     ports:
       - "8050:8050"
     stdin_open: true
     tty: true
     restart: on-failure:5
-    image: jlabyer/hubmap-pancreas-data-explorer:01
+    networks:
+      - inside
+networks:
+  inside:
+    internal: true
+  outside:
