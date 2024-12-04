@@ -139,7 +139,7 @@ def test_display_click_data():
                         )
                     ]
                 ),
-                html.P([dcc.Link("View GeoMX data", href="/")]),
+                html.P([dcc.Link("View GeoMx data", href="/geomx/P1")]),
             ]
         ),
     ]

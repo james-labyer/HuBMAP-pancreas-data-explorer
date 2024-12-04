@@ -158,7 +158,7 @@ def display_click_data(click_data):
                 "label": "View optical clearing data",
                 "value": row.iloc[0]["Optical clearing"],
             },
-            {"label": "View GeoMX data", "value": row.iloc[0]["GeoMX"]},
+            {"label": "View GeoMx data", "value": row.iloc[0]["GeoMx"]},
             {"label": "View proteomics data", "value": row.iloc[0]["Proteomics"]},
         ]
         card_content = []

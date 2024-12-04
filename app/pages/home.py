@@ -14,7 +14,7 @@ columns = [
     {"field": "Block ID"},
     {"field": "Anatomical region"},
     {"field": "Optical clearing", "cellRenderer": "dsLink"},
-    {"field": "GeoMX", "cellRenderer": "dsLink"},
+    {"field": "GeoMx", "cellRenderer": "dsLink"},
     {"field": "Proteomics", "cellRenderer": "dsLink"},
 ]
 
