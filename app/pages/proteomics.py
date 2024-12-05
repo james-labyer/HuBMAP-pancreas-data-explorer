@@ -557,6 +557,16 @@ def download_xlsx(n_clicks):
 
 
 @callback(
+    Output("download-vtk", "data"),
+    Input("btn-download-vtk", "n_clicks"),
+    prevent_initial_call=True,
+)
+def download_vtk(n_clicks):
+    logging.info("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
+    return dcc.send_file("assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
+
+
+@callback(
     Output("download-ili-xlsx", "data"),
     Input("btn-download-ili-xlsx", "n_clicks"),
     prevent_initial_call=True,

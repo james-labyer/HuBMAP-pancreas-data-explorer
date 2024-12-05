@@ -2,7 +2,7 @@ services:
   nginx-proxy:
     build:
       context: .
-      dockerfile: "./Dockerfile-nginx"
+      dockerfile: "./nginx/Dockerfile-nginx"
     ports:
       - "80:80"
     depends_on:
@@ -11,12 +11,17 @@ services:
       - inside
       - outside
   dash-app:
-    build: .
+    build: 
+      context: .
+      dockerfile: "./app/Dockerfile-dev-dash"
     ports:
       - "8050:8050"
     stdin_open: true
     tty: true
-    restart: on-failure:5
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app
     networks:
       - inside
 networks:
