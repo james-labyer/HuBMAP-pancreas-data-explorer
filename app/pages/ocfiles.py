@@ -3,6 +3,11 @@ from dash import html, register_page
 import dash_ag_grid as dag
 import logging
 
+app_logger = logging.getLogger(__name__)
+gunicorn_logger = logging.getLogger("gunicorn.error")
+app_logger.handlers = gunicorn_logger.handlers
+app_logger.setLevel(gunicorn_logger.level)
+
 
 def title(block=None, pancreas=None):
     return f"{block} optical clearing"
@@ -19,7 +24,7 @@ thumbnails = pd.read_csv("assets/optical-clearing-czi/oc-thumbnails.csv")
 
 
 def layout(block=None, **kwargs):
-    logging.debug(
+    app_logger.debug(
         f"Data columns imported for optical clearing file summary:\n{thumbnails.columns}"
     )
 

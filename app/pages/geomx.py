@@ -3,6 +3,11 @@ from dash import html, register_page
 import dash_ag_grid as dag
 import logging
 
+app_logger = logging.getLogger(__name__)
+gunicorn_logger = logging.getLogger("gunicorn.error")
+app_logger.handlers = gunicorn_logger.handlers
+app_logger.setLevel(gunicorn_logger.level)
+
 
 def title(pancreas="P1"):
     if not pancreas:
@@ -22,7 +27,7 @@ reports = pd.read_csv("assets/geomx-reports.csv")
 
 
 def layout(pancreas="P1", **kwargs):
-    logging.debug(f"Data columns imported for report link list:\n{reports.columns}")
+    app_logger.debug(f"Data columns imported for report link list:\n{reports.columns}")
 
     p_reports = reports.loc[reports["pancreas"] == pancreas]
 

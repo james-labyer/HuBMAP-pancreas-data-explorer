@@ -14,4 +14,4 @@ RUN pip install pytest pytest-cov
 ENV PATH="/app:$PATH"
 ENV PORT=8050
 EXPOSE 8050
-ENTRYPOINT ["gunicorn", "app:server", "-b", "0.0.0.0:8050"]
+ENTRYPOINT ["gunicorn", "app:server", "-b", "0.0.0.0:8050", "--log-level", "debug"]

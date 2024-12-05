@@ -4,6 +4,11 @@ from dash import html, dcc, callback, Input, Output, State, register_page, no_up
 from PIL import Image
 import pandas as pd
 
+app_logger = logging.getLogger(__name__)
+gunicorn_logger = logging.getLogger("gunicorn.error")
+app_logger.handlers = gunicorn_logger.handlers
+app_logger.setLevel(gunicorn_logger.level)
+
 
 def title(oc=None, pancreas=None, block=None):
     return f"{oc} optical clearing"
@@ -155,7 +160,7 @@ def update_pic(tab, slider, data):
     prevent_initial_call=True,
 )
 def download_file(n_clicks, data):
-    logging.info(f"Sending {data['file']}")
+    app_logger.info(f"Sending {data['file']}")
     return dcc.send_file(
         f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['file']}"
     )

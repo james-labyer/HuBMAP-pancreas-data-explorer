@@ -4,10 +4,14 @@ import dash_ag_grid as dag
 import logging
 
 register_page(__name__, path="/", title="HuBMAP Pancreas Data Explorer")
+app_logger = logging.getLogger(__name__)
+gunicorn_logger = logging.getLogger("gunicorn.error")
+app_logger.handlers = gunicorn_logger.handlers
+app_logger.setLevel(gunicorn_logger.level)
 
 blocks = pd.read_csv("assets/block-data.csv")
 
-logging.debug(f"Data columns imported for home page grid:\n{blocks.columns}")
+app_logger.debug(f"Data columns imported for home page grid:\n{blocks.columns}")
 
 columns = [
     {"field": "Order"},

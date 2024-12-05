@@ -26,11 +26,7 @@ def handle_args():
         help="set log level to DEBUG, INFO, WARNING, ERROR, or CRITICAL",
     )
 
-    args = parser.parse_args()
-
-    format_str = f"[%(asctime)s {socket.gethostname()}] %(filename)s:%(funcName)s:%(lineno)s - %(levelname)s: %(message)s"
-
-    logging.basicConfig(level=args.loglevel, format=format_str)
+    return parser.parse_args()
 
 
 footer = "\u00a9" + " 2024, Texas Advanced Computing Center"
@@ -164,7 +160,9 @@ def render_breadcrumb(pathname):
 
 
 if __name__ == "__main__":
-    handle_args()
+    args = handle_args()
+    format_str = f"[%(asctime)s {socket.gethostname()}] %(filename)s:%(funcName)s:%(lineno)s - %(levelname)s: %(message)s"
+    logging.basicConfig(level=args.loglevel, format=format_str)
     app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
     server = app.server
     app.layout = layout
@@ -180,5 +178,9 @@ else:
         external_stylesheets=[dbc.themes.LUMEN],
         use_pages=True,
     )
+    gunicorn_logger = logging.getLogger("gunicorn.error")
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
+    app.logger.debug("Test")
     server = app.server
     app.layout = layout
