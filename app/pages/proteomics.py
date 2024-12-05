@@ -123,7 +123,7 @@ def make_cube_fig(
             zaxis=dict(tickvals=Z_AXIS),
         )
     )
-    app_logger.info("Added cube view to proteomics page")
+    app_logger.debug("Added cube view to proteomics page")
     return fig1
 
 
@@ -149,7 +149,7 @@ def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="
             name="Point View",
         )
     )
-    app_logger.info("Added point view to proteomics page")
+    app_logger.debug("Added point view to proteomics page")
     return fig2
 
 
@@ -207,7 +207,7 @@ def make_layer_fig(colorscheme=D_SCHEME, protein=D_PROTEIN):
             ),
         ]
     )
-    app_logger.info("Added layer view to proteomics page")
+    app_logger.debug("Added layer view to proteomics page")
     return fig
 
 
@@ -259,7 +259,7 @@ def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN):
                 )
 
     fig4 = go.Figure(data=data)
-    app_logger.info("Added sphere view to proteomics page")
+    app_logger.debug("Added sphere view to proteomics page")
     return fig4
 
 
@@ -556,7 +556,7 @@ def save_point_opacity(value):
     prevent_initial_call=True,
 )
 def download_xlsx(n_clicks):
-    app_logger.info("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx")
+    app_logger.debug("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx")
     return dcc.send_file("assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.xlsx")
 
 
@@ -566,7 +566,7 @@ def download_xlsx(n_clicks):
     prevent_initial_call=True,
 )
 def download_vtk(n_clicks):
-    app_logger.info("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
+    app_logger.debug("Sending assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
     return dcc.send_file("assets/HubMAP_TMC_p1_20C_3D_protINT_May8_sorted.vti")
 
 
@@ -576,7 +576,7 @@ def download_vtk(n_clicks):
     prevent_initial_call=True,
 )
 def download_ili_xlsx(n_clicks):
-    app_logger.info("Sending assets/HuBMAP_ili_data10-11-24.csv")
+    app_logger.debug("Sending assets/HuBMAP_ili_data10-11-24.csv")
     return dcc.send_file("assets/HuBMAP_ili_data10-11-24.csv")
 
 
@@ -586,5 +586,5 @@ def download_ili_xlsx(n_clicks):
     prevent_initial_call=True,
 )
 def download_ili_volume(n_clicks):
-    app_logger.info("Sending assets/ili_vol_template.nrrd")
+    app_logger.debug("Sending assets/ili_vol_template.nrrd")
     return dcc.send_file("assets/ili_vol_template.nrrd")

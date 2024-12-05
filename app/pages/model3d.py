@@ -85,7 +85,7 @@ def make_mesh_fig(pancreas=1):
             )
             fig = go.Figure(data1)
             name = data1[0]["name"]
-            app_logger.info(
+            app_logger.debug(
                 f"Added trace for {name} to 3D Model of Pancreas {pancreas}"
             )
         else:
@@ -97,7 +97,7 @@ def make_mesh_fig(pancreas=1):
             )
             fig.add_trace(go.Mesh3d(data[0]))
             name = data[0]["name"]
-            app_logger.info(
+            app_logger.debug(
                 f"Added trace for {name} to 3D Model of Pancreas {pancreas}"
             )
     fig.update_layout(
@@ -158,7 +158,7 @@ def display_click_data(click_data):
             == traces.loc[click_data["points"][0]["curveNumber"], "name"]
         ]
         block_name = row.iloc[0]["Block ID"]
-        app_logger.info(f"Displaying click data for {block_name}")
+        app_logger.debug(f"Displaying click data for {block_name}")
         item_data = [
             {"label": "Block ", "value": row.iloc[0]["Block ID"]},
             {"label": "Anatomical region: ", "value": row.iloc[0]["Anatomical region"]},

@@ -160,7 +160,7 @@ def update_pic(tab, slider, data):
     prevent_initial_call=True,
 )
 def download_file(n_clicks, data):
-    app_logger.info(f"Sending {data['file']}")
+    app_logger.debug(f"Sending {data['file']}")
     return dcc.send_file(
         f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['file']}"
     )

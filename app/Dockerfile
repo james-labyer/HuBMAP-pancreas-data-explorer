@@ -10,6 +10,7 @@ WORKDIR /usr/src/app
 COPY --from=poetry /app/requirements.txt .
 RUN pip install -r ./requirements.txt
 COPY ./app/app.py \
+     ./app/gunicorn_conf.py \
      ./
 COPY ./app/assets \
      ./assets
@@ -20,4 +21,4 @@ RUN chmod +rx ./app.py
 ENV PATH="/app:$PATH"
 ENV PORT=8050
 EXPOSE 8050
-ENTRYPOINT ["gunicorn", "--worker-tmp-dir", "/dev/shm", "--workers=2", "--threads=4", "--worker-class=gthread", "--log-file=gunicorn_logs", "app:server", "-b", "0.0.0.0:8050"]
+ENTRYPOINT ["gunicorn", "-c", "gunicorn_conf.py", "app:server"]
