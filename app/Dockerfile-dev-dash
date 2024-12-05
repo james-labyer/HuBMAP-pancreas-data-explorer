@@ -1,9 +1,16 @@
-FROM python:3.9.20-bookworm
+FROM python:3.13-bookworm AS poetry
+RUN pip install "poetry==1.8.4"
 WORKDIR /app
+COPY ./pyproject.toml ./poetry.lock ./
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --with=dev
+
+FROM python:3.13-bookworm
 RUN apt-get update && apt-get upgrade -y && apt-get install -y python3
-COPY ./requirements.txt ./
+WORKDIR /app
+COPY --from=poetry /app/requirements.txt .
 RUN pip install -r ./requirements.txt
 RUN pip install pytest pytest-cov
+
 ENV PATH="/app:$PATH"
 ENV PORT=8050
 EXPOSE 8050
