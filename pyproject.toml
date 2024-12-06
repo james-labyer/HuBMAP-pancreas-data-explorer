@@ -27,3 +27,11 @@ pytest-cov = "~6.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint.per-file-ignores]
+# Ignore unused imports in test files, which have to import app.app for tests to work even though app.app is not directly referenced in the file
+"app/tests/test_proteomics.py" = ["F401"]
+"app/tests/test_ocpage.py" = ["F401"]
+"app/tests/test_oc-links.py" = ["F401"]
+"app/tests/test_home.py" = ["F401"]
+"app/tests/test_3d.py" = ["F401"]
