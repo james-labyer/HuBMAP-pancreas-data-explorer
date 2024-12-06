@@ -1,10 +1,11 @@
+import logging
+import math
+
 import dash_bootstrap_components as dbc
-from dash import Input, Output, html, dcc, register_page, callback
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import numpy as np
-import math
-import logging
+from dash import Input, Output, callback, dcc, html, register_page
 
 register_page(__name__, title="Block P1-20C Proteomics")
 app_logger = logging.getLogger(__name__)

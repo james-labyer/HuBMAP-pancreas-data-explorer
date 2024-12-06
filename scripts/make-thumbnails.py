@@ -1,5 +1,5 @@
-from PIL import Image, ImageOps, ImageDraw
 import pandas as pd
+from PIL import Image, ImageDraw, ImageOps
 
 img_data = pd.read_csv("thumbnails1-4A.csv")
 

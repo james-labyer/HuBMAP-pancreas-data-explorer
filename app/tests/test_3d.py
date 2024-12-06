@@ -1,19 +1,20 @@
-import pytest
+import json
 import sys
 from pathlib import Path
-from dash import html, dcc
+
 import dash_bootstrap_components as dbc
-import json
 import plotly
+import pytest
+from dash import dcc, html
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 import app.app
 from app.pages.model3d import (
     display_click_data,
-    make_mesh_settings,
-    read_obj,
     make_mesh_data,
     make_mesh_fig,
+    make_mesh_settings,
+    read_obj,
 )
 
 

@@ -1,7 +1,8 @@
+import logging
+
+import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
-import dash_ag_grid as dag
-import logging
 
 register_page(__name__, path="/", title="HuBMAP Pancreas Data Explorer")
 app_logger = logging.getLogger(__name__)

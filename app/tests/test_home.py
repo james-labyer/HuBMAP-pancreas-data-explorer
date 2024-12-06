@@ -1,12 +1,13 @@
 import sys
 from pathlib import Path
+
 from dash import page_registry
 
 sys.path.append(str(Path(__file__).parent.parent.parent))
 import app.app
+from app.pages.geomx import reports
 from app.pages.home import blocks
 from app.pages.ocfiles import thumbnails
-from app.pages.geomx import reports
 
 
 def test_links():

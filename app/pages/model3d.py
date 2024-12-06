@@ -1,10 +1,11 @@
-import pandas as pd
-from dash import html, dcc, register_page, Output, Input, callback
+import logging
+
 import dash_bootstrap_components as dbc
 import numpy as np
-from pywavefront import Wavefront
+import pandas as pd
 import plotly.graph_objects as go
-import logging
+from dash import Input, Output, callback, dcc, html, register_page
+from pywavefront import Wavefront
 
 register_page(__name__, path="/3d", title="3D Pancreas Model")
 app_logger = logging.getLogger(__name__)

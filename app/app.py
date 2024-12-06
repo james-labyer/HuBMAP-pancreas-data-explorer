@@ -1,17 +1,18 @@
-from dash import (
-    Dash,
-    html,
-    dcc,
-    page_container,
-    callback,
-    Output,
-    Input,
-    State,
-)
-import dash_bootstrap_components as dbc
 import argparse
 import logging
 import socket
+
+import dash_bootstrap_components as dbc
+from dash import (
+    Dash,
+    Input,
+    Output,
+    State,
+    callback,
+    dcc,
+    html,
+    page_container,
+)
 
 
 def handle_args():

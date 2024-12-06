@@ -1,8 +1,9 @@
-import dash_bootstrap_components as dbc
 import logging
-from dash import html, dcc, callback, Input, Output, State, register_page, no_update
-from PIL import Image
+
+import dash_bootstrap_components as dbc
 import pandas as pd
+from dash import Input, Output, State, callback, dcc, html, no_update, register_page
+from PIL import Image
 
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
