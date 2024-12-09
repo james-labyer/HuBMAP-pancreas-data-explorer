@@ -79,7 +79,8 @@ def make_download_section(filename):
                 className="download-button",
             ),
             dcc.Download(id="download-oc"),
-        ]
+        ],
+        style={"min-height": 155},
     )
 
 
@@ -103,15 +104,24 @@ def layout(oc=None, **kwargs):
     oc = img_dict["oc"].split("-")
     return html.Div(
         [
-            html.H2(f"{img_dict['block']} Optical Clearing {oc[-1]}"),
-            make_tab_content(
-                (img_dict["slices"] > 1),
-                img_dict["slices"],
-                img_dict["channels"],
+            html.Section(
+                [
+                    html.H2(f"{img_dict['block']} Optical Clearing {oc[-1]}"),
+                    make_tab_content(
+                        (img_dict["slices"] > 1),
+                        img_dict["slices"],
+                        img_dict["channels"],
+                    ),
+                    dcc.Store(id="oc-slider-store"),
+                    dcc.Store(id="oc-file-store", data=img_dict),
+                ]
             ),
-            dcc.Store(id="oc-slider-store"),
-            dcc.Store(id="oc-file-store", data=img_dict),
-            make_download_section(img_dict["file"]),
+            html.Section(
+                [
+                    make_download_section(img_dict["file"]),
+                    html.Hr(),
+                ]
+            ),
         ]
     )
 
@@ -143,14 +153,27 @@ def update_pic(tab, slider, data):
     else:
         c = int(tab[-1]) - 1
 
-    pic = Image.open(
-        f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
-    )
+    if data["file"][-3:] == "jpg":
+        pic = Image.open(
+            f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data["file"]}"
+        )
+    else:
+        pic = Image.open(
+            f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
+        )
     # add max-height and max-width to style based on image's dimensions
+    if data["height"] > 600:
+        ar = data["width"] / data["height"]
+        max_height = 600
+        max_width = ar * 600
+    else:
+        max_height = data["height"]
+        max_width = data["width"]
+
     return html.Img(
         src=pic,
         className="custom-slicer-img solo-slicer-img",
-        style={"max-height": data["height"], "max-width": data["width"]},
+        style={"max-height": max_height, "max-width": max_width},
     )
 
 

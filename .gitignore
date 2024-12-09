@@ -26,34 +26,14 @@ __pycache__*
 **/P1_7A2_KRT CD31 INS tile stack higher res 2_Stitch.czi
 **/P1_7A2_KRT CD31 INS tile stack_Stitch.czi
 **/P1_7A2_KRT CD31 INS tile stack_Stitch.tif
-**/app/assets/optical-clearing-czi/P2-1A/**.czi
-**/app/assets/optical-clearing-czi/P2-7A/**.czi
-**/app/assets/optical-clearing-czi/P2-13A/**.czi
-**/app/assets/optical-clearing-czi/P2-19A/**.czi
-
-
-
-# auto-generated pages that require large files
-**/P1-14A-optical-clearing-2.py
-**/P1-14A-optical-clearing-5.py
-**/P1-14A-optical-clearing-7.py
-**/P1-14A-optical-clearing-10.py
-**/P1-14A-optical-clearing-12.py
-**/P114Aopticalclearing2.py
-**/P114Aopticalclearing5.py
-**/P114Aopticalclearing7.py
-**/P114Aopticalclearing10.py
-**/P114Aopticalclearing12.py
-**/P119Aopticalclearing4.py
-**/P119Aopticalclearing5.py
-**/P119Aopticalclearing9.py
-**/P17Aopticalclearing1.py
-**/P17Aopticalclearing2.py
-**/P17Aopticalclearing5.py
-**/P17Aopticalclearing6.py
+**/app/assets/optical-clearing-czi/P2-1A/*/*.czi
+**/app/assets/optical-clearing-czi/P2-7A/*/*.czi
+**/app/assets/optical-clearing-czi/P2-7A/*/*.avi
+**/app/assets/optical-clearing-czi/P2-13A/*/*.czi
+**/app/assets/optical-clearing-czi/P2-19A/*/*.czi
+**/app/assets/optical-clearing-czi/P2-19A/*/*.czi
 
 # script depots
 **/scripts/t-in
 **/scripts/t-out
-**/scripts/output
-**/prep/output
+

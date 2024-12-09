@@ -18,11 +18,6 @@ hr {
     width: 100%;
 }
 
-/*.centered-graph {
-    margin-left: auto;
-    margin-right: auto;
-}*/
-
 .title {
     padding: 1rem 1rem 1rem 1rem;
     margin-right: 0px;
@@ -54,8 +49,7 @@ hr {
 
 .custom-slicer-img {
     padding-top: 20px;
-    max-height: 100%;
-    max-width: 100%;
+    width: 100%;
 }
 
 .solo-slicer-img {
@@ -154,10 +148,6 @@ p {
     margin-bottom: 20px;
 }
 
-/* .slicer {
-    margin: 40px;
-} */
-
 .center-aligned-header .ag-header-cell-label {
     justify-content: center;
 }
@@ -178,9 +168,3 @@ p {
     padding-left: 17px;
     padding-right: 17px;
 }
-
-@media (max-width: 980px) {
-    .solo-slicer-img {
-        width: 100%;
-    }
-  }

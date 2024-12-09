@@ -1,6 +1,7 @@
 // This macro processes .czi files and converts them to PNGs colored according to the LUTs stored in the .czi settings.
 // The resulting PNGs are served from assets/optical-clearing-czi
 // Before running the macro, create the input and output directories and add them to inpath and outpath in this script.
+// Files in the input directory should be sorted into folders with one folder per tissue block
 // Run the macro by opening Fiji and selecting Plugins > Macros > Run... 
 
 inpath = ""
@@ -33,10 +34,16 @@ for (m = 0; m < dirs.length; m++){
 		Ext.setId(inpath + dirs[m] + files[n]);
 		// get channel colors
 		colors = newArray(channels);
-		for (j=1; j<=channels; j++){
-			Ext.getMetadataValue("Experiment|AcquisitionBlock|MultiTrackSetup|TrackSetup|Detector|Color #"+j, value);
-			colors[j-1] = value;
-			print(colors[j-1]);
+		if (channels == 1) {
+			Ext.getMetadataValue("Experiment|AcquisitionBlock|MultiTrackSetup|TrackSetup|Detector|Color", value);
+			colors[0] = value;
+			print(colors[0]);
+		} else {
+			for (j=1; j<=channels; j++){
+				Ext.getMetadataValue("Experiment|AcquisitionBlock|MultiTrackSetup|TrackSetup|Detector|Color #"+j, value);
+				colors[j-1] = value;
+				print(colors[j-1]);
+			}	
 		}
 		// convert to 8-bit if needed
 		run("8-bit");

@@ -42,3 +42,49 @@ P1-7A,P1-7A-8,P1_7A2_stack NY CD31 INS no KRT.czi,P1_7A2_stack NY CD31 INS no KR
 P1-7A,P1-7A-9,P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi,P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection,256,256,1,2
 P1-7A,P1-7A-10,P1_7A2_stack NY KRT CD31 INS stack.czi,P1_7A2_stack NY KRT CD31 INS stack,256,256,24,3
 P1-7A,P1-7A-11,P1_7A2_tile scan CD31 INS.czi,P1_7A2_tile scan CD31 INS,2354,2355,1,2
+P2-13A,P2-13A-1,P2 13A GCG 405 TH 633 5 um stack 20x_Maximum intensity projection.czi,P2 13A GCG 405 TH 633 5 um stack 20x_Maximum intensity projection,3440,3440,1,2
+P2-13A,P2-13A-2,P2 13A GCG 405 TH 633 5 um stack 20x.czi,P2 13A GCG 405 TH 633 5 um stack 20x,3440,3440,12,2
+P2-13A,P2-13A-3,P2 13A GCG 405 TH 633 tile 50um stack_Maximum intensity projection.czi,P2 13A GCG 405 TH 633 tile 50um stack_Maximum intensity projection,1893,1893,1,2
+P2-13A,P2-13A-4,P2 13A GCG 405 TH 633 tile 50um stack.czi,P2 13A GCG 405 TH 633 tile 50um stack,1893,1893,3,2
+P2-13A,P2-13A-5,P2 13A Th 633 15um stack_Maximum intensity projection.czi,P2 13A Th 633 15um stack_Maximum intensity projection,1648,1648,1,1
+P2-13A,P2-13A-6,P2 13A Th 633 15um stack.czi,P2 13A Th 633 15um stack,1648,1648,11,1
+P2-13A,P2-13A-7,P2 13A Th 633 tile 50um stack_Maximum intensity projection.czi,P2 13A Th 633 tile 50um stack_Maximum intensity projection,1893,1893,1,1
+P2-13A,P2-13A-8,P2 13A Th 633 tile 50um stack.czi,P2 13A Th 633 tile 50um stack,1893,1893,7,1
+P2-13A,P2-13A-9,P2 13A VIP 488 tile 50um stack.czi,P2 13A VIP 488 tile 50um stack,1894,1893,7,1
+P2-13A,P2-13A-10,P2-13A INS 488 PGP 647 8 um stack_Maximum intensity projection.czi,P2-13A INS 488 PGP 647 8 um stack_Maximum intensity projection,512,512,1,2
+P2-13A,P2-13A-11,P2-13A INS 488 PGP 647 8 um stack.czi,P2-13A INS 488 PGP 647 8 um stack,512,512,11,2
+P2-13A,P2-13A-12,P2-13A INS 488 PGP 647 tile 8 um stack.czi,P2-13A INS 488 PGP 647 tile 8 um stack,1894,1894,11,2
+P2-13A,P2-13A-13,P2-13A INS 488 tile 25um stack _Maximum intensity projection.czi,P2-13A INS 488 tile 25um stack _Maximum intensity projection,946,946,1,1
+P2-13A,P2-13A-14,P2-13A INS 488 tile 25um stack.czi,P2-13A INS 488 tile 25um stack,946,946,6,1
+P2-13A,P2-13A-15,P2-13A PGP 647 488 tile 25um stack.czi,P2-13A PGP 647 488 tile 25um stack,946,946,5,1
+P2-13A,P2-13A-16,P2-13A PGP 647 tile 25um stack _Maximum intensity projection.czi,P2-13A PGP 647 tile 25um stack _Maximum intensity projection,946,946,1,1
+P2-19A,P2-19A-1,P2 19A CD31 546 laser 488.czi,P2 19A CD31 546 laser 488,2048,2048,1,1
+P2-19A,P2-19A-2,P2 19A CD31 546 laser 514.czi,P2 19A CD31 546 laser 514,2048,2048,1,1
+P2-19A,P2-19A-3,P2 19A CD31 546 laser 561.czi,P2 19A CD31 546 laser 561,2048,2048,1,1
+P2-19A,P2-19A-4,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9_Maximum intensity projection.czi,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9_Maximum intensity projection,1433,2815,1,4
+P2-19A,P2-19A-5,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9.czi,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9,1433,2815,13,4
+P2-19A,P2-19A-6,P2 19A GCG 405 Parasym 488 CD31 546 TH 633_Maximum intensity projection.czi,P2 19A GCG 405 Parasym 488 CD31 546 TH 633_Maximum intensity projection,2048,2048,1,4
+P2-19A,P2-19A-7,P2 19A GCG 405 Parasym 488 CD31 546 TH 633.czi,P2 19A GCG 405 Parasym 488 CD31 546 TH 633,2048,2048,78,4
+P2-19A,P2-19A-8,P2 19A GCG 405 TH 633 tile z 6um_Maximum intensity projection.czi,P2 19A GCG 405 TH 633 tile z 6um_Maximum intensity projection,5733,9420,1,2
+P2-19A,P2-19A-9,P2 19A GCG 405 TH 633 tile z 6um.czi,P2 19A GCG 405 TH 633 tile z 6um,5733,9420,9,2
+P2-19A,P2-19A-10,P2 19A Parasym 488 TH 633 tile z 25.czi,P2 19A Parasym 488 TH 633 tile z 25,5733,9420,4,2
+P2-19A,P2-19A-11,P2 19A TH 633 set exposure.czi,P2 19A TH 633 set exposure,2048,2048,1,1
+P2-1A,P2-1A-1,P2-1A GCG 405 INS 488 tile Z 20um_Maximum intensity projection.czi,P2-1A GCG 405 INS 488 tile Z 20um_Maximum intensity projection,4065,7917,1,2
+P2-1A,P2-1A-2,P2-1A GCG 405 INS 488 tile Z 20um.czi,P2-1A GCG 405 INS 488 tile Z 20um,4065,7917,9,2
+P2-1A,P2-1A-3,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection-1.czi,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection-1,1433,1894,10,2
+P2-1A,P2-1A-4,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection.czi,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection,1433,1894,1,2
+P2-1A,P2-1A-5,P2-1A INS 488 tile Z 20um_Maximum intensity projection.czi,P2-1A INS 488 tile Z 20um_Maximum intensity projection,4065,7917,1,1
+P2-1A,P2-1A-6,P2-1A INS 488 tile Z 20um.czi,P2-1A INS 488 tile Z 20um,4065,7917,12,1
+P2-7A,P2-7A-1,P2 07A 03 LYVE NCAM INS stack2_Maximum intensity projection_c1+2+3.jpg,P2 07A 03 LYVE NCAM INS stack2_Maximum intensity projection_c1+2+3,512,512,1,1
+P2-7A,P2-7A-2,P2 07A 03 Lyve NCAM stack 2x.avi,P2 07A 03 Lyve NCAM stack 2x,1024,1024,47,1
+P2-7A,P2-7A-3,P2 07A 04 NF200 555 ganglion stack.avi,P2 07A 04 NF200 555 ganglion stack,1656,1656,68,1
+P2-7A,P2-7A-4,P2-7A INS 488 PGP 647_Maximum intensity projection.czi,P2-7A INS 488 PGP 647_Maximum intensity projection,1407,1177,1,2
+P2-7A,P2-7A-5,P2-7A INS 488 PGP 647_stack z 8um_Maximum intensity projection.czi,P2-7A INS 488 PGP 647_stack z 8um_Maximum intensity projection,1648,1648,1,2
+P2-7A,P2-7A-6,P2-7A INS 488 PGP 647_stack z 8um-1.czi,P2-7A INS 488 PGP 647_stack z 8um-1,1407,1177,11,2
+P2-7A,P2-7A-7,P2-7A INS 488 PGP 647_stack z 8um.czi,P2-7A INS 488 PGP 647_stack z 8um,1648,1648,8,2
+P2-7A,P2-7A-8,P2-7A PGP 647 tile only.czi,P2-7A PGP 647 tile only,9063,7580,1,1
+P2-7A,P2-7A-9,P2-7A PGP 647 tile.czi,P2-7A PGP 647 tile,9063,7580,1,1
+P2-7A,P2-7A-10,P2-7A PGP 647_stack z 5 um 20x_Maximum intensity projection.czi,P2-7A PGP 647_stack z 5 um 20x_Maximum intensity projection,2200,2200,1,1
+P2-7A,P2-7A-11,P2-7A PGP 647_stack z 5 um 20x.czi,P2-7A PGP 647_stack z 5 um 20x,2200,2200,12,1
+P2-7A,P2-7A-12,P2-7A TH 633_Maximum intensity projection.czi,P2-7A TH 633_Maximum intensity projection,2354,1894,1,1
+P2-7A,P2-7A-13,P2-7A TH 633.czi,P2-7A TH 633,2354,1894,9,1
