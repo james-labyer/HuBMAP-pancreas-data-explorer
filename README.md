@@ -40,28 +40,38 @@ Run pytest within a development container:
 docker exec {container_name} pytest --cov-report term-missing --cov
 ```
 
-## Setting up production for the first time
-1. Log into the server and clone this repo.
+## Preparing the production image
 
-   ```
-   git clone https://github.com/james-labyer/HuBMAP-pancreas-data-explorer.git
-   ```
-
-2. Use `scripts/move.sh` to migrate large files into production. You will first need to edit `move.sh` to include the correct values for file source, file destination, and key.
-
-
-3. Build the image
+1. On your machine, build the image
 
    ```
    docker compose -f docker-compose.yaml build
    ```
 
-4. Run the image
+2. Publish the image to Docker Hub
 
    ```
-   docker compose -f docker-compose.yaml up
+   docker tag hubmap-pancreas-data-explorer-dash-app jlabyer/hubmap-pancreas-data-explorer:{tag}
+   docker push jlabyer/hubmap-pancreas-data-explorer:{tag}
    ```
 
+3. On the production server, pull the newly published image from Docker Hub
 
-## Generating PNG file to display optical clearing data
-Follow the instructions in `scripts/convert-czi-to-png.ijm` to convert .czi files to a series of .png files for display on the site.
+   ```
+   docker pull jlabyer/hubmap-pancreas-data-explorer:{tag}
+   ```
+
+4. Run the image and test it
+
+   ```
+   docker run -p 127.0.0.1:8050:8050 jlabyer/hubmap-pancreas-data-explorer:{tag}
+   ```
+
+5. Clean up old images
+
+   ```
+   docker system prune -a --volumes
+   ```
+
+## Preparing assets for display on the website
+See the `documentation` folder for more information about how to prepare optical clearing files and 3d model files for display on the website. 
