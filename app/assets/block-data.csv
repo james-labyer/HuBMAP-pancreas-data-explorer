@@ -1,11 +1,12 @@
-﻿Order,Block ID,Anatomical region,Optical clearing,GeoMx,Proteomics
-1,P1-3,Pancreatic head, , , 
-2,P1-4A,Pancreatic head,/optical-clearing-files/P1-4A,/geomx/P1, 
-3,P1-7A,Pancreatic neck,/optical-clearing-files/P1-7A, , 
-4,P1-9,Pancreatic neck, ,/geomx/P1, 
-5,P1-14A,Pancreatic body,/optical-clearing-files/P1-14A, , 
-6,P1-19A,Pancreatic tail,/optical-clearing-files/P1-19A, , 
-7,P1-20A,Pancreatic tail, , , 
-8,P1-20B,Pancreatic tail, , , 
-9,P1-20C,Pancreatic tail, , ,/proteomics
-10,P1-21,Pancreatic tail, ,/geomx/P1, 
+﻿Pancreas,Order,Block ID,Anatomical region,Optical clearing,GeoMx,Proteomics
+P1,2,P1-4A,Pancreatic head,/optical-clearing-files/P1-4A,/geomx/P1, 
+P1,3,P1-7A,Pancreatic neck,/optical-clearing-files/P1-7A, , 
+P1,4,P1-9,Pancreatic neck, ,/geomx/P1, 
+P1,5,P1-14A,Pancreatic body,/optical-clearing-files/P1-14A, , 
+P1,6,P1-19A,Pancreatic tail,/optical-clearing-files/P1-19A, , 
+P1,9,P1-20C,Pancreatic tail, , ,/proteomics
+P1,10,P1-21,Pancreatic tail, ,/geomx/P1, 
+P2,1,P2-1A,Pancreatic head,/optical-clearing-files/P2-1A, , 
+P2,2,P2-7A,Pancreatic neck,/optical-clearing-files/P2-7A, , 
+P2,3,P2-13A,Pancreatic body,/optical-clearing-files/P2-13A, , 
+P2,4,P2-19A,Pancreatic tail,/optical-clearing-files/P2-19A, , 

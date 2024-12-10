@@ -20,7 +20,7 @@ def test_links():
             assert block_name in thumbnails["Block"].values
     for j in range(blocks["GeoMx"].size):
         if blocks["GeoMx"][j] != " ":
-            pancreas = blocks["GeoMx"][i].split("/")[-1]
+            pancreas = blocks["GeoMx"][j].split("/")[-1]
             assert pancreas in reports["pancreas"].values
     for k in range(blocks["Proteomics"].size):
         if blocks["Proteomics"][k] != " ":

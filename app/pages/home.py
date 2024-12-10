@@ -14,6 +14,22 @@ blocks = pd.read_csv("assets/block-data.csv")
 
 app_logger.debug(f"Data columns imported for home page grid:\n{blocks.columns}")
 
+
+def make_grid(pancreas="P1"):
+    p = blocks.loc[blocks["Pancreas"] == pancreas]
+    prows = p.to_dict("records")
+    pheight = len(prows) * 41.25 + 49 + 15
+
+    return dag.AgGrid(
+        id=f"{pancreas}-df",
+        rowData=prows,
+        columnDefs=columns,
+        className="ag-theme-alpine block-grid",
+        columnSize="sizeToFit",
+        style={"height": pheight},
+    )
+
+
 columns = [
     {"field": "Order"},
     {"field": "Block ID"},
@@ -23,14 +39,14 @@ columns = [
     {"field": "Proteomics", "cellRenderer": "dsLink"},
 ]
 
-grid = dag.AgGrid(
-    id="blocks-df",
-    rowData=blocks.to_dict("records"),
-    columnDefs=columns,
-    className="ag-theme-alpine block-grid",
-    columnSize="sizeToFit",
-    style={"height": 490},
+layout = html.Div(
+    [
+        html.Section([html.Header(html.H2("Pancreas 1 Datasets")), make_grid("P1")]),
+        html.Section(
+            [
+                html.Header(html.H2("Pancreas 2 Datasets"), className="middle-section"),
+                make_grid("P2"),
+            ]
+        ),
+    ]
 )
-
-
-layout = html.Section([html.Header(html.H2("Pancreas 1 Datasets")), grid])

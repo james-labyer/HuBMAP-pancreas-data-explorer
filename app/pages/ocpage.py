@@ -162,13 +162,13 @@ def update_pic(tab, slider, data):
             f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
         )
     # add max-height and max-width to style based on image's dimensions
-    if data["height"] > 600:
-        ar = data["width"] / data["height"]
+    if int(data["height"]) > 600:
+        ar = int(data["width"]) / int(data["height"])
         max_height = 600
         max_width = ar * 600
     else:
-        max_height = data["height"]
-        max_width = data["width"]
+        max_height = int(data["height"])
+        max_width = int(data["width"])
 
     return html.Img(
         src=pic,

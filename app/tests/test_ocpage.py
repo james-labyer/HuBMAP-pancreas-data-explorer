@@ -108,8 +108,8 @@ def test_update_pic():
         "basefile": "P1_14A1_ KRT19 green INS white stack",
         "slices": "14",
         "channels": "2",
-        "height": "2048",
-        "width": "2048",
+        "height": 600,
+        "width": 600,
     }
     # no tab, no slider
     pic = Image.open(
