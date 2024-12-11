@@ -19,6 +19,7 @@ Constants and Datasets
 
 D_PROTEIN = "INS"
 D_SCHEME = "haline"
+D_LAYER = "All"
 LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
@@ -84,6 +85,28 @@ def make_sphere(x, y, z, radius, resolution=5):
     return (X, Y, Z)
 
 
+def set_layout(fig):
+    fig.update_layout(
+        scene=dict(
+            xaxis=dict(
+                nticks=10,
+                range=[X_AXIS[0], X_AXIS[-1]],
+            ),
+            yaxis=dict(
+                nticks=6,
+                range=[Y_AXIS[0], Y_AXIS[-1]],
+            ),
+            zaxis=dict(
+                nticks=5,
+                range=[Z_AXIS[0], Z_AXIS[-1]],
+            ),
+            aspectmode="manual",
+            aspectratio=dict(x=0.9, y=0.5, z=0.4),
+            camera=dict(eye=dict(x=0.7, y=0.7, z=0.7)),
+        ),
+    )
+
+
 """
 Layout and Figure Creation Functions
 """
@@ -117,13 +140,7 @@ def make_cube_fig(
         )
     )
 
-    fig1.update_layout(
-        scene=dict(
-            xaxis=dict(tickvals=X_AXIS),
-            yaxis=dict(tickvals=Y_AXIS),
-            zaxis=dict(tickvals=Z_AXIS),
-        )
-    )
+    set_layout(fig1)
     app_logger.debug("Added cube view to proteomics page")
     return fig1
 
@@ -150,86 +167,103 @@ def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="
             name="Point View",
         )
     )
+    set_layout(fig2)
     app_logger.debug("Added point view to proteomics page")
     return fig2
 
 
-def make_layer_fig(colorscheme=D_SCHEME, protein=D_PROTEIN):
+def make_layer_fig(colorscheme=D_SCHEME, protein=D_PROTEIN, layer=D_LAYER):
     """Create figure for layer view of proteomics data"""
-    x = X_AXIS[:9]
-    y = Y_AXIS[:5]
-    z1 = [[35 for i in x] for j in y]
-    z2 = [[70 for i in x] for j in y]
-    z3 = [[105 for i in x] for j in y]
-    z4 = [[140 for i in x] for j in y]
+    x = [246, 296, 346, 396, 446, 496, 546, 596, 646]
+    y = [274.5, 327.5, 380.5, 433.5, 486.5]
 
-    color_sets = []
+    zlayers = {
+        "Layer 1": [[17.5 for i in x] for j in y],
+        "Layer 2": [[52.5 for i in x] for j in y],
+        "Layer 3": [[87.5 for i in x] for j in y],
+        "Layer 4": [[122.5 for i in x] for j in y],
+    }
 
-    for k in range(4):
-        this_layer = select_layer(LAYERS[k], points_df)
-        color_sets.append(get_colors(this_layer, protein))
+    cmin = math.floor(protein_df.loc[0, protein])
+    cmax = math.ceil(protein_df.loc[1, protein])
 
-    fig = go.Figure(
-        data=[
+    data = []
+
+    if layer == "All":
+        for k in range(4):
+            this_layer = select_layer(LAYERS[k + 1], points_df)
+            color_set = get_colors(this_layer, protein)
+            if k == 0:
+                data.append(
+                    go.Surface(
+                        x=x,
+                        y=y,
+                        z=zlayers[LAYERS[k + 1]],
+                        colorscale=colorscheme,
+                        surfacecolor=color_set,
+                        name=LAYERS[k + 1],
+                        cmin=cmin,
+                        cmax=cmax,
+                    ),
+                )
+            else:
+                data.append(
+                    go.Surface(
+                        x=x,
+                        y=y,
+                        z=zlayers[LAYERS[k + 1]],
+                        colorscale=colorscheme,
+                        surfacecolor=color_set,
+                        name=LAYERS[k + 1],
+                        cmin=cmin,
+                        cmax=cmax,
+                        showscale=False,
+                    ),
+                )
+    else:
+        this_layer = select_layer(layer, points_df)
+        color_set = get_colors(this_layer, protein)
+        data.append(
             go.Surface(
                 x=x,
                 y=y,
-                z=z1,
+                z=zlayers[layer],
                 colorscale=colorscheme,
-                surfacecolor=color_sets[0],
-                name="Layer 1",
+                surfacecolor=color_set,
+                name=layer,
+                cmin=cmin,
+                cmax=cmax,
             ),
-            go.Surface(
-                x=x,
-                y=y,
-                z=z2,
-                showscale=False,
-                colorscale=colorscheme,
-                surfacecolor=color_sets[1],
-                name="Layer 2",
-            ),
-            go.Surface(
-                x=x,
-                y=y,
-                z=z3,
-                showscale=False,
-                colorscale=colorscheme,
-                surfacecolor=color_sets[2],
-                name="Layer 3",
-            ),
-            go.Surface(
-                x=x,
-                y=y,
-                z=z4,
-                showscale=False,
-                colorscale=colorscheme,
-                surfacecolor=color_sets[3],
-                name="Layer 4",
-            ),
-        ]
-    )
+        )
+
+    fig = go.Figure(data=data)
+    set_layout(fig)
     app_logger.debug("Added layer view to proteomics page")
     return fig
 
 
-def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN):
+def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer=D_LAYER):
     """Create figure for sphere view of proteomics data"""
     res = 5
     data = []
     cmin = math.floor(protein_df.loc[0, protein])
     cmax = math.ceil(protein_df.loc[1, protein])
-    for k in points_df.index:
-        s_color = points_df.loc[k, protein]
+
+    layer_df = select_layer(layer, points_df)
+
+    scalebar = False
+    for k in layer_df.index:
+        s_color = layer_df.loc[k, protein]
         if not np.isnan(s_color):
             (X, Y, Z) = make_sphere(
-                x=points_df.loc[k, "X Center"],
-                y=points_df.loc[k, "Y Center"],
-                z=points_df.loc[k, "Z Center"],
-                radius=16,
+                x=layer_df.loc[k, "X Center"],
+                y=layer_df.loc[k, "Y Center"],
+                z=layer_df.loc[k, "Z Center"],
+                radius=14,
                 resolution=res,
             )
             c = [[s_color.item() for i in range(res)] for j in range(res * 2)]
-            if k == 1:
+            if not scalebar:
                 data.append(
                     go.Surface(
                         x=X,
@@ -243,6 +277,7 @@ def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN):
                         name=f"val:\n{s_color.item()}",
                     )
                 )
+                scalebar = True
             else:
                 data.append(
                     go.Surface(
@@ -260,6 +295,7 @@ def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN):
                 )
 
     fig4 = go.Figure(data=data)
+    set_layout(fig4)
     app_logger.debug("Added sphere view to proteomics page")
     return fig4
 
@@ -302,6 +338,16 @@ filters = dbc.Card(
                             C_SCHEMES,
                             D_SCHEME,
                             id="cschemedd",
+                        ),
+                    ]
+                ),
+                dbc.Col(
+                    [
+                        html.P("Choose a layer:", className="card-text"),
+                        dcc.Dropdown(
+                            LAYERS,
+                            D_LAYER,
+                            id="layersdd",
                         ),
                     ]
                 ),
@@ -463,6 +509,7 @@ layout = html.Div(
                 dcc.Store(id="cap-store"),
                 dcc.Store(id="cube-opacity-store"),
                 dcc.Store(id="point-opacity-store"),
+                dcc.Store(id="layer-store"),
             ],
         ),
         html.Section(
@@ -502,11 +549,12 @@ def update_controls(at):
     Input("cap-store", "data"),
     Input("cube-opacity-store", "data"),
     Input("point-opacity-store", "data"),
+    Input("layer-store", "data"),
 )
-def update_fig(tab, color, protein, cap, cubeopacity, pointopacity):
-    props = [color, protein, cap, cubeopacity, pointopacity]
-    settings = [D_SCHEME, D_PROTEIN, True, 0.4, 0.1]
-    for i in range(5):
+def update_fig(tab, color, protein, cap, cubeopacity, pointopacity, layer):
+    props = [color, protein, cap, cubeopacity, pointopacity, layer]
+    settings = [D_SCHEME, D_PROTEIN, True, 0.4, 0.1, "All"]
+    for i in range(6):
         if props[i] is not None:
             settings[i] = props[i]
     if tab == "cube-tab":
@@ -515,15 +563,23 @@ def update_fig(tab, color, protein, cap, cubeopacity, pointopacity):
             protein=settings[1],
             caps=settings[2],
             opacity=settings[3],
+            layer=settings[5],
         )
     elif tab == "point-tab":
         return make_point_fig(
-            colorscheme=settings[0], protein=settings[1], opacity=settings[4]
+            colorscheme=settings[0],
+            protein=settings[1],
+            opacity=settings[4],
+            layer=settings[5],
         )
     elif tab == "layer-tab":
-        return make_layer_fig(colorscheme=settings[0], protein=settings[1])
+        return make_layer_fig(
+            colorscheme=settings[0], protein=settings[1], layer=settings[5]
+        )
     elif tab == "sphere-tab":
-        return make_sphere_fig(colorscheme=settings[0], protein=settings[1])
+        return make_sphere_fig(
+            colorscheme=settings[0], protein=settings[1], layer=settings[5]
+        )
 
 
 @callback(Output("protein-store", "data"), Input("proteinsdd", "value"))
@@ -533,6 +589,11 @@ def save_protein_filter(value):
 
 @callback(Output("color-store", "data"), Input("cschemedd", "value"))
 def save_color_scheme(value):
+    return value
+
+
+@callback(Output("layer-store", "data"), Input("layersdd", "value"))
+def save_layer(value):
     return value
 
 
