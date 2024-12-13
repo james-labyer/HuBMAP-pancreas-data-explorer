@@ -44,7 +44,7 @@ C_SCHEMES = [
     "ylorrd",
 ]
 
-cubes_df1 = pd.read_csv("assets/rectangles_output_test.csv")
+cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
@@ -192,7 +192,6 @@ def make_cube_fig(
 
     set_layout(fig1)
     app_logger.debug("Added cube view to proteomics page")
-    print(fig1)
     return fig1
 
 
@@ -391,7 +390,6 @@ def make_islet_slider(start=D_ISLET):
 
 
 def make_extra_filters(tab, isletopt="All"):
-    print(tab)
     controls = []
     if tab == "cube-tab":
         controls = [
@@ -614,7 +612,6 @@ Callbacks
     Input("islet-store", "data"),
 )
 def update_controls(at, isletopt):
-    print("at: ", at)
     if at == "layer-tab" or not at:
         return
     else:

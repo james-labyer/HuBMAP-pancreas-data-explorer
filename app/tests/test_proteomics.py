@@ -60,6 +60,33 @@ def test_uf_cube_layer():
     assert fig2["data"][0]["z"].max() == 69.999
 
 
+def test_uf_cube_islet():
+    fig1 = update_fig(
+        "cube-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
+    )
+    fig2 = update_fig(
+        "cube-tab",
+        D_SCHEME,
+        D_PROTEIN,
+        D_OPACITY,
+        D_OPACITY,
+        "All",
+        "Pixels with islet tissue",
+    )
+    fig3 = update_fig(
+        "cube-tab",
+        D_SCHEME,
+        D_PROTEIN,
+        D_OPACITY,
+        D_OPACITY,
+        "All",
+        "Pixels without islet tissue",
+    )
+    assert len(fig1["data"][0]["z"]) == 1440
+    assert len(fig2["data"][0]["z"]) == 728
+    assert len(fig3["data"][0]["z"]) == 712
+
+
 def test_uf_point_opacity():
     # test that fig2's opacity value is updated as expected
     fig1 = update_fig("point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, 0.5, "All", "All")
@@ -195,6 +222,34 @@ def test_uf_sphere_layer():
     assert fig1["data"][0]["z"].max() == 31.5
     assert fig2["data"][0]["z"].min() == 108.5
     assert fig2["data"][0]["z"].max() == 136.5
+
+
+def test_uf_sphere_islet():
+    fig1 = update_fig(
+        "sphere-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
+    )
+    fig2 = update_fig(
+        "sphere-tab",
+        D_SCHEME,
+        D_PROTEIN,
+        D_OPACITY,
+        D_OPACITY,
+        "All",
+        "Pixels with islet tissue",
+    )
+    fig3 = update_fig(
+        "sphere-tab",
+        D_SCHEME,
+        D_PROTEIN,
+        D_OPACITY,
+        D_OPACITY,
+        "All",
+        "Pixels without islet tissue",
+    )
+
+    assert len(fig1["data"]) == 169
+    assert len(fig2["data"]) == 91
+    assert len(fig3["data"]) == 78
 
 
 def test_uo_protein():
