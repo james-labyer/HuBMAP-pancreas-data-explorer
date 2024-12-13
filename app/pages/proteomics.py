@@ -21,6 +21,8 @@ D_PROTEIN = "INS"
 D_SCHEME = "haline"
 D_LAYER = "All"
 LAYERS = ["All", "Layer 1", "Layer 2", "Layer 3", "Layer 4"]
+D_ISLET = "All"
+ISLET_OPTIONS = ["All", "Pixels with islet tissue", "Pixels without islet tissue"]
 X_AXIS = [221, 271, 321, 371, 421, 471, 521, 571, 621, 671]
 Y_AXIS = [248, 301, 354, 407, 460, 513]
 Z_AXIS = [0, 35, 70, 105, 140]
@@ -42,7 +44,7 @@ C_SCHEMES = [
     "ylorrd",
 ]
 
-cubes_df1 = pd.read_csv("assets/rectangles_output.csv")
+cubes_df1 = pd.read_csv("assets/rectangles_output_test.csv")
 points_df = pd.read_csv("assets/HuBMAP_ili_data10-11-24.csv")
 protein_df = pd.read_csv("assets/protein_labels.csv")
 proteins = protein_df.columns.tolist()
@@ -63,6 +65,15 @@ def select_layer(zlayer, df):
         return df[(df["Z Center"] >= 70) & (df["Z Center"] < 105)]
     elif zlayer == "Layer 4":
         return df[df["Z Center"] >= 105]
+
+
+def select_islet(isletopt, df):
+    if isletopt == "All":
+        return df
+    elif isletopt == "Pixels with islet tissue":
+        return df[df["Islet"]]
+    elif isletopt == "Pixels without islet tissue":
+        return df[~df["Islet"]]
 
 
 def get_colors(df, protein):
@@ -113,41 +124,88 @@ Layout and Figure Creation Functions
 
 
 def make_cube_fig(
-    opacity=0.4, caps=True, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"
+    opacity=0.4,
+    colorscheme=D_SCHEME,
+    protein=D_PROTEIN,
+    layer="All",
+    isletopt="All",
 ):
     """Create figure for cube view of proteomics data"""
-    df3 = select_layer(layer, cubes_df1)
+    df2 = select_layer(layer, cubes_df1)
+    df3 = select_islet(isletopt, df2)
 
     X = df3.loc[:, "X Center"]
     Y = df3.loc[:, "Y Center"]
     Z = df3.loc[:, "Z Center"]
     values = df3.loc[:, protein]
 
+    # In the dataset, within each set of points representing a cube, the points are ordered as follows:
+    # [
+    #     [x, y, z],
+    #     [x + x_dist, y, z],
+    #     [x, y + y_dist, z],
+    #     [x + x_dist, y + y_dist, z],
+    #     [x, y, z + z_dist],
+    #     [x + x_dist, y, z + z_dist],
+    #     [x, y + y_dist, z + z_dist],
+    #     [x + x_dist, y + y_dist, z + z_dist],
+    # ]
+
+    triangle_pattern = [
+        [0, 1, 2],
+        [0, 1, 4],
+        [0, 2, 4],
+        [4, 5, 1],
+        [4, 2, 6],
+        [4, 5, 6],
+        [3, 2, 6],
+        [3, 5, 1],
+        [3, 2, 1],
+        [7, 6, 5],
+        [7, 6, 3],
+        [7, 3, 5],
+    ]
+
+    all_triangles = []
+
+    for m in range(0, df3.shape[0], 8):
+        all_triangles.extend([[m + x[0], m + x[1], m + x[2]] for x in triangle_pattern])
+
+    faces1 = np.array(all_triangles)
+    faces2 = np.transpose(faces1)
+
     fig1 = go.Figure(
-        data=go.Volume(
+        data=go.Mesh3d(
             x=X,
             y=Y,
             z=Z,
-            value=values,
-            isomin=math.floor(protein_df.loc[0, protein]),
-            isomax=math.ceil(protein_df.loc[1, protein]),
+            i=faces2[0],
+            j=faces2[1],
+            k=faces2[2],
+            intensity=values,
             opacity=opacity,
-            surface_count=180,
-            slices_z=dict(show=True, locations=[0.4]),
-            caps=dict(x_show=caps, y_show=caps, z_show=caps, x_fill=1),
             colorscale=colorscheme,
-            name="Cube View",
+            cmin=math.floor(protein_df.loc[0, protein]),
+            cmax=math.ceil(protein_df.loc[1, protein]),
         )
     )
 
     set_layout(fig1)
     app_logger.debug("Added cube view to proteomics page")
+    print(fig1)
     return fig1
 
 
-def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="All"):
+def make_point_fig(
+    opacity=0.1,
+    colorscheme=D_SCHEME,
+    protein=D_PROTEIN,
+    layer="All",
+    isletopt="All",
+):
     """Create figure for point view of proteomics data"""
     df4 = select_layer(layer, points_df)
+    df4 = select_islet(isletopt, df4)
     X = df4.loc[:, "X Center"]
     Y = df4.loc[:, "Y Center"]
     Z = df4.loc[:, "Z Center"]
@@ -167,6 +225,7 @@ def make_point_fig(opacity=0.1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer="
             name="Point View",
         )
     )
+
     set_layout(fig2)
     app_logger.debug("Added point view to proteomics page")
     return fig2
@@ -242,7 +301,13 @@ def make_layer_fig(colorscheme=D_SCHEME, protein=D_PROTEIN, layer=D_LAYER):
     return fig
 
 
-def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer=D_LAYER):
+def make_sphere_fig(
+    opacity=1,
+    colorscheme=D_SCHEME,
+    protein=D_PROTEIN,
+    layer=D_LAYER,
+    isletopt="All",
+):
     """Create figure for sphere view of proteomics data"""
     res = 5
     data = []
@@ -250,6 +315,7 @@ def make_sphere_fig(opacity=1, colorscheme=D_SCHEME, protein=D_PROTEIN, layer=D_
     cmax = math.ceil(protein_df.loc[1, protein])
 
     layer_df = select_layer(layer, points_df)
+    layer_df = select_islet(isletopt, layer_df)
 
     scalebar = False
     for k in layer_df.index:
@@ -311,6 +377,53 @@ def make_opacity_slider(id, opacity):
             id=id,
         ),
     ]
+
+
+def make_islet_slider(start=D_ISLET):
+    return [
+        html.P("Filter islet tissue:", className="card-text"),
+        dcc.Dropdown(
+            ISLET_OPTIONS,
+            start,
+            id="isletdd",
+        ),
+    ]
+
+
+def make_extra_filters(tab, isletopt="All"):
+    print(tab)
+    controls = []
+    if tab == "cube-tab":
+        controls = [
+            dbc.Col(
+                children=make_islet_slider(isletopt),
+                width=3,
+            ),
+            dbc.Col(
+                children=make_opacity_slider("cubeslider", 0.4),
+                width=6,
+            ),
+        ]
+    elif tab == "point-tab":
+        controls = [
+            dbc.Col(
+                children=make_opacity_slider("pointslider", 0.1),
+                width=12,
+            ),
+        ]
+    elif tab == "sphere-tab":
+        controls = [
+            dbc.Col(
+                children=make_islet_slider(isletopt),
+            ),
+        ]
+
+    return dbc.Card(
+        dbc.CardBody(
+            dbc.Row(children=controls),
+        ),
+        color="light",
+    )
 
 
 """
@@ -401,41 +514,6 @@ tab_content = dbc.Card(
     ]
 )
 
-cube_controls = dbc.Card(
-    dbc.CardBody(
-        dbc.Row(
-            children=[
-                dbc.Col(
-                    children=[
-                        html.P("Add or remove end caps:"),
-                        dbc.Switch(
-                            id="cubecapswitch",
-                            value=True,
-                        ),
-                    ],
-                    width=3,
-                ),
-                dbc.Col(
-                    children=make_opacity_slider("cubeslider", 0.4),
-                    width=9,
-                ),
-            ],
-        ),
-    ),
-    color="light",
-)
-
-point_controls = dbc.Card(
-    dbc.CardBody(
-        dbc.Row(
-            dbc.Col(
-                children=make_opacity_slider("pointslider", 0.1),
-                width=12,
-            ),
-        ),
-    ),
-    color="light",
-)
 
 study_downloads = html.Div(
     children=[
@@ -506,10 +584,10 @@ layout = html.Div(
                 tab_content,
                 dcc.Store(id="protein-store"),
                 dcc.Store(id="color-store"),
-                dcc.Store(id="cap-store"),
                 dcc.Store(id="cube-opacity-store"),
                 dcc.Store(id="point-opacity-store"),
                 dcc.Store(id="layer-store"),
+                dcc.Store(id="islet-store"),
             ],
         ),
         html.Section(
@@ -533,12 +611,14 @@ Callbacks
 @callback(
     Output("extra-filters", "children"),
     Input("tabs", "active_tab"),
+    Input("islet-store", "data"),
 )
-def update_controls(at):
-    if at == "cube-tab":
-        return cube_controls
-    elif at == "point-tab":
-        return point_controls
+def update_controls(at, isletopt):
+    print("at: ", at)
+    if at == "layer-tab" or not at:
+        return
+    else:
+        return make_extra_filters(at, isletopt)
 
 
 @callback(
@@ -546,14 +626,14 @@ def update_controls(at):
     Input("tabs", "active_tab"),
     Input("color-store", "data"),
     Input("protein-store", "data"),
-    Input("cap-store", "data"),
     Input("cube-opacity-store", "data"),
     Input("point-opacity-store", "data"),
     Input("layer-store", "data"),
+    Input("islet-store", "data"),
 )
-def update_fig(tab, color, protein, cap, cubeopacity, pointopacity, layer):
-    props = [color, protein, cap, cubeopacity, pointopacity, layer]
-    settings = [D_SCHEME, D_PROTEIN, True, 0.4, 0.1, "All"]
+def update_fig(tab, color, protein, cubeopacity, pointopacity, layer, isletopt):
+    props = [color, protein, cubeopacity, pointopacity, layer, isletopt]
+    settings = [D_SCHEME, D_PROTEIN, 0.4, 0.1, "All", "All"]
     for i in range(6):
         if props[i] is not None:
             settings[i] = props[i]
@@ -561,24 +641,28 @@ def update_fig(tab, color, protein, cap, cubeopacity, pointopacity, layer):
         return make_cube_fig(
             colorscheme=settings[0],
             protein=settings[1],
-            caps=settings[2],
-            opacity=settings[3],
-            layer=settings[5],
+            opacity=settings[2],
+            layer=settings[4],
+            isletopt=settings[5],
         )
     elif tab == "point-tab":
         return make_point_fig(
             colorscheme=settings[0],
             protein=settings[1],
-            opacity=settings[4],
-            layer=settings[5],
+            opacity=settings[3],
+            layer=settings[4],
+            isletopt=settings[5],
         )
     elif tab == "layer-tab":
         return make_layer_fig(
-            colorscheme=settings[0], protein=settings[1], layer=settings[5]
+            colorscheme=settings[0], protein=settings[1], layer=settings[4]
         )
     elif tab == "sphere-tab":
         return make_sphere_fig(
-            colorscheme=settings[0], protein=settings[1], layer=settings[5]
+            colorscheme=settings[0],
+            protein=settings[1],
+            layer=settings[4],
+            isletopt=settings[5],
         )
 
 
@@ -597,8 +681,8 @@ def save_layer(value):
     return value
 
 
-@callback(Output("cap-store", "data"), Input("cubecapswitch", "value"))
-def save_cap_setting(value):
+@callback(Output("islet-store", "data"), Input("isletdd", "value"))
+def save_islet_opt(value):
     return value
 
 

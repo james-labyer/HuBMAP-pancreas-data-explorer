@@ -12,36 +12,25 @@ D_PROTEIN = "INS"
 D_SCHEME = "jet"
 D_OPACITY = 0.4
 D_LAYER = "All"
-D_CAPS = False
 
 protein_df = pd.read_csv("assets/protein_labels.csv")
 
 
 def test_uf_cube_opacity():
     # test that fig1's opacity value is updated as expected
-    fig1 = update_fig("cube-tab", D_SCHEME, D_PROTEIN, D_CAPS, 0.5, 0.4, "All")
-    fig2 = update_fig("cube-tab", D_SCHEME, D_PROTEIN, D_CAPS, 0, 0.4, "All")
+    fig1 = update_fig("cube-tab", D_SCHEME, D_PROTEIN, 0.5, 0.4, "All", "All")
+    fig2 = update_fig("cube-tab", D_SCHEME, D_PROTEIN, 0, 0.4, "All", "All")
 
     assert fig1["data"][0]["opacity"] == 0.5
     assert fig2["data"][0]["opacity"] == 0
     with pytest.raises(ValueError):
-        update_fig("cube-tab", D_SCHEME, D_PROTEIN, D_CAPS, 11, 1, "All")
-
-
-def test_uf_cube_cap():
-    # test that fig1's cap value is updated as expected
-    fig1 = update_fig(
-        "cube-tab", D_SCHEME, D_PROTEIN, False, D_OPACITY, D_OPACITY, "All"
-    )
-    assert fig1["data"][0]["caps"]["x"]["show"] is False
-    assert fig1["data"][0]["caps"]["y"]["show"] is False
-    assert fig1["data"][0]["caps"]["z"]["show"] is False
+        update_fig("cube-tab", D_SCHEME, D_PROTEIN, 11, 1, "All", "All")
 
 
 def test_uf_cube_cscheme():
     # test that fig1's color scheme value is updated as expected
     fig1 = update_fig(
-        "cube-tab", "inferno", D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "cube-tab", "inferno", D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
 
     assert fig1["data"][0]["colorscale"] == (
@@ -60,10 +49,10 @@ def test_uf_cube_cscheme():
 
 def test_uf_cube_layer():
     fig1 = update_fig(
-        "cube-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "cube-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
     fig2 = update_fig(
-        "cube-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "Layer 2"
+        "cube-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "Layer 2", "All"
     )
     assert fig1["data"][0]["z"].min() == 0.0
     assert fig1["data"][0]["z"].max() == 139.999
@@ -73,19 +62,19 @@ def test_uf_cube_layer():
 
 def test_uf_point_opacity():
     # test that fig2's opacity value is updated as expected
-    fig1 = update_fig("point-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, 0.5, "All")
-    fig2 = update_fig("point-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, 0, "All")
+    fig1 = update_fig("point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, 0.5, "All", "All")
+    fig2 = update_fig("point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, 0, "All", "All")
 
     assert fig1["data"][0]["opacity"] == 0.5
     assert fig2["data"][0]["opacity"] == 0
     with pytest.raises(ValueError):
-        update_fig("point-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, 11, "All")
+        update_fig("point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, 11, "All", "All")
 
 
 def test_uf_point_cscheme():
     # test that fig2's color scheme value is updated as expected
     fig1 = update_fig(
-        "point-tab", "inferno", D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "point-tab", "inferno", D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
 
     assert fig1["data"][0]["colorscale"] == (
@@ -104,10 +93,10 @@ def test_uf_point_cscheme():
 
 def test_uf_point_layer():
     fig1 = update_fig(
-        "point-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
     fig2 = update_fig(
-        "point-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "Layer 3"
+        "point-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "Layer 3", "All"
     )
     assert fig1["data"][0]["z"].min() == 17.5
     assert fig1["data"][0]["z"].max() == 122.5
@@ -118,7 +107,7 @@ def test_uf_point_layer():
 def test_uf_layer_cscheme():
     # test that fig3's color scheme value is updated as expected
     fig1 = update_fig(
-        "layer-tab", "inferno", D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "layer-tab", "inferno", D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
 
     assert fig1["data"][0]["colorscale"] == (
@@ -137,10 +126,10 @@ def test_uf_layer_cscheme():
 
 def test_uf_layer_layer():
     fig1 = update_fig(
-        "layer-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "layer-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
     fig2 = update_fig(
-        "layer-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "Layer 2"
+        "layer-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "Layer 2", "All"
     )
     f1l1maxes = []
     f1l1mins = []
@@ -172,7 +161,7 @@ def test_uf_layer_layer():
 def test_uf_sphere_cscheme():
     # test that fig4's color scheme value is updated as expected
     fig1 = update_fig(
-        "sphere-tab", "inferno", D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "sphere-tab", "inferno", D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
 
     assert fig1["data"][0]["colorscale"] == (
@@ -191,10 +180,16 @@ def test_uf_sphere_cscheme():
 
 def test_uf_sphere_layer():
     fig1 = update_fig(
-        "sphere-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "All"
+        "sphere-tab", D_SCHEME, D_PROTEIN, D_OPACITY, D_OPACITY, "All", "All"
     )
     fig2 = update_fig(
-        "sphere-tab", D_SCHEME, D_PROTEIN, D_CAPS, D_OPACITY, D_OPACITY, "Layer 4"
+        "sphere-tab",
+        D_SCHEME,
+        D_PROTEIN,
+        D_OPACITY,
+        D_OPACITY,
+        "Layer 4",
+        "All",
     )
     assert fig1["data"][0]["z"].min() == 3.5
     assert fig1["data"][0]["z"].max() == 31.5
@@ -204,7 +199,7 @@ def test_uf_sphere_layer():
 
 def test_uo_protein():
     # test that max and min values for the specified protein are as expected
-    fig1 = update_fig("cube-tab", D_SCHEME, "GCG", D_CAPS, D_OPACITY, D_OPACITY, "All")
+    fig1 = update_fig("cube-tab", D_SCHEME, "GCG", D_OPACITY, D_OPACITY, "All", "All")
 
-    assert min(fig1["data"][0]["value"]) == protein_df.loc[0, "GCG"]
-    assert max(fig1["data"][0]["value"]) == protein_df.loc[1, "GCG"]
+    assert min(fig1["data"][0]["intensity"]) == protein_df.loc[0, "GCG"]
+    assert max(fig1["data"][0]["intensity"]) == protein_df.loc[1, "GCG"]
