@@ -648,7 +648,7 @@ def update_fig(tab, color, protein, cubeopacity, pointopacity, layer, isletopt):
             protein=settings[1],
             opacity=settings[3],
             layer=settings[4],
-            isletopt=settings[5],
+            isletopt="All",
         )
     elif tab == "layer-tab":
         return make_layer_fig(
