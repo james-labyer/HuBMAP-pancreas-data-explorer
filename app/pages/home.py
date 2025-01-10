@@ -4,7 +4,7 @@ import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
 
-register_page(__name__, path="/", title="HuBMAP Pancreas Data Explorer")
+register_page(__name__, path="/")
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers

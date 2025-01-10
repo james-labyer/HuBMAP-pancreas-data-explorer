@@ -3,6 +3,7 @@ import logging
 import socket
 
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash import (
     Dash,
     Input,
@@ -13,6 +14,15 @@ from dash import (
     html,
     page_container,
 )
+import os
+import sys
+from flask import Flask, request
+
+os.chdir("..")
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
+os.chdir("./app")
+from components import header
 
 
 def handle_args():
@@ -30,97 +40,36 @@ def handle_args():
     return parser.parse_args()
 
 
-footer = "\u00a9" + " 2024, Texas Advanced Computing Center"
+# Flask setup
+server = Flask(__name__)
 
-layout = html.Div(
-    children=[
-        dcc.Location(id="url"),
-        html.Header(
-            dbc.Container(
-                [
-                    dbc.Navbar(
-                        [
-                            dbc.Row(
-                                [
-                                    dbc.Col(
-                                        [
-                                            html.Img(
-                                                src="./assets/magnifying-glass-chart-solid.svg",
-                                                className="text-light header-img",
-                                            ),
-                                            html.H1(
-                                                [
-                                                    "HuBMAP Pancreas Data Explorer",
-                                                ],
-                                                className="bg-primary text-light title",
-                                            ),
-                                        ],
-                                        width=True,
-                                        class_name="title-group",
-                                    ),
-                                    dbc.Col(
-                                        [
-                                            dbc.NavbarToggler(
-                                                id="navbar-toggler",
-                                                n_clicks=0,
-                                            ),
-                                            dbc.Collapse(
-                                                dbc.Nav(
-                                                    [
-                                                        dbc.NavItem(
-                                                            dbc.NavLink(
-                                                                "All Data",
-                                                                href="/",
-                                                                class_name="text-light",
-                                                            )
-                                                        ),
-                                                        dbc.NavItem(
-                                                            dbc.NavLink(
-                                                                "3D Model",
-                                                                href="/3d",
-                                                                class_name="text-light",
-                                                            )
-                                                        ),
-                                                    ],
-                                                    pills=True,
-                                                    horizontal="end",
-                                                    navbar=True,
-                                                ),
-                                                id="navbar-collapse",
-                                                is_open=False,
-                                                navbar=True,
-                                            ),
-                                        ],
-                                        width=2,
-                                        md=3,
-                                    ),
-                                ],
-                                justify="between",
-                                class_name="w-100",
-                                align="center",
-                            ),
-                        ],
-                        class_name="bg-primary text-light w-100",
-                        color="primary",
-                        dark=True,
-                        sticky="top",
-                    ),
-                    html.Div(id="breadcrumb"),
-                ],
-                fluid=True,
-                class_name="px-0",
+
+@server.route("/title", methods=["POST"])
+def update_title():
+    labels = pd.read_csv("../config/labels.csv")
+    # need to escape?
+    labels.at[0, "title"] = request.get_json()["title"]
+    labels.to_csv("../config/labels.csv")
+    # This title update only works temporarily
+    # app.title = request.get_json()["title"]
+    return "", 204
+
+
+def serve_layout():
+    return html.Div(
+        children=[
+            dcc.Location(id="url"),
+            header.make_header("app"),
+            html.Main(
+                dbc.Container(
+                    page_container,
+                    id="content-div",
+                    class_name="main-div",
+                )
             ),
-        ),
-        html.Main(
-            dbc.Container(
-                page_container,
-                id="content-div",
-                class_name="main-div",
-            )
-        ),
-        html.Footer(footer),
-    ]
-)
+            header.footer,
+        ]
+    )
 
 
 @callback(
@@ -136,7 +85,7 @@ def toggle_navbar_collapse(n, is_open):
 
 @callback(Output("breadcrumb", "children"), [Input("url", "pathname")])
 def render_breadcrumb(pathname):
-    if "/optical-clearing/P" in pathname and len(pathname) > 28:
+    if pathname and "/optical-clearing/P" in pathname and len(pathname) > 28:
         # break out the parts of the path
         parts = pathname.split("/")
         # get first six characters of final path child and make them upper case
@@ -164,13 +113,19 @@ if __name__ == "__main__":
     args = handle_args()
     format_str = f"[%(asctime)s {socket.gethostname()}] %(filename)s:%(funcName)s:%(lineno)s - %(levelname)s: %(message)s"
     logging.basicConfig(level=args.loglevel, format=format_str)
-    app = Dash(__name__, external_stylesheets=[dbc.themes.LUMEN], use_pages=True)
-    server = app.server
-    app.layout = layout
+    app = Dash(
+        __name__,
+        external_stylesheets=[dbc.themes.LUMEN],
+        use_pages=True,
+        server=server,
+        title=header.get_title(),
+    )
+    # server = app.server
+    app.layout = serve_layout
     app.run_server(
         host="0.0.0.0",
         port="8050",
-        debug=True,
+        # debug=True,
         dev_tools_props_check=False,
     )
 else:
@@ -178,10 +133,12 @@ else:
         __name__,
         external_stylesheets=[dbc.themes.LUMEN],
         use_pages=True,
+        server=server,
+        title=header.get_title(),
     )
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
     app.logger.debug("Test")
-    server = app.server
-    app.layout = layout
+    # server = app.server
+    app.layout = serve_layout

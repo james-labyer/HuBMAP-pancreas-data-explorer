@@ -1,0 +1,179 @@
+body {
+    font-size: 1.25rem;
+}
+
+hr {
+    border: 1px solid #555;
+}
+
+.main-div {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.model-page {
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-right: 20px;
+    width: 100%;
+}
+
+.title {
+    padding: 1rem 1rem 1rem 1rem;
+    margin-right: 0px;
+}
+
+.all-data {
+    margin: 5px 5px 5px 5px;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+}
+
+.header-img {
+    height: 40px;
+    padding-left: 20px;
+}
+
+.slicer-card {
+    margin-top: 20px;
+}
+
+.custom-slicer-div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-slicer-img {
+    padding-top: 20px;
+    width: 100%;
+}
+
+.solo-slicer-img {
+    padding: 20px;
+}
+
+.download-header {
+    margin-top: 20px;
+}
+
+#navbar-simple {
+    color: #f6f6f6;
+    padding-left: 0px;
+    margin-left: 0px;
+}
+
+#navbar-simple a {
+    color: #f6f6f6;
+}
+
+#navbar-simple a.navbar-brand {
+    font-size: 2.25rem;
+    margin-left: 0;
+}
+
+.dcc-graph {
+    height: 600px;
+}
+
+.block-card {
+    height: 100%;
+}
+
+.ag-theme-alpine.large {
+    --ag-row-height: 120px;
+}
+
+.thumbnail {
+    height: 110px;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.ag-theme-alpine.block-grid div {
+    font-size: 1rem;
+    font-family: 'Source Sans Pro'
+}
+
+footer {
+    margin: 3rem 1rem 0rem 1rem;
+    text-align: center;
+    font-size: .9rem;
+}
+
+section header {
+    margin-bottom: 1.6rem;
+}
+
+.middle-section {
+    margin-top: 2rem;
+}
+
+.download-button {
+    margin-top: .75rem;
+    margin-right: .75rem;
+    margin-bottom: .75rem;
+}
+
+#slice-view {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+#block-table {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+p {
+    margin-bottom: 0;
+    text-align : left;
+    font-family: 'Source Sans Pro';
+ }
+
+ .viz-placeholder {
+    border: 2px solid black;
+    margin-bottom: 2rem;
+    padding: 1rem;
+}
+
+.loader-wrapper > div {
+    visibility: visible !important;
+}
+
+.proteomics-filter {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.center-aligned-header .ag-header-cell-label {
+    justify-content: center;
+}
+
+.center-aligned-cell {
+    text-align: center;
+    justify-content: center;
+}
+
+.ag-row .ag-cell {
+    display: flex;
+    align-items: center;
+  }
+
+#download-dataset {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    padding-left: 17px;
+    padding-right: 17px;
+}
+
+.form-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
