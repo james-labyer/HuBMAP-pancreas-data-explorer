@@ -3,6 +3,7 @@ import sys
 import requests
 from dash import html, register_page, dcc, Output, Input, State, callback, no_update
 import dash_bootstrap_components as dbc
+import nh3
 
 os.chdir("..")
 if os.getcwd() not in sys.path:
@@ -10,6 +11,7 @@ if os.getcwd() not in sys.path:
 os.chdir("./config_portal")
 
 title = "Update Configuration"
+MAX_TITLE_LENGTH = 2048
 
 register_page(__name__, path="/", title=title)
 
@@ -52,9 +54,9 @@ def confirm_modal(message, update_id):
     )
 
 
-def failure_alert(code):
+def failure_alert(message):
     return dbc.Alert(
-        f"Something went wrong. The public-facing app sent the following HTTP status code: {code}",
+        message,
         id="failure-alert",
         is_open=True,
         dismissable=True,
@@ -155,11 +157,23 @@ def add_modal(n1):
 def toggle_modal(confirm_title, cancel_update, is_open, value):
     if confirm_title:
         if value:
-            r = requests.post("http://localhost:8050/title", json={"title": value})
-            if r.status_code == 204:
-                return not is_open, success_alert
+            if len(value) > MAX_TITLE_LENGTH:
+                return not is_open, failure_alert(
+                    f"Title must be shorter than {MAX_TITLE_LENGTH} characters. Please try again."
+                )
             else:
-                return not is_open, failure_alert(r.status_code)
+                clean_title = nh3.clean_text(value)
+                r = requests.post(
+                    "http://localhost:8050/title",
+                    json={"title": clean_title},
+                    timeout=5,
+                )
+                if r.status_code == 204:
+                    return not is_open, success_alert
+                else:
+                    return not is_open, failure_alert(
+                        f"Something went wrong. The public-facing app sent the following HTTP status code: {r.status_code}"
+                    )
         else:
             return not is_open, no_update
     elif cancel_update:
