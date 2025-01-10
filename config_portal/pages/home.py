@@ -65,6 +65,29 @@ def failure_alert(message):
     )
 
 
+def update_title(value, is_open):
+    if value:
+        if len(value) > MAX_TITLE_LENGTH:
+            return not is_open, failure_alert(
+                f"Title must be shorter than {MAX_TITLE_LENGTH} characters. Please try again."
+            )
+        else:
+            clean_title = nh3.clean_text(value)
+            r = requests.post(
+                "http://localhost:8050/title",
+                json={"title": clean_title},
+                timeout=5,
+            )
+            if r.status_code == 204:
+                return not is_open, success_alert
+            else:
+                return not is_open, failure_alert(
+                    f"Something went wrong. The public-facing app sent the following HTTP status code: {r.status_code}"
+                )
+    else:
+        return not is_open, no_update
+
+
 confirm_title_msg = "Are you sure you want to update the title? This change will be immediately visible to the public."
 
 pub_warning = dbc.Card(
@@ -156,26 +179,7 @@ def add_modal(n1):
 )
 def toggle_modal(confirm_title, cancel_update, is_open, value):
     if confirm_title:
-        if value:
-            if len(value) > MAX_TITLE_LENGTH:
-                return not is_open, failure_alert(
-                    f"Title must be shorter than {MAX_TITLE_LENGTH} characters. Please try again."
-                )
-            else:
-                clean_title = nh3.clean_text(value)
-                r = requests.post(
-                    "http://localhost:8050/title",
-                    json={"title": clean_title},
-                    timeout=5,
-                )
-                if r.status_code == 204:
-                    return not is_open, success_alert
-                else:
-                    return not is_open, failure_alert(
-                        f"Something went wrong. The public-facing app sent the following HTTP status code: {r.status_code}"
-                    )
-        else:
-            return not is_open, no_update
+        return update_title(value, is_open)
     elif cancel_update:
         return not is_open, no_update
     else:
