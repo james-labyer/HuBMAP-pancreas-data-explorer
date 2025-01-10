@@ -1,7 +1,7 @@
 import os
 import sys
 import requests
-from dash import html, register_page, dcc, Output, Input, State, callback, no_update
+from dash import html, register_page, Output, Input, State, callback, no_update
 import dash_bootstrap_components as dbc
 
 os.chdir("..")

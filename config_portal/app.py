@@ -1,17 +1,13 @@
 import dash_bootstrap_components as dbc
 from dash import (
     Dash,
-    Input,
-    Output,
-    State,
-    callback,
     dcc,
     html,
     page_container,
 )
 import os
 import sys
-from flask import Flask, request
+from flask import Flask
 import logging
 import socket
 
