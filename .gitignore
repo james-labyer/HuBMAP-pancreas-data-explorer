@@ -32,6 +32,13 @@ __pycache__*
 **/app/assets/optical-clearing-czi/P2-13A/*/*.czi
 **/app/assets/optical-clearing-czi/P2-19A/*/*.czi
 **/app/assets/optical-clearing-czi/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2-1A/*/*.czi
+**/app/assets/scientific-images/P2-7A/*/*.czi
+**/app/assets/scientific-images/P2-7A/*/*.avi
+**/app/assets/scientific-images/P2-13A/*/*.czi
+**/app/assets/scientific-images/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2*
 
 # script depots
 **/scripts/t-in
