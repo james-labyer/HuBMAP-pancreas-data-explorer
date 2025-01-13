@@ -11,13 +11,13 @@ app_logger.setLevel(gunicorn_logger.level)
 
 
 def title(block=None, pancreas=None):
-    return f"{block} optical clearing"
+    return f"{block} scientific images"
 
 
 register_page(
     __name__,
-    path_template="/optical-clearing-files/<block>",
-    path="/optical-clearing-files/P1-19A",
+    path_template="/scientific-images/<block>",
+    path="/scientific-images/P1-19A",
     title=title,
 )
 
@@ -26,7 +26,7 @@ thumbnails = pd.read_csv("assets/optical-clearing-czi/oc-thumbnails.csv")
 
 def layout(block=None, **kwargs):
     app_logger.debug(
-        f"Data columns imported for optical clearing file summary:\n{thumbnails.columns}"
+        f"Data columns imported for scientific image file summary:\n{thumbnails.columns}"
     )
 
     block_thumbnails = thumbnails.loc[thumbnails["Block"] == block]
@@ -54,7 +54,7 @@ def layout(block=None, **kwargs):
     return html.Div(
         html.Section(
             children=[
-                html.Header(html.H2(f"{block} Optical Clearing Files")),
+                html.Header(html.H2(f"{block} Scientific Image Files")),
                 grid,
             ],
         )

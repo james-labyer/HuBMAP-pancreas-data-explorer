@@ -1,4 +1,5 @@
 # Preparing optical clearing files for display on the website
+This document details how to prepare scientific images for display on this website without using the configuration portal. Parts of this process will ultimately be superceded by the configuration portal.
 
 ## Generate large PNGs for viewing on optical clearing file view pages
 

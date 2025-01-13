@@ -30,7 +30,6 @@ def make_grid(organ="P1"):
     o = blocks.loc[blocks["Organ ID"] == organ]
     orows = o.to_dict("records")
     oheight = len(orows) * 41.25 + 49 + 15
-    print(o)
 
     return dag.AgGrid(
         id=f"{organ}-df",

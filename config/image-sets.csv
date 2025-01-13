@@ -23,3 +23,68 @@ P1-19A,P1-19A-8,Optical Clearing,P1_19A2 CD31 red INS white stack_Maximum intens
 P1-19A,P1-19A-9,Optical Clearing,P1_19A2 INS tile scan_Stitch.czi,474,589,1,1
 P1-19A,P1-19A-10,Optical Clearing,P1_19A AF_CD31.avi,512,512,60,1
 P1-19A,P1-19A-11,Optical Clearing,P1_19A2__z_stack__no_tiling__not_isotropic_dx_dy_dz_sampling.avi,512,512,60,1
+P1-4A,P1-4A-1,Optical Clearing,P1_4A2 top rows scan CD31 555 INS 680.czi,244,588,1,2
+P1-4A,P1-4A-2,Optical Clearing,P1_4A2_CD31 555.czi,512,512,1,1
+P1-4A,P1-4A-3,Optical Clearing,P1_4A2_CD31_555_INS_680 stack.czi,1024,1024,22,2
+P1-4A,P1-4A-4,Optical Clearing,P1_4A2_GCG_KRT19_CD31_INS_2  stack_Maximum intensity projection.czi,1024,1024,1,4
+P1-4A,P1-4A-5,Optical Clearing,P1_4A_1_stack_KRT19_555_INS_680.czi,1024,1024,28,2
+P1-4A,P1-4A-6,Optical Clearing,P1_4A_1_stack_KRT19_555_INS_680_Maximum intensity projection.czi,1024,1024,1,2
+P1-4A,P1-4A-7,Optical Clearing,P1_4A_1_tile_Nuclear_KRT19_555_INS_647_2_Stitch.czi,1898,2816,1,3
+P1-4A,P1-4A-8,Optical Clearing,P1_4A_GCG_KRT19_CD31_INS stack adj.czi,1024,1024,12,4
+P1-7A,P1-7A-1,Optical Clearing,P1_7A2_CD31 INS tile and stack_Stitch.czi,2359,2362,5,2
+P1-7A,P1-7A-2,Optical Clearing,P1_7A2_KRT CD31 INS higher res_Stitch.czi,2867,4710,1,3
+P1-7A,P1-7A-3,Optical Clearing,P1_7A2_KRT CD31 INS tile 2_Stitch.czi,1434,1894,1,3
+P1-7A,P1-7A-4,Optical Clearing,P1_7A2_KRT CD31 INS tile 3_Stitch.czi,1894,3277,1,3
+P1-7A,P1-7A-5,Optical Clearing,P1_7A2_KRT CD31 INS tile stack higher res 2_Stitch.czi,5992,5992,4,3
+P1-7A,P1-7A-6,Optical Clearing,P1_7A2_KRT CD31 INS tile stack_Stitch.czi,4066,5992,1,3
+P1-7A,P1-7A-7,Optical Clearing,P1_7A2_KRT CD31 INS tile_Stitch.czi,1437,2355,1,3
+P1-7A,P1-7A-8,Optical Clearing,P1_7A2_stack NY CD31 INS no KRT.czi,256,256,24,2
+P1-7A,P1-7A-9,Optical Clearing,P1_7A2_stack NY CD31 INS no KRT_Maximum intensity projection.czi,256,256,1,2
+P1-7A,P1-7A-10,Optical Clearing,P1_7A2_stack NY KRT CD31 INS stack.czi,256,256,24,3
+P1-7A,P1-7A-11,Optical Clearing,P1_7A2_tile scan CD31 INS.czi,2354,2355,1,2
+P2-13A,P2-13A-1,Optical Clearing,P2 13A GCG 405 TH 633 5 um stack 20x_Maximum intensity projection.czi,3440,3440,1,2
+P2-13A,P2-13A-2,Optical Clearing,P2 13A GCG 405 TH 633 5 um stack 20x.czi,3440,3440,12,2
+P2-13A,P2-13A-3,Optical Clearing,P2 13A GCG 405 TH 633 tile 50um stack_Maximum intensity projection.czi,1893,1893,1,2
+P2-13A,P2-13A-4,Optical Clearing,P2 13A GCG 405 TH 633 tile 50um stack.czi,1893,1893,3,2
+P2-13A,P2-13A-5,Optical Clearing,P2 13A Th 633 15um stack_Maximum intensity projection.czi,1648,1648,1,1
+P2-13A,P2-13A-6,Optical Clearing,P2 13A Th 633 15um stack.czi,1648,1648,11,1
+P2-13A,P2-13A-7,Optical Clearing,P2 13A Th 633 tile 50um stack_Maximum intensity projection.czi,1893,1893,1,1
+P2-13A,P2-13A-8,Optical Clearing,P2 13A Th 633 tile 50um stack.czi,1893,1893,7,1
+P2-13A,P2-13A-9,Optical Clearing,P2 13A VIP 488 tile 50um stack.czi,1894,1893,7,1
+P2-13A,P2-13A-10,Optical Clearing,P2-13A INS 488 PGP 647 8 um stack_Maximum intensity projection.czi,512,512,1,2
+P2-13A,P2-13A-11,Optical Clearing,P2-13A INS 488 PGP 647 8 um stack.czi,512,512,11,2
+P2-13A,P2-13A-12,Optical Clearing,P2-13A INS 488 PGP 647 tile 8 um stack.czi,1894,1894,11,2
+P2-13A,P2-13A-13,Optical Clearing,P2-13A INS 488 tile 25um stack _Maximum intensity projection.czi,946,946,1,1
+P2-13A,P2-13A-14,Optical Clearing,P2-13A INS 488 tile 25um stack.czi,946,946,6,1
+P2-13A,P2-13A-15,Optical Clearing,P2-13A PGP 647 488 tile 25um stack.czi,946,946,5,1
+P2-13A,P2-13A-16,Optical Clearing,P2-13A PGP 647 tile 25um stack _Maximum intensity projection.czi,946,946,1,1
+P2-19A,P2-19A-1,Optical Clearing,P2 19A CD31 546 laser 488.czi,2048,2048,1,1
+P2-19A,P2-19A-2,Optical Clearing,P2 19A CD31 546 laser 514.czi,2048,2048,1,1
+P2-19A,P2-19A-3,Optical Clearing,P2 19A CD31 546 laser 561.czi,2048,2048,1,1
+P2-19A,P2-19A-4,Optical Clearing,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9_Maximum intensity projection.czi,1433,2815,1,4
+P2-19A,P2-19A-5,Optical Clearing,P2 19A GCC 405 CPep 488 CD31 456 PGP 647Parasym 488 TH 633 test tile z 9.czi,1433,2815,13,4
+P2-19A,P2-19A-6,Optical Clearing,P2 19A GCG 405 Parasym 488 CD31 546 TH 633_Maximum intensity projection.czi,2048,2048,1,4
+P2-19A,P2-19A-7,Optical Clearing,P2 19A GCG 405 Parasym 488 CD31 546 TH 633.czi,2048,2048,78,4
+P2-19A,P2-19A-8,Optical Clearing,P2 19A GCG 405 TH 633 tile z 6um_Maximum intensity projection.czi,5733,9420,1,2
+P2-19A,P2-19A-9,Optical Clearing,P2 19A GCG 405 TH 633 tile z 6um.czi,5733,9420,9,2
+P2-19A,P2-19A-10,Optical Clearing,P2 19A Parasym 488 TH 633 tile z 25.czi,5733,9420,4,2
+P2-19A,P2-19A-11,Optical Clearing,P2 19A TH 633 set exposure.czi,2048,2048,1,1
+P2-1A,P2-1A-1,Optical Clearing,P2-1A GCG 405 INS 488 tile Z 20um_Maximum intensity projection.czi,4065,7917,1,2
+P2-1A,P2-1A-2,Optical Clearing,P2-1A GCG 405 INS 488 tile Z 20um.czi,4065,7917,9,2
+P2-1A,P2-1A-3,Optical Clearing,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection-1.czi,1433,1894,10,2
+P2-1A,P2-1A-4,Optical Clearing,P2-1A GCG 405 TH 633 tile Z 20um_Maximum intensity projection.czi,1433,1894,1,2
+P2-1A,P2-1A-5,Optical Clearing,P2-1A INS 488 tile Z 20um_Maximum intensity projection.czi,4065,7917,1,1
+P2-1A,P2-1A-6,Optical Clearing,P2-1A INS 488 tile Z 20um.czi,4065,7917,12,1
+P2-7A,P2-7A-1,Optical Clearing,P2 07A 03 LYVE NCAM INS stack2_Maximum intensity projection_c1+2+3.jpg,512,512,1,1
+P2-7A,P2-7A-2,Optical Clearing,P2 07A 03 Lyve NCAM stack 2x.avi,1024,1024,47,1
+P2-7A,P2-7A-3,Optical Clearing,P2 07A 04 NF200 555 ganglion stack.avi,1656,1656,68,1
+P2-7A,P2-7A-4,Optical Clearing,P2-7A INS 488 PGP 647_Maximum intensity projection.czi,1407,1177,1,2
+P2-7A,P2-7A-5,Optical Clearing,P2-7A INS 488 PGP 647_stack z 8um_Maximum intensity projection.czi,1648,1648,1,2
+P2-7A,P2-7A-6,Optical Clearing,P2-7A INS 488 PGP 647_stack z 8um-1.czi,1407,1177,11,2
+P2-7A,P2-7A-7,Optical Clearing,P2-7A INS 488 PGP 647_stack z 8um.czi,1648,1648,8,2
+P2-7A,P2-7A-8,Optical Clearing,P2-7A PGP 647 tile only.czi,9063,7580,1,1
+P2-7A,P2-7A-9,Optical Clearing,P2-7A PGP 647 tile.czi,9063,7580,1,1
+P2-7A,P2-7A-10,Optical Clearing,P2-7A PGP 647_stack z 5 um 20x_Maximum intensity projection.czi,2200,2200,1,1
+P2-7A,P2-7A-11,Optical Clearing,P2-7A PGP 647_stack z 5 um 20x.czi,2200,2200,12,1
+P2-7A,P2-7A-12,Optical Clearing,P2-7A TH 633_Maximum intensity projection.czi,2354,1894,1,1
+P2-7A,P2-7A-13,Optical Clearing,P2-7A TH 633.czi,2354,1894,9,1
