@@ -172,3 +172,8 @@ p {
     padding-left: 17px;
     padding-right: 17px;
 }
+
+.form-card {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
