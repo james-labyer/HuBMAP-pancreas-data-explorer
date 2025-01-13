@@ -5,48 +5,61 @@ import pandas as pd
 from dash import html, register_page
 
 register_page(__name__, path="/")
+
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
-blocks = pd.read_csv("assets/block-data.csv")
+blocks = pd.read_csv("../config/blocks.csv")
+organs = blocks["Organ ID"].unique()
 
 app_logger.debug(f"Data columns imported for home page grid:\n{blocks.columns}")
 
-
-def make_grid(pancreas="P1"):
-    p = blocks.loc[blocks["Pancreas"] == pancreas]
-    prows = p.to_dict("records")
-    pheight = len(prows) * 41.25 + 49 + 15
-
-    return dag.AgGrid(
-        id=f"{pancreas}-df",
-        rowData=prows,
-        columnDefs=columns,
-        className="ag-theme-alpine block-grid",
-        columnSize="sizeToFit",
-        style={"height": pheight},
-    )
-
-
 columns = [
     {"field": "Order"},
-    {"field": "Block ID"},
+    {"field": "Tissue Block"},
     {"field": "Anatomical region"},
-    {"field": "Optical clearing", "cellRenderer": "dsLink"},
-    {"field": "GeoMx", "cellRenderer": "dsLink"},
+    {"field": "Images", "cellRenderer": "dsLink"},
+    {"field": "Reports", "cellRenderer": "dsLink"},
     {"field": "Proteomics", "cellRenderer": "dsLink"},
 ]
 
-layout = html.Div(
-    [
-        html.Section([html.Header(html.H2("Pancreas 1 Datasets")), make_grid("P1")]),
-        html.Section(
-            [
-                html.Header(html.H2("Pancreas 2 Datasets"), className="middle-section"),
-                make_grid("P2"),
-            ]
-        ),
-    ]
-)
+
+def make_grid(organ="P1"):
+    o = blocks.loc[blocks["Organ ID"] == organ]
+    orows = o.to_dict("records")
+    oheight = len(orows) * 41.25 + 49 + 15
+    print(o)
+
+    return dag.AgGrid(
+        id=f"{organ}-df",
+        rowData=orows,
+        columnDefs=columns,
+        className="ag-theme-alpine block-grid",
+        columnSize="sizeToFit",
+        style={"height": oheight},
+    )
+
+
+def layout():
+    sections = []
+    for organ in organs:
+        organ_data = blocks.loc[blocks["Organ ID"] == organ]
+        # assumes they have set the organ description consistently
+        organ_desc = organ_data.at[organ_data.index[0], "Organ Description"]
+        if len(sections) == 0:
+            section = html.Section(
+                [html.Header(html.H2(f"{organ_desc} Datasets")), make_grid(organ)]
+            )
+        else:
+            section = section = html.Section(
+                [
+                    html.Header(
+                        html.H2(f"{organ_desc} Datasets"), className="middle-section"
+                    ),
+                    make_grid(organ),
+                ]
+            )
+        sections.append(section)
+    return html.Div(sections)

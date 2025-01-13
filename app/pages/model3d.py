@@ -8,19 +8,20 @@ from dash import Input, Output, callback, dcc, html, register_page
 from pywavefront import Wavefront
 
 register_page(__name__, path="/3d", title="3D Pancreas Model")
+
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
-blocks = pd.read_csv("assets/block-data.csv")
+blocks = pd.read_csv("../config/blocks.csv")
 traces = pd.read_csv("assets/obj/obj-files.csv")
 
 
 def read_obj(file):
-    pancreas = Wavefront(file, collect_faces=True)
-    matrix_vertices = np.array(pancreas.vertices)
-    faces = np.array(pancreas.mesh_list[0].faces)
+    organ = Wavefront(file, collect_faces=True)
+    matrix_vertices = np.array(organ.vertices)
+    faces = np.array(organ.mesh_list[0].faces)
     app_logger.debug(
         f"Read {file} and found vertices ndarray of shape {matrix_vertices.shape} and faces ndarray of shape {faces.shape}"
     )
@@ -30,6 +31,7 @@ def read_obj(file):
 def make_mesh_settings(
     vertices,
     faces,
+    name,
     color="cyan",
     opacity=1,
 ):
@@ -50,7 +52,7 @@ def make_mesh_settings(
         "i": L,
         "j": M,
         "k": N,
-        "name": "Pancreas",
+        "name": name,
         "showscale": None,
         "lighting": {
             "ambient": 0.18,
@@ -69,7 +71,7 @@ def make_mesh_settings(
 
 def make_mesh_data(name, file, color=None, opacity=1):
     vertices, faces = read_obj(file)
-    data = make_mesh_settings(vertices, faces, color=color, opacity=opacity)
+    data = make_mesh_settings(vertices, faces, name, color=color, opacity=opacity)
     data[0]["name"] = name
     return data
 
@@ -155,19 +157,19 @@ layout = html.Div([make_graph_layout(1)])
 def display_click_data(click_data):
     if click_data and click_data["points"][0]["curveNumber"] > 3:
         row = blocks.loc[
-            blocks["Block ID"]
+            blocks["Tissue Block"]
             == traces.loc[click_data["points"][0]["curveNumber"], "name"]
         ]
-        block_name = row.iloc[0]["Block ID"]
+        block_name = row.iloc[0]["Tissue Block"]
         app_logger.debug(f"Displaying click data for {block_name}")
         item_data = [
-            {"label": "Block ", "value": row.iloc[0]["Block ID"]},
+            {"label": "Block ", "value": row.iloc[0]["Tissue Block"]},
             {"label": "Anatomical region: ", "value": row.iloc[0]["Anatomical region"]},
             {
-                "label": "View optical clearing data",
-                "value": row.iloc[0]["Optical clearing"],
+                "label": "View scientific images",
+                "value": row.iloc[0]["Images"],
             },
-            {"label": "View GeoMx data", "value": row.iloc[0]["GeoMx"]},
+            {"label": "View reports", "value": row.iloc[0]["Reports"]},
             {"label": "View proteomics data", "value": row.iloc[0]["Proteomics"]},
         ]
         card_content = []
