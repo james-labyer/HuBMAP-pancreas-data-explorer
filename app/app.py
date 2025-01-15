@@ -55,6 +55,20 @@ def update_title():
     return "", 204
 
 
+@server.route("/block-data", methods=["POST"])
+def update_block_data():
+    file = request.files["file"]
+    file.save("../config/blocks.csv")
+    return "", 204
+
+
+@server.route("/si-files", methods=["POST"])
+def update_si_files():
+    file = request.files["file"]
+    file.save("../config/image-sets.csv")
+    return "", 204
+
+
 def serve_layout():
     return html.Div(
         children=[
@@ -85,7 +99,7 @@ def toggle_navbar_collapse(n, is_open):
 
 @callback(Output("breadcrumb", "children"), [Input("url", "pathname")])
 def render_breadcrumb(pathname):
-    if pathname and "/optical-clearing/P" in pathname and len(pathname) > 28:
+    if pathname and "/scientific-images/" in pathname and len(pathname) > 28:
         # break out the parts of the path
         parts = pathname.split("/")
         # get first six characters of final path child and make them upper case
@@ -97,11 +111,11 @@ def render_breadcrumb(pathname):
             items=[
                 {"label": "Home", "href": "/", "external_link": False},
                 {
-                    "label": f"{block} optical clearing",
-                    "href": f"/optical-clearing-files/{parts[-2]}",
+                    "label": f"{block} scientific image sets",
+                    "href": f"/scientific-images-list/{parts[-2]}",
                     "external_link": False,
                 },
-                {"label": f"{block} optical clearing {oc[-1]}", "active": True},
+                {"label": f"{block} scientific image set {oc[-1]}", "active": True},
             ],
         )
         return bc
@@ -125,7 +139,7 @@ if __name__ == "__main__":
     app.run_server(
         host="0.0.0.0",
         port="8050",
-        # debug=True,
+        debug=True,
         dev_tools_props_check=False,
     )
 else:

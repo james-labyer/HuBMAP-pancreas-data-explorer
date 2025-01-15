@@ -44,3 +44,6 @@ __pycache__*
 **/scripts/t-in
 **/scripts/t-out
 
+# config files
+**/blocks.csv
+**/image-sets.csv

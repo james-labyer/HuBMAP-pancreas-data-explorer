@@ -24,10 +24,17 @@ nh3 = "^0.2.20"
 [tool.poetry.group.dev]
 optional = true
 
+[tool.poetry.group.config]
+optional = true
+
 [tool.poetry.group.dev.dependencies]
 pytest = "~8.3.4"
 pytest-cov = "~6.0.0"
 bandit = "^1.8.0"
+
+[tool.poetry.group.config.dependencies]
+filetype = "^1.2.0"
+python-calamine = "^0.3.1"
 
 [build-system]
 requires = ["poetry-core"]

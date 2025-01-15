@@ -21,7 +21,6 @@ if os.getcwd() not in sys.path:
 os.chdir("./config_portal")
 from components import header
 
-print(header.get_title())
 title = header.get_title() + " Configuration"
 
 

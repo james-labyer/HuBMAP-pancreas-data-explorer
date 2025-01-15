@@ -10,14 +10,14 @@ app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
 
-def title(block=None, pancreas=None):
+def title(block=None, organ=None):
     return f"{block} scientific images"
 
 
 register_page(
     __name__,
-    path_template="/scientific-images/<block>",
-    path="/scientific-images/P1-19A",
+    path_template="/scientific-images-list/<block>",
+    path="/scientific-images-list/P1-19A",
     title=title,
 )
 
@@ -54,7 +54,7 @@ def layout(block=None, **kwargs):
     return html.Div(
         html.Section(
             children=[
-                html.Header(html.H2(f"{block} Scientific Image Files")),
+                html.Header(html.H2(f"{block} Scientific Image Sets")),
                 grid,
             ],
         )
