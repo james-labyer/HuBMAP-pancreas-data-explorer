@@ -15,7 +15,8 @@ from dash import (
 )
 import dash_bootstrap_components as dbc
 import nh3
-from config_portal.components import ui, validate
+from config_portal.config_components import ui, validate
+from flask_login import current_user
 
 os.chdir("..")
 if os.getcwd() not in sys.path:
@@ -109,8 +110,26 @@ pub_warning = dbc.Card(
         dbc.CardBody(
             html.P(
                 [
-                    html.I(className="bi bi-exclamation-triangle-fill me-2"),
+                    html.I(className="fa-solid fa-triangle-exclamation me-2"),
                     "Published data will be available to end users without a login",
+                ],
+            ),
+        ),
+    ],
+    color="warning",
+    inverse=True,
+    class_name="form-card",
+)
+
+login_warning = dbc.Card(
+    [
+        dbc.CardBody(
+            html.P(
+                [
+                    html.I(className="fa-solid fa-triangle-exclamation me-2"),
+                    "Please ",
+                    dcc.Link("log in", href="/login", className="link--warning"),
+                    " to continue",
                 ],
             ),
         ),
@@ -145,76 +164,95 @@ title_form = dbc.Card(
 )
 
 
-layout = html.Div(
-    [
-        html.H2(title),
-        pub_warning,
-        html.Div(id="update-status-div"),
-        html.Div(id="output-si-block-upload"),
-        html.Section(
+def layout(**kwargs):
+    if not current_user.is_authenticated:
+        return login_warning
+    else:
+        return html.Div(
             [
-                title_form,
-                html.Div(id="update-modal-div"),
-            ],
-            id="app-settings",
-        ),
-        html.Section(
-            [
-                ui.make_upload_card(
-                    "Update tissue block and scientific image metadata",
+                dcc.Location(id="config-url"),
+                html.H2(title),
+                pub_warning,
+                html.Div(id="update-status-div"),
+                html.Div(id="output-si-block-upload"),
+                html.Section(
                     [
-                        "For tissue block and scientific metadata file format, see example file:"
+                        title_form,
+                        html.Div(id="update-modal-div"),
                     ],
-                    "si-block",
-                    MAX_EXCEL_SIZE,
+                    id="app-settings",
                 ),
-            ],
-            id="block-metadata",
-        ),
-        html.Section(
-            [
-                ui.make_upload_card(
-                    "Update proteomics data",
-                    ["For proteomics data file format, see example file:"],
-                    "proteomics",
-                    MAX_EXCEL_SIZE,
-                ),
-            ],
-            id="proteomics-data",
-        ),
-        html.Section(
-            [
-                # is DL really useful for images?
-                ui.make_upload_card(
-                    "Update scientific images",
+                html.Section(
                     [
-                        "Must be uploaded as a .zip file, no files over 1 GB. Can upload source files for download from website and .PNG images for display on website. Image names must match names in image metadata files. New images will replace existing images with the same name. See example file for details."
+                        ui.make_upload_card(
+                            "Update tissue block and scientific image metadata",
+                            [
+                                "For tissue block and scientific metadata file format, see example file:"
+                            ],
+                            "si-block",
+                            MAX_EXCEL_SIZE,
+                        ),
                     ],
-                    "sci-images",
-                    MAX_IMG_SIZE,
-                    90,
+                    id="block-metadata",
                 ),
-            ],
-            id="sci-images",
-        ),
-        html.Section(
-            [
-                ui.make_upload_card(
-                    "Update 3D model files",
+                html.Section(
                     [
-                        "Example .obj file of whole organ:",
-                        "Example .obj file of tissue blocks:",
+                        ui.make_upload_card(
+                            "Update proteomics data",
+                            ["For proteomics data file format, see example file:"],
+                            "proteomics",
+                            MAX_EXCEL_SIZE,
+                        ),
                     ],
-                    "obj-files",
-                    MAX_OBJ_SIZE,
-                    # Add note about unsupported .obj features
-                    summary_note="Not all .obj features are supported",
+                    id="proteomics-data",
                 ),
-            ],
-            id="obj-files",
-        ),
-    ]
-)
+                html.Section(
+                    [
+                        ui.make_upload_card(
+                            "Update scientific images",
+                            [],
+                            "sci-images",
+                            MAX_IMG_SIZE,
+                            90,
+                            example=False,
+                            accordion=True,
+                            acc_notes=[
+                                [
+                                    "Upload Requirements",
+                                    "No files over 1 GB. Can upload source files for download from website and .PNG images for display on website. Source file names must match names in image metadata file exactly. PNG image file names must follow the format described in Image Names. New images will replace existing images with the same name.",
+                                ],
+                                [
+                                    "Supported File Types",
+                                    ", ".join(validate.VALID_EXTS["image"]),
+                                ],
+                                [
+                                    "Image Names",
+                                    "PNG image names must be of the following format: {Source file name}_C{Channel number, starting at zero}{sequence number, starting at zero and padded with zeroes to four digits}. Example: P1_4A2_image_stack_C10001.png .",
+                                ],
+                            ],
+                            upload_multiple=True,
+                        ),
+                    ],
+                    id="sci-images",
+                ),
+                html.Section(
+                    [
+                        ui.make_upload_card(
+                            "Update 3D model files",
+                            [
+                                "Example .obj file of whole organ:",
+                                "Example .obj file of tissue blocks:",
+                            ],
+                            "obj-files",
+                            MAX_OBJ_SIZE,
+                            # Add note about unsupported .obj features
+                            summary_note="Not all .obj features are supported",
+                        ),
+                    ],
+                    id="obj-files",
+                ),
+            ]
+        )
 
 
 # Scientific images metadata
@@ -237,7 +275,7 @@ def update_si_block_output(list_of_contents, filename):
         content_type, content_string = list_of_contents.split(",")
         decoded = base64.b64decode(content_string)
         is_valid_type = validate.check_file_type(decoded, "excel")
-        if is_valid_type:
+        if is_valid_type[0]:
             done = validate.process_si_block_file(decoded, "si-block")
             if done[0]:
                 return ui.success_alert("The file was uploaded successfully.")
@@ -245,7 +283,7 @@ def update_si_block_output(list_of_contents, filename):
                 return ui.failure_alert(done[1])
             # return [list_of_contents[0:100]]
         else:
-            return ["Validation error"]
+            return [is_valid_type[1]]
 
 
 # Proteomics
@@ -265,6 +303,39 @@ def send_proteomics_example(n_clicks):
 def update_proteomics_output(list_of_contents):
     if list_of_contents is not None:
         return [list_of_contents[0:16]]
+
+
+@callback(
+    Output("output-sci-images-upload", "children"),
+    Input("sci-images-upload", "contents"),
+    Input("sci-images-upload", "filename"),
+)
+def update_sci_images(list_of_contents, filenames):
+    if list_of_contents is not None:
+        # items = list_of_contents.split(",")
+        for i in range(len(list_of_contents)):
+            # for item in list_of_contents:
+            content_type, content_string = list_of_contents[i].split(",")
+            # print(content_type, content_string[0:100])
+            decoded = base64.b64decode(content_string)
+            is_valid_type = validate.check_file_type(decoded, "image", filenames[i])
+            # return is_valid_type
+            if is_valid_type[0]:
+                is_processed = validate.process_sci_image(decoded, filenames[i])
+                if is_processed[0]:
+                    return ui.success_alert("The file was uploaded successfully.")
+                else:
+                    return ui.failure_alert(is_processed[1])
+                # # need new method
+                # done = validate.process_si_block_file(decoded, "si-block")
+                # if done[0]:
+                #     return ui.success_alert("The file was uploaded successfully.")
+                # else:
+                #     return ui.failure_alert(done[1])
+                # # return [list_of_contents[0:100]]
+            else:
+                return [is_valid_type[1]]
+    return ["Success"]
 
 
 # 3D Models

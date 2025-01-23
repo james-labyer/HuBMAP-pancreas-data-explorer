@@ -81,7 +81,7 @@ def make_download(button_text, prefix):
     ]
 
 
-def make_upload(prefix, max_size):
+def make_upload(prefix, max_size, allow_multiple=False):
     return [
         dbc.Col(
             [
@@ -94,8 +94,9 @@ def make_upload(prefix, max_size):
                     id=f"{prefix}-upload",
                     className="drop-zone",
                     max_size=max_size,
+                    multiple=allow_multiple,
                 ),
-                # html.Div(id=f"output-{prefix}-upload"),
+                html.Div(id=f"output-{prefix}-upload"),
             ]
         ),
         dbc.Col(
@@ -106,28 +107,56 @@ def make_upload(prefix, max_size):
 
 
 def make_upload_card(
-    header, dl_notes, prefix, max_size, dl_height=60, summary_note=None
+    header,
+    dl_notes,
+    prefix,
+    max_size,
+    dl_height=60,
+    summary_note=None,
+    example=True,
+    accordion=False,
+    acc_notes=None,
+    upload_multiple=False,
 ):
     body_items = []
-    if summary_note:
-        body_items.append(html.P(summary_note))
-    for i in range(len(dl_notes)):
-        dl_row = dbc.Row(
-            [
+    if accordion:
+        body_items.append(make_accordion(acc_notes))
+    else:
+        if summary_note:
+            body_items.append(html.P(summary_note))
+        for i in range(len(dl_notes)):
+            row_contents = [
                 dbc.Col(html.P(dl_notes[i])),
-                dbc.Col(
-                    make_download("Download example", f"{prefix}-{i}"),
-                    width="auto",
-                ),
-            ],
-            align="center",
-            style={"height": f"{dl_height}px"},
+            ]
+            if example:
+                row_contents.append(
+                    dbc.Col(
+                        make_download("Download example", f"{prefix}-{i}"),
+                        width="auto",
+                    ),
+                )
+            dl_row = dbc.Row(
+                row_contents,
+                align="center",
+                style={"height": f"{dl_height}px"},
+            )
+            body_items.append(dl_row)
+        if example:
+            body_items.append(html.Hr())
+    if upload_multiple:
+        body_items.append(
+            dbc.Row(
+                make_upload(prefix, max_size, allow_multiple=upload_multiple),
+                align="center",
+                class_name="upload-row",
+            )
         )
-        body_items.append(dl_row)
-    body_items.append(html.Hr())
-    body_items.append(
-        dbc.Row(make_upload(prefix, max_size), align="center", class_name="upload-row")
-    )
+    else:
+        body_items.append(
+            dbc.Row(
+                make_upload(prefix, max_size), align="center", class_name="upload-row"
+            )
+        )
     return dbc.Card(
         [
             dbc.CardHeader(html.H4(header, className="upload-card-title")),
@@ -149,3 +178,16 @@ def success_alert(message):
         fade=False,
         color="success",
     )
+
+
+def make_accordion(items):
+    accordion_items = []
+    for item in items:
+        this_item = dbc.AccordionItem(
+            [
+                html.P([item[1]]),
+            ],
+            title=item[0],
+        )
+        accordion_items.append(this_item)
+    return dbc.Accordion(accordion_items)

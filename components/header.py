@@ -10,7 +10,14 @@ def get_title():
 
 def set_nav(page):
     if page == "config":
-        return html.Div()
+        return dbc.Col(
+            [
+                html.Div(id="auth-link"),
+            ],
+            className="auth-nav",
+            id="auth-nav",
+            width="auto",
+        )
     elif page == "app":
         return dbc.Col(
             [

@@ -35,6 +35,13 @@ bandit = "^1.8.0"
 [tool.poetry.group.config.dependencies]
 filetype = "^1.2.0"
 python-calamine = "^0.3.1"
+flask-login = "^0.6.3"
+python-dotenv = "^1.0.1"
+python-magic = "^0.4.27"
+
+[tool.poetry.plugins.dotenv]
+ignore="false"
+location=".env"
 
 [build-system]
 requires = ["poetry-core"]

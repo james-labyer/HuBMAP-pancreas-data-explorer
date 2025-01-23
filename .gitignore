@@ -3,6 +3,7 @@ venv/*
 .pytest_cache*
 __pycache__*
 .coverage
+.env
 
 # files that are too large
 **/P1_14A1_ KRT19 green INS white stack.czi
@@ -47,3 +48,6 @@ __pycache__*
 # config files
 **/blocks.csv
 **/image-sets.csv
+
+# depot
+**/depot/images/**
