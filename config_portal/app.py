@@ -4,7 +4,6 @@ from dash import (
     Input,
     Output,
     State,
-    callback,
     dcc,
     html,
     page_container,
@@ -12,8 +11,7 @@ from dash import (
 )
 import json
 import os
-import sys
-from flask import Flask, request, session
+from flask import Flask, session
 import logging
 import socket
 from flask_login import (
@@ -23,14 +21,8 @@ from flask_login import (
     login_user,
 )
 from dotenv import load_dotenv
-# from config_portal.components import ui
-
-os.chdir("..")
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
-os.chdir("./config_portal")
+from config_components import ui
 from components import header
-from config_portal.config_components import ui
 
 load_dotenv()
 
@@ -160,4 +152,4 @@ def auth_button_click(n_clicks_login, username, password):
 if __name__ == "__main__":
     format_str = f"[%(asctime)s {socket.gethostname()}] %(filename)s:%(funcName)s:%(lineno)s - %(levelname)s: %(message)s"
     logging.basicConfig(level="DEBUG", format=format_str)
-    app.run(host="0.0.0.0", port="8040", debug=True)
+    app.run_server(host="0.0.0.0", port="8040", debug=True)

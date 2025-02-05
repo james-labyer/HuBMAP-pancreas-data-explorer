@@ -235,3 +235,16 @@ p {
 .accordion-button, .accordion-body {
     background-color: #f6f6f6;
 }
+
+.inner-alert {
+    margin-top: 20px;
+}
+
+.result-toast {
+    z-index: 1;
+    position: fixed;
+    top: 66px;
+    right: 10px; 
+    width: 350px;
+    font-size: 16px;
+  }

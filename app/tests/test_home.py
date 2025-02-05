@@ -1,13 +1,9 @@
-import sys
-from pathlib import Path
-
 from dash import page_registry
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
-import app.app
-from app.pages.geomx import reports
-from app.pages.home import read_blocks
-from app.pages.ocfiles import thumbnails
+import app
+from pages.geomx import reports
+from pages.home import read_blocks
+from pages.ocfiles import thumbnails
 
 blocks = read_blocks()
 

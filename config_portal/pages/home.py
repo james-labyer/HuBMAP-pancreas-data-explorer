@@ -15,91 +15,26 @@ from dash import (
 )
 import dash_bootstrap_components as dbc
 import nh3
-from config_portal.config_components import ui, validate
-from flask_login import current_user
+import shutil
+import pandas as pd
 
-os.chdir("..")
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
-os.chdir("./config_portal")
+# from config_portal.config_components import ui, validate
+from config_components import ui, validate
+
+from flask_login import current_user
+from pathlib import Path
+
+# os.chdir("..")
+# if os.getcwd() not in sys.path:
+#     sys.path.append(os.getcwd())
+# os.chdir("./config_portal")
 
 title = "Update Configuration"
-MAX_TITLE_LENGTH = 2048
 MAX_EXCEL_SIZE = 1000000
-MAX_IMG_SIZE = MAX_EXCEL_SIZE * 1000
+MAX_IMG_SIZE = MAX_EXCEL_SIZE * 150
 MAX_OBJ_SIZE = MAX_EXCEL_SIZE * 50
 
 register_page(__name__, path="/", title=title)
-
-
-def update_title(value, is_open):
-    if value:
-        if len(value) > MAX_TITLE_LENGTH:
-            return not is_open, ui.failure_alert(
-                f"Title must be shorter than {MAX_TITLE_LENGTH} characters. Please try again."
-            )
-        else:
-            clean_title = nh3.clean_text(value)
-            r = requests.post(
-                "http://localhost:8050/title",
-                json={"title": clean_title},
-                timeout=5,
-            )
-            if r.status_code == 204:
-                return not is_open, ui.success_alert(
-                    "The configuration has been updated. Refresh the public-facing app to see the changes."
-                )
-            else:
-                return not is_open, ui.failure_alert(
-                    f"Something went wrong. The public-facing app sent the following HTTP status code: {r.status_code}"
-                )
-    else:
-        return not is_open, ui.failure_alert("Please provide a name.")
-
-
-def update_si_block(is_open):
-    block_data = {
-        "file": (
-            validate.FILE_DESTINATION["si-block"]["block-data"],
-            open(validate.FILE_DESTINATION["si-block"]["block-data"], "rb"),
-            "text/csv",
-            {"Expires": "0"},
-        )
-    }
-
-    r1 = requests.post(
-        "http://localhost:8050/block-data",
-        files=block_data,
-        timeout=5,
-    )
-
-    if r1.status_code == 204:
-        si_files = {
-            "file": (
-                validate.FILE_DESTINATION["si-block"]["si-files"],
-                open(validate.FILE_DESTINATION["si-block"]["si-files"], "rb"),
-                "text/csv",
-                {"Expires": "0"},
-            )
-        }
-        r2 = requests.post(
-            "http://localhost:8050/si-files",
-            files=si_files,
-            timeout=5,
-        )
-        if r2.status_code == 204:
-            return not is_open, ui.success_alert(
-                "The configuration has been updated. Refresh the public-facing app to see the changes."
-            )
-        else:
-            return not is_open, ui.failure_alert(
-                f"Something went wrong. The public-facing app sent the following HTTP status code: {r2.status_code}"
-            )
-
-    else:
-        return not is_open, ui.failure_alert(
-            f"Something went wrong. The public-facing app sent the following HTTP status code: {r1.status_code}"
-        )
 
 
 confirm_title_msg = "Are you sure you want to update the title? This change will be immediately visible to the public."
@@ -174,7 +109,6 @@ def layout(**kwargs):
                 html.H2(title),
                 pub_warning,
                 html.Div(id="update-status-div"),
-                html.Div(id="output-si-block-upload"),
                 html.Section(
                     [
                         title_form,
@@ -192,6 +126,7 @@ def layout(**kwargs):
                             "si-block",
                             MAX_EXCEL_SIZE,
                         ),
+                        html.Div(id="output-si-block-upload"),
                     ],
                     id="block-metadata",
                 ),
@@ -219,7 +154,7 @@ def layout(**kwargs):
                             acc_notes=[
                                 [
                                     "Upload Requirements",
-                                    "No files over 1 GB. Can upload source files for download from website and .PNG images for display on website. Source file names must match names in image metadata file exactly. PNG image file names must follow the format described in Image Names. New images will replace existing images with the same name.",
+                                    "No files over 150 MB. Can upload source files for download from website and .PNG images for display on website. Source file names must match names in image metadata file exactly. PNG image file names must follow the format described in Image Names. New images will replace existing images with the same name.",
                                 ],
                                 [
                                     "Supported File Types",
@@ -232,6 +167,7 @@ def layout(**kwargs):
                             ],
                             upload_multiple=True,
                         ),
+                        dcc.Loading(html.Div(id="output-sci-images-upload")),
                     ],
                     id="sci-images",
                 ),
@@ -278,12 +214,14 @@ def update_si_block_output(list_of_contents, filename):
         if is_valid_type[0]:
             done = validate.process_si_block_file(decoded, "si-block")
             if done[0]:
-                return ui.success_alert("The file was uploaded successfully.")
+                return ui.success_toast(
+                    "Metadata updated", "The file was uploaded successfully."
+                )
             else:
-                return ui.failure_alert(done[1])
+                return ui.failure_toast("Metadata not updated", done[1])
             # return [list_of_contents[0:100]]
         else:
-            return [is_valid_type[1]]
+            return ui.failure_toast("Metadata not updated", is_valid_type[1])
 
 
 # Proteomics
@@ -310,32 +248,27 @@ def update_proteomics_output(list_of_contents):
     Input("sci-images-upload", "contents"),
     Input("sci-images-upload", "filename"),
 )
-def update_sci_images(list_of_contents, filenames):
+def upload_sci_images(list_of_contents, filenames):
+    # print(type(list_of_contents), file=sys.stdout, flush=True)
     if list_of_contents is not None:
-        # items = list_of_contents.split(",")
         for i in range(len(list_of_contents)):
-            # for item in list_of_contents:
+            print(list_of_contents[i][:100], file=sys.stdout, flush=True)
+            if list_of_contents[i] == "":
+                return ui.failure_toast(
+                    "Image(s) not uploaded", "One or more files were too large."
+                )
             content_type, content_string = list_of_contents[i].split(",")
-            # print(content_type, content_string[0:100])
             decoded = base64.b64decode(content_string)
             is_valid_type = validate.check_file_type(decoded, "image", filenames[i])
-            # return is_valid_type
             if is_valid_type[0]:
                 is_processed = validate.process_sci_image(decoded, filenames[i])
-                if is_processed[0]:
-                    return ui.success_alert("The file was uploaded successfully.")
-                else:
-                    return ui.failure_alert(is_processed[1])
-                # # need new method
-                # done = validate.process_si_block_file(decoded, "si-block")
-                # if done[0]:
-                #     return ui.success_alert("The file was uploaded successfully.")
-                # else:
-                #     return ui.failure_alert(done[1])
-                # # return [list_of_contents[0:100]]
+                if not is_processed[0]:
+                    return ui.failure_toast("Image(s) not uploaded", is_processed[1])
             else:
-                return [is_valid_type[1]]
-    return ["Success"]
+                return ui.failure_toast("Image(s) not uploaded", is_valid_type[1])
+        return ui.success_toast(
+            "Images uploaded", "The files were uploaded successfully."
+        )
 
 
 # 3D Models
@@ -371,14 +304,17 @@ def update_obj_files_output(list_of_contents):
     Output("update-modal-div", "children"),
     Input("title-publish", "n_clicks"),
     Input("si-block-publish", "n_clicks"),
+    Input("sci-images-publish", "n_clicks"),
     prevent_initial_call=True,
 )
-def add_modal(title, si_block):
+def add_modal(title, si_block, sci_images):
     button_clicked = ctx.triggered_id
     if button_clicked == "title-publish":
         return ui.confirm_update_modal(confirm_title_msg, "title")
     elif button_clicked == "si-block-publish":
         return ui.confirm_update_modal(confirm_si_block_msg, "si-block")
+    elif button_clicked == "sci-images-publish":
+        return ui.confirm_update_modal(confirm_si_block_msg, "sci-images")
     return no_update
 
 
@@ -388,17 +324,22 @@ def add_modal(title, si_block):
     [
         Input("confirm-update-title", "n_clicks"),
         Input("confirm-update-si-block", "n_clicks"),
+        Input("confirm-update-sci-images", "n_clicks"),
         Input("cancel-update", "n_clicks"),
     ],
     [State("confirm-update-modal", "is_open"), State("title-input", "value")],
 )
-def toggle_modal(confirm_title, confirm_si_block, cancel_update, is_open, value):
+def toggle_modal(
+    confirm_title, confirm_si_block, confirm_sci_images, cancel_update, is_open, value
+):
     if confirm_title:
-        return update_title(value, is_open)
+        return validate.update_title(value, is_open)
     elif confirm_si_block:
         # check if file has been processed
         # send request
-        return update_si_block(is_open)
+        return validate.update_si_block(is_open)
+    elif confirm_sci_images:
+        return validate.update_sci_images(is_open)
     elif cancel_update:
         return not is_open, no_update
     else:

@@ -4,6 +4,8 @@ import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
 
+from pages.constants import FILE_DESTINATION as FD
+
 register_page(__name__, path="/")
 
 app_logger = logging.getLogger(__name__)
@@ -13,7 +15,7 @@ app_logger.setLevel(gunicorn_logger.level)
 
 
 def read_blocks():
-    return pd.read_csv("../config/blocks.csv")
+    return pd.read_csv(FD["si-block"]["block-data"])
 
 
 def make_grid(blocks, columns, organ="P1"):

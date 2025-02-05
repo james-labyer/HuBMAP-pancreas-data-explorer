@@ -1,10 +1,6 @@
-import sys
-from pathlib import Path
-
-sys.path.append(str(Path(__file__).parent.parent.parent))
-import app.app
-from app.pages.ocfiles import thumbnails
-from app.pages.ocpage import s_imgs
+import app
+from pages.ocfiles import thumbnails
+from pages.ocpage import s_imgs
 
 
 def test_oc_page_links():

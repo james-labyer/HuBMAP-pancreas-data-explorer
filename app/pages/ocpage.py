@@ -1,19 +1,22 @@
 import logging
+import sys
 
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, State, callback, dcc, html, no_update, register_page
 from PIL import Image
 
+from pages.constants import FILE_DESTINATION as FD
+
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
-s_imgs = pd.read_csv("../config/image-sets.csv")
+s_imgs = pd.read_csv(FD["si-block"]["si-files"])
 
 
-def title(iset=None, organ=None, block=None):
+def title(iset=None, block=None):
     if iset:
         img = s_imgs.loc[(s_imgs["Image Set"] == iset)]
         if img.empty:
@@ -27,8 +30,8 @@ def title(iset=None, organ=None, block=None):
 
 register_page(
     __name__,
-    path_template="/scientific-images/<organ>/<block>/<iset>",
-    path="/scientific-images/P1/P1-19A/P1-19A-1",
+    path_template="/scientific-images/<block>/<iset>",
+    path="/scientific-images/P1-19A/P1-19A-1",
     title=title,
 )
 
@@ -167,11 +170,11 @@ def update_pic(tab, slider, data):
 
     if data["file"][-3:] == "jpg":
         pic = Image.open(
-            f"assets/scientific-images/{data['block']}/{data['basefile']}/{data["file"]}"
+            f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data["file"]}"
         )
     else:
         pic = Image.open(
-            f"assets/scientific-images/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
+            f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
         )
     # add max-height and max-width to style based on image's dimensions
     if int(data["height"]) > 600:
@@ -198,5 +201,5 @@ def update_pic(tab, slider, data):
 def download_file(n_clicks, data):
     app_logger.debug(f"Sending {data['file']}")
     return dcc.send_file(
-        f"assets/scientific-images/{data['block']}/{data['basefile']}/{data['file']}"
+        f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data['file']}"
     )

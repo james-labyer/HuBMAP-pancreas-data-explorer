@@ -7,6 +7,8 @@ import plotly.graph_objects as go
 from dash import Input, Output, callback, dcc, html, register_page
 from pywavefront import Wavefront
 
+from pages.constants import FILE_DESTINATION as FD
+
 register_page(__name__, path="/3d", title="3D Pancreas Model")
 
 app_logger = logging.getLogger(__name__)
@@ -14,7 +16,7 @@ gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
-blocks = pd.read_csv("../config/blocks.csv")
+blocks = pd.read_csv(FD["si-block"]["block-data"])
 traces = pd.read_csv("assets/obj/obj-files.csv")
 
 

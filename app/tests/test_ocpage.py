@@ -1,6 +1,4 @@
 import json
-import sys
-from pathlib import Path
 
 import dash
 import dash_bootstrap_components as dbc
@@ -8,9 +6,8 @@ import plotly
 from dash import dcc, html
 from PIL import Image
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
-import app.app
-from app.pages.ocpage import make_tab_content, update_pic
+import app
+from pages.ocpage import make_tab_content, update_pic
 
 
 def test_make_tab_content():

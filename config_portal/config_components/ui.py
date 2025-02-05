@@ -1,7 +1,7 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 
-PUBLISH_BUTTONS = ["title", "si-block", "proteomics", "obj-files"]
+PUBLISH_BUTTONS = ["title", "si-block", "proteomics", "obj-files", "sci-images"]
 
 
 def confirm_update_modal(message, suffix):
@@ -59,7 +59,7 @@ def confirm_update_modal(message, suffix):
     )
 
 
-def failure_alert(message):
+def failure_alert(message, className=None):
     return dbc.Alert(
         message,
         id="failure-alert",
@@ -67,6 +67,37 @@ def failure_alert(message):
         dismissable=True,
         fade=False,
         color="danger",
+        className=className,
+    )
+
+
+def success_toast(header, message):
+    return (
+        dbc.Toast(
+            message,
+            id="success-toast",
+            header=header,
+            is_open=True,
+            dismissable=True,
+            class_name="result-toast",
+            header_class_name="text-success",
+            duration=4000,
+        ),
+    )
+
+
+def failure_toast(header, message):
+    return (
+        dbc.Toast(
+            message,
+            id="failure-toast",
+            header=header,
+            is_open=True,
+            dismissable=True,
+            class_name="result-toast",
+            header_class_name="text-danger",
+            duration=4000,
+        ),
     )
 
 
@@ -96,7 +127,7 @@ def make_upload(prefix, max_size, allow_multiple=False):
                     max_size=max_size,
                     multiple=allow_multiple,
                 ),
-                html.Div(id=f"output-{prefix}-upload"),
+                # html.Div(id=f"output-{prefix}-upload"),
             ]
         ),
         dbc.Col(
@@ -164,19 +195,6 @@ def make_upload_card(
         ],
         color="light",
         class_name="form-card",
-    )
-
-
-# "The configuration has been updated. Refresh the public-facing app to see the changes."
-def success_alert(message):
-    return dbc.Alert(
-        message,
-        id="success-alert",
-        is_open=True,
-        duration=4000,
-        dismissable=True,
-        fade=False,
-        color="success",
     )
 
 

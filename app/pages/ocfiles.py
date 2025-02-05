@@ -4,13 +4,15 @@ import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
 
+from pages.constants import FILE_DESTINATION as FD
+
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
 
-def title(block=None, organ=None):
+def title(block=None):
     return f"{block} scientific images"
 
 
@@ -21,7 +23,7 @@ register_page(
     title=title,
 )
 
-thumbnails = pd.read_csv("assets/optical-clearing-czi/oc-thumbnails.csv")
+thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
 
 
 def layout(block=None, **kwargs):

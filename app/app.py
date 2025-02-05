@@ -1,9 +1,10 @@
 import argparse
 import logging
+import os
 import socket
+import sys
 
 import dash_bootstrap_components as dbc
-import pandas as pd
 from dash import (
     Dash,
     Input,
@@ -14,9 +15,7 @@ from dash import (
     html,
     page_container,
 )
-import os
-import sys
-from flask import Flask, request
+from flask import Flask
 
 os.chdir("..")
 if os.getcwd() not in sys.path:
@@ -42,31 +41,6 @@ def handle_args():
 
 # Flask setup
 server = Flask(__name__)
-
-
-@server.route("/title", methods=["POST"])
-def update_title():
-    labels = pd.read_csv("../config/labels.csv")
-    # need to escape?
-    labels.at[0, "title"] = request.get_json()["title"]
-    labels.to_csv("../config/labels.csv")
-    # This title update only works temporarily
-    # app.title = request.get_json()["title"]
-    return "", 204
-
-
-@server.route("/block-data", methods=["POST"])
-def update_block_data():
-    file = request.files["file"]
-    file.save("../config/blocks.csv")
-    return "", 204
-
-
-@server.route("/si-files", methods=["POST"])
-def update_si_files():
-    file = request.files["file"]
-    file.save("../config/image-sets.csv")
-    return "", 204
 
 
 def serve_layout():
@@ -153,6 +127,5 @@ else:
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
-    app.logger.debug("Test")
     # server = app.server
     app.layout = serve_layout
