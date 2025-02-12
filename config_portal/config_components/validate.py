@@ -12,13 +12,18 @@ import shutil
 import traceback
 from PIL import Image, ImageDraw, ImageOps
 import logging
+import base64
+from collections.abc import Callable
+import numpy as np
 
 MAX_TITLE_LENGTH = 2048
+MAX_FILENAME_LENGTH = 255
 FINAL_THUMBNAIL_SIZE = (220, 110)
 THUMBNAIL_TILE = (110, 110)
 NAMEREG = r"\.\w{3,8}"  # regex to check file name format
 VALID_EXTS = {
     "excel": ["xls", "xlsx"],
+    "excel/vol": ["xls", "xlsx", "stl", "nrrd", "vti", "obj", "mtl"],
     "image": [
         # Allows PNG, AVI, Image Cytometry Standard, OME-TIFF, TIFF, CZI, SVS, AFI, SCN, GDAL, ZVI, DCM, NDPI, and VSI extensions
         "png",
@@ -55,9 +60,15 @@ VALID_MIMES = {
         "application/vnd.ms-excel",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
+    "excel/vol": [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/octet-stream",
+        "text/xml",
+    ],
     "image": ["image/tiff", "image/png", "video/x-msvideo", "image/jpeg"],
 }
-EXPECTED_HEADERS = {
+REQUIRED_HEADERS = {
     "si-block": {
         "block-data": [
             "Tissue Block",
@@ -80,7 +91,43 @@ EXPECTED_HEADERS = {
             "Channels",
         ],
     },
-    "proteomics": {},
+    "spatial-map": {
+        "meta": [
+            "Block",
+            "Title",
+            "Description",
+        ],
+        "points_data": [
+            "Block ID",
+            "X Center",
+            "Y Center",
+            "Z Center",
+            "X Size",
+            "Y Size",
+            "Z Size",
+            "Category",
+            "Value1",
+        ],
+        "value_ranges": ["Value1"],
+        "value_labels": ["Value", "Label"],
+        "category_labels": [
+            "Category",
+            "Label (Only True)",
+            "Label (Only False)",
+        ],
+        "vol_measurements": [
+            "X Min",
+            "X Max",
+            "X Size",
+            "Y Min",
+            "Y Max",
+            "Y Size",
+            "Z Min",
+            "Z Max",
+            "Z Size",
+        ],
+    },
+    "downloads": {"downloads": ["Name", "Label", "Desc", "Block"]},
     "obj-files": {},
 }
 
@@ -95,7 +142,7 @@ app_logger.setLevel(gunicorn_logger.level)
 def check_file_type(file, valid_type, filename=None):
     ftype = filetype.guess(file)
     if ftype is None:
-        if valid_type == "image":
+        if valid_type == "image" or valid_type == "excel/vol":
             ftype = magic.from_buffer(file)
             if ftype == "data":
                 if filename is None:
@@ -111,7 +158,7 @@ def check_file_type(file, valid_type, filename=None):
                 # since using magic, need to get mime type from magic and ext from name
                 ext = Path(filename).suffix
                 mime = magic.from_buffer(file, mime=True)
-                if (ext in VALID_EXTS[valid_type]) and (
+                if (ext[1:] in VALID_EXTS[valid_type]) and (
                     mime in VALID_MIMES[valid_type]
                 ):
                     return True, ""
@@ -142,42 +189,80 @@ def update_links(column, df):
             links = {
                 "Images": f"/scientific-images-list/{df["Tissue Block"].at[i]}",
                 "Reports": "/reports",
-                "Proteomics": f"/proteomics/{df["Tissue Block"].at[i]}",
+                "Proteomics": f"/spatial-map/{df["Tissue Block"].at[i]}",
             }
             if not (df[column].at[i] == " "):
                 df[column].at[i] = links[column]
             i += 1
 
 
-def process_si_block_file(file, which_headers):
-    for key, item in EXPECTED_HEADERS[which_headers].items():
-        try:
-            df = pd.read_excel(
-                io.BytesIO(file), sheet_name=key, engine="calamine", na_values=[" "]
-            )
-        except ValueError:
-            return False, "Worksheet names must match the template."
-        except Exception as err:
-            return False, f"Import failed with error: {err}"
-        for col in ["Images", "Reports", "Proteomics"]:
-            if col in df.columns and df.dtypes[col] != "object":
-                df[col] = df[col].astype("object")
-        # check for appropriate column headers
-        df.fillna(" ", inplace=True)
-        if df.columns.to_list() == EXPECTED_HEADERS[which_headers][key]:
-            # sanitize spreadsheet content
-            for column in EXPECTED_HEADERS[which_headers][key]:
-                if df[column].dtype == "object":
-                    # if column is a string, check for html
-                    df[column] = df[column].apply(check_html_helper)
-                    # calculate link values for main page links
-                    if key == "block-data":
-                        update_links(column, df)
-            # save validated data as csv
-            df.to_csv(FD[which_headers][key]["depot"], index=False)
+def open_excel_from_bytes(file: bytes, worksheet=None) -> pd.DataFrame:
+    """Reads an Excel spreadsheet. Returns a dict of DataFrames if no worksheets are
+    provided, returns one Dataframe if a worksheet is provided."""
+    try:
+        dfs = pd.read_excel(
+            io.BytesIO(file), sheet_name=worksheet, engine="calamine", na_values=[" "]
+        )
+        return True, "", dfs
+    except ValueError:
+        return False, "Worksheet names must match the template.", {}
+    except Exception as err:
+        return False, f"Import failed with error: {err}", {}
+
+
+def sanitize_df(df: pd.DataFrame) -> pd.DataFrame:
+    for column in df.columns:
+        if df[column].dtype == "object":
+            # if column is a string, check for html
+            df[column] = df[column].apply(check_html_helper)
+    return df
+
+
+def check_excel_headers(file: bytes, which_headers: str) -> tuple[bool, str, dict]:
+    """Checks that the file includes required headers and sanitizes any html.
+    Returns (success, error message, dict of DataFrames if successful)
+    """
+    dfs = {}
+    for key in REQUIRED_HEADERS[which_headers].keys():
+        dfr = open_excel_from_bytes(file, worksheet=key)
+        if dfr[0]:
+            df = dfr[2]
         else:
-            return False, "Column headers must match the template."
-    return True, ""
+            return False, dfr[1], {}
+        df.fillna(" ", inplace=True)
+        # check that required columns are in the workbook
+        if set(REQUIRED_HEADERS[which_headers][key]).issubset(
+            set(df.columns.to_list())
+        ):
+            dfs[key] = sanitize_df(df)
+        else:
+            return (
+                False,
+                f"Workbook {key} is missing required columns from the template.",
+                {},
+            )
+    return True, "", dfs
+
+
+def process_si_block_file(file: bytes, which_headers: str) -> tuple[bool, str, object]:
+    header_check = check_excel_headers(file, which_headers)
+    if header_check[0]:
+        for key in REQUIRED_HEADERS[which_headers].keys():
+            if key == "block-data":
+                for col in ["Images", "Reports", "Proteomics"]:
+                    if (
+                        col in header_check[2][key].columns
+                        and header_check[2][key].dtypes[col] != "object"
+                    ):
+                        header_check[2][key][col] = header_check[2][key][col].astype(
+                            "object"
+                        )
+                    # calculate link values for main page links
+                    update_links(col, header_check[2][key])
+            header_check[2][key].to_csv(FD[which_headers][key]["depot"], index=False)
+        return True, "", ""
+    else:
+        return (header_check[0], header_check[1], "")
 
 
 def check_image_name(
@@ -275,37 +360,35 @@ def check_png_name_ending(filename: str) -> tuple[bool, str]:
         )
 
 
-def process_sci_image(file: bytes, filename: str) -> tuple[bool, str]:
+def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
     """This function is called when a user uploads files to the scientific images upload widget.
     It checks that image metadata exists and the image name conforms to naming conventions, then
     saves the image to the depot.
 
-    Returns (check results, error message)
+    Returns (check results, error message, str)
+    Third return value is for compatibility with upload_content, the function that calls it
     """
 
     # should validation function clear depot before adding new stuff?
     df = pd.read_csv(FD["si-block"]["si-files"]["publish"])
     if df.empty:
-        return False, "You must upload image metadata before uploading images"
+        return False, "You must upload image metadata before uploading images", ""
     ext = Path(filename).suffix
     # if not a PNG, search for the name exactly
     name_info = check_image_name(filename, df)
     if name_info[0] == 0:
-        return False, name_info[4]
+        return False, name_info[4], ""
     # if PNG, check naming scheme
     if ext == ".png":
         nums_check = check_png_name_ending(filename)
         if not nums_check[0]:
-            return (
-                nums_check[0],
-                nums_check[1],
-            )
+            return (nums_check[0], nums_check[1], "")
     # save file
     with open(os.path.join(FD["sci-images"]["depot"], filename), "wb") as fp:
         fp.write(file)
     p = Path(f"{FD["sci-images"]["depot"]}")
 
-    return True, ""
+    return True, "", ""
 
 
 def update_title(value, is_open):
@@ -317,7 +400,7 @@ def update_title(value, is_open):
             )
         else:
             try:
-                clean_title = nh3.clean_text(value)
+                clean_title = check_html_helper(value)
                 d = {"title": [clean_title]}
                 df = pd.DataFrame(data=d)
                 # FILE_DESTINATION["title"]
@@ -585,4 +668,244 @@ def update_sci_images(is_open: bool) -> tuple[bool, object]:
     generate_thumbnails(tdi, tdf)
     return not is_open, ui.success_toast(
         "Images published", "Images transferred successfully"
+    )
+
+
+def upload_content(
+    content: str,
+    filename: str,
+    filetype: str,
+    which_function: Callable,
+    param=None,
+) -> tuple[bool, str, object]:
+    """For a given base64 file string, converts the data to bytes, checks the file type for validity,
+    and runs the given file processing function.
+    Returns (success, error message, optional object from processing function.)"""
+    if content == "":
+        return False, "One or more files were too large.", ""
+    content_type, content_string = content.split(",")
+    decoded = base64.b64decode(content_string)
+    is_valid_type = check_file_type(decoded, filetype, filename)
+    if is_valid_type[0]:
+        is_processed = which_function(decoded, param)
+        if not is_processed[0]:
+            return False, is_processed[1], ""
+        else:
+            return True, "", is_processed[2]
+    else:
+        return False, is_valid_type[1], ""
+
+
+def is_valid_filename(*args, fn="") -> bool:
+    """Returns a boolean: True if the name conforms to rules, False if it is over the max
+    length or contains forbidden characters."""
+    # TODO: fix this so it actually finds the forbidden characters
+    if len(fn) > MAX_FILENAME_LENGTH:
+        return False, f"{fn} exceeds {MAX_FILENAME_LENGTH} characters in length"
+
+    # p = re.compile(r"[^\w\s_()-]")
+    # fname = Path(fn)
+    matches = re.findall(r"[^\w\s_()-.]", fn)
+    # matches = p.search(fname.stem)
+    # matches = p.findall(fname.stem)
+    print("regex matches", matches, file=sys.stdout, flush=True)
+    if len(matches) == 0:
+        return True, ""
+    else:
+        # match_list = p.findall(fname.stem)
+
+        return (
+            False,
+            f"{fn} contains the following forbidden character sequence(s): {", ".join(matches)}",
+            # f"{fn} contains the following forbidden character sequence(s): {", ".join(match_list)}",
+        )
+
+
+def validate_filename_col(col):
+    for i in range(col.shape[0]):
+        is_valid = is_valid_filename(col.loc[i])
+        print(col.loc[i], is_valid, file=sys.stdout, flush=True)
+        if not is_valid[0]:
+            return False, is_valid[1]
+    return True, ""
+
+
+def write_excel(dfs, filename, loc):
+    # check that loc exists
+    p = Path(loc)
+    if not Path.exists(p):
+        Path.mkdir(p, parents=True)
+    with pd.ExcelWriter(f"{loc}/{filename}", mode="w") as writer:
+        df = pd.DataFrame(data={})
+        df.to_excel(writer)
+    # save into Excel workbook
+    try:
+        with pd.ExcelWriter(
+            f"{loc}/{filename}",
+            mode="a",
+            engine="openpyxl",
+        ) as writer:
+            for key in dfs.keys():
+                df = sanitize_df(dfs[key])
+                df.to_excel(writer, sheet_name=key, index=False)
+        return True, "", filename
+    except Exception as err:
+        print(traceback.print_exc(), file=sys.stdout, flush=True)
+        app_logger.debug(traceback.print_exc())
+        return False, str(err), ""
+
+
+def update_downloads_list(old_list: pd.DataFrame, new_entries: pd.DataFrame):
+    # TODO: add ability to delete downloads
+    ol = old_list.copy()
+    valid_names = validate_filename_col(new_entries["Name"])
+    if not valid_names[0]:
+        return False, valid_names[1], ""
+    # drop duplicate names in existing data
+    ol.drop_duplicates(subset=["Name"], inplace=True)
+    ol.index = range(len(ol))
+    new_rows = new_entries.shape[0]
+    existing_rows = ol.shape[0]
+    to_drop = []
+    # add rows to downloads.csv
+    for i in range(new_rows):
+        # find names existing records that match names in new record
+        if ol["Name"].eq(new_entries["Name"].loc[i]).any():
+            matches = np.flatnonzero(ol["Name"].eq(new_entries["Name"].loc[i]))
+            to_drop.extend(matches[1:])
+            ol.iloc[matches[0]] = new_entries.iloc[i]
+        else:
+            ol.loc[existing_rows + i] = new_entries.iloc[i]
+    # drop rows that were duplicated by entries in new upload
+    ol.drop(to_drop, inplace=True)
+    return ol
+
+
+def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str, str]:
+    """Checks downloads.xlsx, which can be uploaded to spatial map files, for duplicates and
+    unsafe filenames, then saves a csv in depot."""
+    header_check = check_excel_headers(file, "downloads")
+    # update downloads.csv
+    if header_check[0]:
+        # check if downloads.csv exists
+        new = False
+        try:
+            df = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
+        except FileNotFoundError:
+            df = header_check[2]["downloads"]
+            new = True
+            valid_names = validate_filename_col(df["Name"])
+            if not valid_names[0]:
+                return False, valid_names[1], ""
+            # drop duplicate names
+            df.drop_duplicates(subset=["Name"], inplace=True)
+        if not new:
+            df1 = header_check[2]["downloads"]
+            df = update_downloads_list(df, df1)
+        # save csv
+        df.to_csv(FD["spatial-map"]["downloads-file"]["depot"], index=False)
+        # no filename because this file's presence alone should not trigger name update
+        return True, "", ""
+    else:
+        return False, header_check[1], ""
+
+
+def get_spatial_map_folder(filename):
+    """Determines the block name for the download file so that the file can be saved in the
+    correct folder"""
+    df = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
+    block = df["Block"][df["Name"] == filename]
+    if block.empty:
+        return (
+            False,
+            f"{filename} is not present in downloads list. You must add an entry to downloads.xlsx to upload this file.",
+        )
+    # print("block", block.iloc[0], file=sys.stdout, flush=True)
+    return True, block.iloc[0]
+
+
+def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
+    """Takes a file, checks the headers if metadata file, and saves them file to the depot.
+    Overwrites file if it already exists.
+    Returns (success, error message, empty str for compatibility with other functions)"""
+    # throw an error if filename is not valid
+    is_valid = is_valid_filename(filename)
+    if not is_valid[0]:
+        return False, is_valid[1], ""
+    if filename == "spatial-map-data.xlsx":
+        header_check = check_excel_headers(file, "spatial-map")
+        # (success, error message, dict of DataFrames if successful)
+        if header_check[0]:
+            # get block name
+            block = header_check[2]["meta"]["Block"].values[0]
+            loc = f"{FD["spatial-map"]["meta"]["depot"]}/{block}"
+            return write_excel(header_check[2], filename, loc)
+        else:
+            return False, header_check[1], ""
+    elif filename == "downloads.xlsx":
+        return check_downloads_xlsx(file, filename)
+    elif Path(filename).suffix == ".xlsx":
+        # need to get save location from downloads.csv
+        open_results = open_excel_from_bytes(file)
+        if open_results[0]:
+            try:
+                block = get_spatial_map_folder(filename)
+                if not block[0]:
+                    return False, block[1], ""
+                # config_portal/depot/spatial-map/spatial_measurement_map_example.xlsx
+                loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
+                return write_excel(open_results[2], filename, loc)
+            except Exception as err:
+                # print(traceback.print_exc(), file=sys.stdout, flush=True)
+                app_logger.debug(traceback.print_exc())
+                return False, str(err), ""
+        else:
+            return False, open_results[1], ""
+    else:
+        try:
+            block = get_spatial_map_folder(filename)
+            if not block[0]:
+                return False, block[1], ""
+            dest = Path(f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}")
+            # save file
+            if not Path.exists(dest):
+                Path.mkdir(dest, parents=True)
+            with open(
+                f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}/{filename}", "wb"
+            ) as f:
+                f.write(file)
+            return True, "", filename
+        except Exception as err:
+            # (traceback.print_exc(), file=sys.stdout, flush=True)
+            app_logger.debug(traceback.print_exc())
+            return False, str(err), ""
+
+
+def publish_spatial_map_data(is_open):
+    # move each folder in the spatial map depot to shared volume /config
+    p = Path(FD["spatial-map"]["downloads"]["depot"])
+    dirs_to_move = [x for x in p.iterdir() if x.is_dir()]
+    try:
+        for item in dirs_to_move:
+            dest = Path(f"{FD["spatial-map"]["downloads"]["publish"]}/{item.name}")
+            if not Path.exists(dest):
+                Path.mkdir(dest, parents=True)
+            files_to_move = item.iterdir()
+            for file in files_to_move:
+                file_dest = dest / file.name
+                shutil.move(file, file_dest)
+        # update entries in published downloads.csv
+        new_entries = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
+        old_list = pd.read_csv(FD["spatial-map"]["downloads-file"]["publish"])
+        old_list = update_downloads_list(old_list, new_entries)
+        old_list.to_csv(FD["spatial-map"]["downloads-file"]["publish"], index=False)
+    except FileNotFoundError as err:
+        return not is_open, ui.failure_toast(
+            "Metadata not updated",
+            f"{err}",
+            # "File not found. Please ensure you have uploaded a new configuration file."
+        )
+    return not is_open, ui.success_toast(
+        "Metadata updated",
+        "The configuration has been updated. Refresh the public-facing app to see the changes.",
     )

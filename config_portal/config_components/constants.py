@@ -6,7 +6,22 @@ FILE_DESTINATION = {
             "publish": "/config/image-sets.csv",
         },
     },
-    "proteomics": {"depot": "", "publish": ""},
+    "spatial-map": {
+        "meta": {"depot": "./depot/spatial-map", "publish": "/config/spatial-map"},
+        # "points_data": {"depot": "./depot", "publish": "/config/spatial-map"},
+        # "value_ranges": {"depot": "./depot", "publish": "/config/spatial-map"},
+        # "value_labels": {"depot": "./depot", "publish": "/config/spatial-map"},
+        # "category_labels": {"depot": "./depot", "publish": "/config/spatial-map"},
+        # "vol_measurements": {"depot": "./depot", "publish": "/config/spatial-map"},
+        "downloads": {
+            "depot": "./depot/spatial-map",
+            "publish": "/config/spatial-map",
+        },
+        "downloads-file": {
+            "depot": "./depot/spatial-map/downloads.csv",
+            "publish": "/config/spatial-map/downloads.csv",
+        },
+    },
     "obj-files": {"depot": "", "publish": ""},
     "sci-images": {
         "depot": "./depot/scientific-images",

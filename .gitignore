@@ -48,6 +48,7 @@ __pycache__*
 # config files
 **/blocks.csv
 **/image-sets.csv
+**/config/labels.csv
 
 # depot
-**/depot/images/**
+**/depot/**

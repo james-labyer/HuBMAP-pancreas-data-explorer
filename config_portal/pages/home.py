@@ -1,7 +1,3 @@
-import os
-import sys
-import requests
-import base64
 from dash import (
     html,
     register_page,
@@ -14,31 +10,17 @@ from dash import (
     ctx,
 )
 import dash_bootstrap_components as dbc
-import nh3
-import shutil
-import pandas as pd
-
-# from config_portal.config_components import ui, validate
 from config_components import ui, validate
-
 from flask_login import current_user
-from pathlib import Path
 
-# os.chdir("..")
-# if os.getcwd() not in sys.path:
-#     sys.path.append(os.getcwd())
-# os.chdir("./config_portal")
 
 title = "Update Configuration"
-MAX_EXCEL_SIZE = 1000000
-MAX_IMG_SIZE = MAX_EXCEL_SIZE * 150
-MAX_OBJ_SIZE = MAX_EXCEL_SIZE * 50
+MAX_EXCEL_SIZE = 150000000
+MAX_IMG_SIZE = MAX_EXCEL_SIZE  # * 150
+MAX_OBJ_SIZE = MAX_EXCEL_SIZE  # * 50
 
 register_page(__name__, path="/", title=title)
 
-
-confirm_title_msg = "Are you sure you want to update the title? This change will be immediately visible to the public."
-confirm_si_block_msg = "Are you sure you want to update the tissue block and scientific metadata? This change will be immediately visible to the public."
 
 pub_warning = dbc.Card(
     [
@@ -133,13 +115,15 @@ def layout(**kwargs):
                 html.Section(
                     [
                         ui.make_upload_card(
-                            "Update proteomics data",
-                            ["For proteomics data file format, see example file:"],
-                            "proteomics",
+                            "Update spatial map data",
+                            ["For spatial map data file format, see example file:"],
+                            "spatial-map",
                             MAX_EXCEL_SIZE,
+                            upload_multiple=True,
                         ),
+                        html.Div(id="output-spatial-map-upload"),
                     ],
-                    id="proteomics-data",
+                    id="spatial-map-data",
                 ),
                 html.Section(
                     [
@@ -208,39 +192,73 @@ def send_images_example(n_clicks):
 )
 def update_si_block_output(list_of_contents, filename):
     if list_of_contents is not None:
-        content_type, content_string = list_of_contents.split(",")
-        decoded = base64.b64decode(content_string)
-        is_valid_type = validate.check_file_type(decoded, "excel")
-        if is_valid_type[0]:
-            done = validate.process_si_block_file(decoded, "si-block")
-            if done[0]:
-                return ui.success_toast(
-                    "Metadata updated", "The file was uploaded successfully."
-                )
-            else:
-                return ui.failure_toast("Metadata not updated", done[1])
-            # return [list_of_contents[0:100]]
+        upload_succeeded = validate.upload_content(
+            list_of_contents,
+            filename,
+            "excel",
+            validate.process_si_block_file,
+            "si-block",
+        )
+        if not upload_succeeded[0]:
+            return ui.failure_toast("Metadata not updated", upload_succeeded[1])
         else:
-            return ui.failure_toast("Metadata not updated", is_valid_type[1])
+            return ui.success_toast(
+                "Metadata updated", "The file was uploaded successfully."
+            )
 
 
-# Proteomics
+# Spatial map
 @callback(
-    Output("proteomics-0-example-dl", "data"),
-    Input("proteomics-0-example", "n_clicks"),
+    Output("spatial-map-0-example-dl", "data"),
+    Input("spatial-map-0-example", "n_clicks"),
     prevent_initial_call=True,
 )
-def send_proteomics_example(n_clicks):
-    return dcc.send_file("examples/images-example.xlsx")
+def send_spatial_map_example(n_clicks):
+    return dcc.send_file("examples/spatial_measurement_map_example.xlsx")
 
 
 @callback(
-    Output("output-proteomics-upload", "children"),
-    Input("proteomics-upload", "contents"),
+    Output("output-spatial-map-upload", "children"),
+    Input("spatial-map-upload", "contents"),
+    Input("spatial-map-upload", "filename"),
 )
-def update_proteomics_output(list_of_contents):
+def upload_spatial_map(list_of_contents, filenames):
     if list_of_contents is not None:
-        return [list_of_contents[0:16]]
+        files_iter = [x for x in range(len(list_of_contents))]
+        # make sure downloads.xlsx gets processed first if included
+        if len(list_of_contents) > 1 and "downloads.xlsx" in filenames:
+            # get index to use for contents and filenames
+            idx = filenames.index("downloads.xlsx")
+            # call upload_content
+            upload_succeeded = validate.upload_content(
+                list_of_contents[idx],
+                filenames[idx],
+                "excel/vol",
+                validate.upload_spatial_map_data,
+                filenames[idx],
+            )
+            if not upload_succeeded[0]:
+                return ui.failure_toast(
+                    "Spatial map data not uploaded", upload_succeeded[1]
+                )
+            # delete that index from files_iter so it doesn't get re-processed
+            files_iter.remove(idx)
+        for i in files_iter:
+            upload_succeeded = validate.upload_content(
+                list_of_contents[i],
+                filenames[i],
+                "excel/vol",
+                validate.upload_spatial_map_data,
+                filenames[i],
+            )
+            if not upload_succeeded[0]:
+                return ui.failure_toast(
+                    "Spatial map data not uploaded", upload_succeeded[1]
+                )
+            else:
+                return ui.success_toast(
+                    "Spatial map data uploaded", "The files were uploaded successfully."
+                )
 
 
 @callback(
@@ -249,23 +267,17 @@ def update_proteomics_output(list_of_contents):
     Input("sci-images-upload", "filename"),
 )
 def upload_sci_images(list_of_contents, filenames):
-    # print(type(list_of_contents), file=sys.stdout, flush=True)
     if list_of_contents is not None:
         for i in range(len(list_of_contents)):
-            print(list_of_contents[i][:100], file=sys.stdout, flush=True)
-            if list_of_contents[i] == "":
-                return ui.failure_toast(
-                    "Image(s) not uploaded", "One or more files were too large."
-                )
-            content_type, content_string = list_of_contents[i].split(",")
-            decoded = base64.b64decode(content_string)
-            is_valid_type = validate.check_file_type(decoded, "image", filenames[i])
-            if is_valid_type[0]:
-                is_processed = validate.process_sci_image(decoded, filenames[i])
-                if not is_processed[0]:
-                    return ui.failure_toast("Image(s) not uploaded", is_processed[1])
-            else:
-                return ui.failure_toast("Image(s) not uploaded", is_valid_type[1])
+            upload_succeeded = validate.upload_content(
+                list_of_contents[i],
+                filenames[i],
+                "image",
+                validate.process_sci_image,
+                filenames[i],
+            )
+            if not upload_succeeded[0]:
+                return ui.failure_toast("Image(s) not uploaded", upload_succeeded[1])
         return ui.success_toast(
             "Images uploaded", "The files were uploaded successfully."
         )
@@ -305,17 +317,36 @@ def update_obj_files_output(list_of_contents):
     Input("title-publish", "n_clicks"),
     Input("si-block-publish", "n_clicks"),
     Input("sci-images-publish", "n_clicks"),
+    Input("spatial-map-publish", "n_clicks"),
     prevent_initial_call=True,
 )
-def add_modal(title, si_block, sci_images):
+def add_modal(title, si_block, sci_images, spatial_map):
     button_clicked = ctx.triggered_id
-    if button_clicked == "title-publish":
-        return ui.confirm_update_modal(confirm_title_msg, "title")
-    elif button_clicked == "si-block-publish":
-        return ui.confirm_update_modal(confirm_si_block_msg, "si-block")
-    elif button_clicked == "sci-images-publish":
-        return ui.confirm_update_modal(confirm_si_block_msg, "sci-images")
-    return no_update
+    publish_buttons = {
+        "title-publish": [
+            "title",
+            "Are you sure you want to update the title? This change will be immediately visible to the public.",
+        ],
+        "si-block-publish": [
+            "si-block",
+            "Are you sure you want to update the tissue block and scientific metadata? This change will be immediately visible to the public.",
+        ],
+        "sci-images-publish": [
+            "sci-images",
+            "Are you sure you want to update the scientific images? This change will be visible to the public once you restart the display app.",
+        ],
+        "spatial-map-publish": [
+            "spatial-map",
+            "Are you sure you want to update the spatial map data? This change will be immediately visible to the public.",
+        ],
+    }
+
+    if button_clicked in publish_buttons:
+        return ui.confirm_update_modal(
+            publish_buttons[button_clicked][1], publish_buttons[button_clicked][0]
+        )
+    else:
+        return no_update
 
 
 @callback(
@@ -325,21 +356,28 @@ def add_modal(title, si_block, sci_images):
         Input("confirm-update-title", "n_clicks"),
         Input("confirm-update-si-block", "n_clicks"),
         Input("confirm-update-sci-images", "n_clicks"),
+        Input("confirm-update-spatial-map", "n_clicks"),
         Input("cancel-update", "n_clicks"),
     ],
     [State("confirm-update-modal", "is_open"), State("title-input", "value")],
 )
 def toggle_modal(
-    confirm_title, confirm_si_block, confirm_sci_images, cancel_update, is_open, value
+    confirm_title,
+    confirm_si_block,
+    confirm_sci_images,
+    confirm_spatial_map,
+    cancel_update,
+    is_open,
+    value,
 ):
     if confirm_title:
         return validate.update_title(value, is_open)
     elif confirm_si_block:
-        # check if file has been processed
-        # send request
         return validate.update_si_block(is_open)
     elif confirm_sci_images:
         return validate.update_sci_images(is_open)
+    elif confirm_spatial_map:
+        return validate.publish_spatial_map_data(is_open)
     elif cancel_update:
         return not is_open, no_update
     else:
