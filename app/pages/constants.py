@@ -3,7 +3,7 @@ FILE_DESTINATION = {
         "block-data": "/app/assets/config/blocks.csv",
         "si-files": "/app/assets/config/image-sets.csv",
     },
-    "proteomics": "",
+    "spatial-map": "assets/config/spatial-map",
     "obj-files": "",
     "sci-images": "/config/scientific-images",
     "thumbnails": {

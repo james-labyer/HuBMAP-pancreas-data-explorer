@@ -8,11 +8,6 @@ FILE_DESTINATION = {
     },
     "spatial-map": {
         "meta": {"depot": "./depot/spatial-map", "publish": "/config/spatial-map"},
-        # "points_data": {"depot": "./depot", "publish": "/config/spatial-map"},
-        # "value_ranges": {"depot": "./depot", "publish": "/config/spatial-map"},
-        # "value_labels": {"depot": "./depot", "publish": "/config/spatial-map"},
-        # "category_labels": {"depot": "./depot", "publish": "/config/spatial-map"},
-        # "vol_measurements": {"depot": "./depot", "publish": "/config/spatial-map"},
         "downloads": {
             "depot": "./depot/spatial-map",
             "publish": "/config/spatial-map",

@@ -106,10 +106,8 @@ REQUIRED_HEADERS = {
             "Y Size",
             "Z Size",
             "Category",
-            "Value1",
         ],
-        "value_ranges": ["Value1"],
-        "value_labels": ["Value", "Label"],
+        "value_ranges": ["Row Label"],
         "category_labels": [
             "Category",
             "Label (Only True)",
@@ -218,7 +216,9 @@ def sanitize_df(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def check_excel_headers(file: bytes, which_headers: str) -> tuple[bool, str, dict]:
+def check_excel_headers(
+    file: bytes, which_headers: str, fillna=True
+) -> tuple[bool, str, dict]:
     """Checks that the file includes required headers and sanitizes any html.
     Returns (success, error message, dict of DataFrames if successful)
     """
@@ -229,7 +229,8 @@ def check_excel_headers(file: bytes, which_headers: str) -> tuple[bool, str, dic
             df = dfr[2]
         else:
             return False, dfr[1], {}
-        df.fillna(" ", inplace=True)
+        if fillna:
+            df.fillna(" ", inplace=True)
         # check that required columns are in the workbook
         if set(REQUIRED_HEADERS[which_headers][key]).issubset(
             set(df.columns.to_list())
@@ -383,7 +384,6 @@ def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
         nums_check = check_png_name_ending(filename)
         if not nums_check[0]:
             return (nums_check[0], nums_check[1], "")
-    # save file
     with open(os.path.join(FD["sci-images"]["depot"], filename), "wb") as fp:
         fp.write(file)
     p = Path(f"{FD["sci-images"]["depot"]}")
@@ -403,7 +403,6 @@ def update_title(value, is_open):
                 clean_title = check_html_helper(value)
                 d = {"title": [clean_title]}
                 df = pd.DataFrame(data=d)
-                # FILE_DESTINATION["title"]
                 df.to_csv(f"{FD["title"]["depot"]}", index=False)
                 p = Path(FD["title"]["depot"])
                 t = Path(FD["title"]["publish"])
@@ -424,10 +423,8 @@ def update_title(value, is_open):
 
 
 def update_si_block(is_open):
-    # move to shared volume /config
     try:
         for key in FD["si-block"].keys():
-            # make these paths if they don't exist ?
             p = Path(FD["si-block"][key]["depot"])
             t = Path(FD["si-block"][key]["publish"])
             shutil.move(p, t)
@@ -435,7 +432,6 @@ def update_si_block(is_open):
         return not is_open, ui.failure_toast(
             "Metadata not updated",
             f"{err}",
-            # "File not found. Please ensure you have uploaded a new configuration file."
         )
     return not is_open, ui.success_toast(
         "Metadata updated",
@@ -708,7 +704,7 @@ def is_valid_filename(*args, fn="") -> bool:
     matches = re.findall(r"[^\w\s_()-.]", fn)
     # matches = p.search(fname.stem)
     # matches = p.findall(fname.stem)
-    print("regex matches", matches, file=sys.stdout, flush=True)
+    # print("regex matches", matches, file=sys.stdout, flush=True)
     if len(matches) == 0:
         return True, ""
     else:
@@ -724,7 +720,7 @@ def is_valid_filename(*args, fn="") -> bool:
 def validate_filename_col(col):
     for i in range(col.shape[0]):
         is_valid = is_valid_filename(col.loc[i])
-        print(col.loc[i], is_valid, file=sys.stdout, flush=True)
+        # print(col.loc[i], is_valid, file=sys.stdout, flush=True)
         if not is_valid[0]:
             return False, is_valid[1]
     return True, ""
@@ -750,13 +746,13 @@ def write_excel(dfs, filename, loc):
                 df.to_excel(writer, sheet_name=key, index=False)
         return True, "", filename
     except Exception as err:
-        print(traceback.print_exc(), file=sys.stdout, flush=True)
+        # print(traceback.print_exc(), file=sys.stdout, flush=True)
         app_logger.debug(traceback.print_exc())
         return False, str(err), ""
 
 
 def update_downloads_list(old_list: pd.DataFrame, new_entries: pd.DataFrame):
-    # TODO: add ability to delete downloads
+    # TODO: add ability to delete downloads (list entries and files)
     ol = old_list.copy()
     valid_names = validate_filename_col(new_entries["Name"])
     if not valid_names[0]:
@@ -820,8 +816,98 @@ def get_spatial_map_folder(filename):
             False,
             f"{filename} is not present in downloads list. You must add an entry to downloads.xlsx to upload this file.",
         )
-    # print("block", block.iloc[0], file=sys.stdout, flush=True)
     return True, block.iloc[0]
+
+
+def make_cubes_df(
+    points_df: pd.DataFrame, vol_measurements: pd.DataFrame
+) -> pd.DataFrame:
+    """For each point representing the center of a rectangular prism, calculates eight points representing
+    its vertices."""
+    # Vertices are ordered as follows:
+    # [
+    #     [x, y, z],
+    #     [x + x_dist, y, z],
+    #     [x, y + y_dist, z],
+    #     [x + x_dist, y + y_dist, z],
+    #     [x, y, z + z_dist],
+    #     [x + x_dist, y, z + z_dist],
+    #     [x, y + y_dist, z + z_dist],
+    #     [x + x_dist, y + y_dist, z + z_dist],
+    # ]
+
+    x_transform = vol_measurements.loc[0, "X Size"] / 2
+    y_transform = vol_measurements.loc[0, "Y Size"] / 2
+    z_transform = vol_measurements.loc[0, "Z Size"] / 2
+
+    transform = {
+        "x": [
+            -x_transform,
+            x_transform - 0.001,
+            -x_transform,
+            x_transform - 0.001,
+            -x_transform,
+            x_transform - 0.001,
+            -x_transform,
+            x_transform - 0.001,
+        ],
+        "y": [
+            -y_transform,
+            -y_transform,
+            y_transform - 0.001,
+            y_transform - 0.001,
+            -y_transform,
+            -y_transform,
+            y_transform - 0.001,
+            y_transform - 0.001,
+        ],
+        "z": [
+            -z_transform,
+            -z_transform,
+            -z_transform,
+            -z_transform,
+            z_transform - 0.001,
+            z_transform - 0.001,
+            z_transform - 0.001,
+            z_transform - 0.001,
+        ],
+    }
+
+    cubes_df = pd.DataFrame().reindex(columns=points_df.columns)
+    # for each row in the source df, make 8 rows in the new df. Each row represents a vertex of a rectangular
+    # prism around the provided point
+    for i in points_df.index:
+        new_x = [points_df.loc[i, "X Center"] + x for x in transform["x"]]
+        new_y = [points_df.loc[i, "Y Center"] + y for y in transform["y"]]
+        new_z = [points_df.loc[i, "Z Center"] + z for z in transform["z"]]
+        for j in range(8):
+            idx = j + (i * 8)
+            cubes_df.loc[idx] = points_df.loc[i]
+            cubes_df.loc[idx, "X Center"] = new_x[j]
+            cubes_df.loc[idx, "Y Center"] = new_y[j]
+            cubes_df.loc[idx, "Z Center"] = new_z[j]
+    return cubes_df
+
+
+def check_spatial_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
+    header_check = check_excel_headers(file, "spatial-map", fillna=False)
+    if header_check[0]:
+        # get block name
+        block = header_check[2]["meta"]["Block"].values[0]
+        loc = f"{FD["spatial-map"]["meta"]["depot"]}/{block}"
+        for key, item in header_check[2].items():
+            if key == "points_data":
+                # data must be sorted for Dash to display it correctly
+                item.sort_values(by=["X Center", "Y Center", "Z Center"], inplace=True)
+            item.to_csv(f"{loc}/{key}.csv", index=False)
+        # create cubes csv
+        cubes_df = make_cubes_df(
+            header_check[2]["points_data"], header_check[2]["vol_measurements"]
+        )
+        cubes_df.to_csv(f"{loc}/cube_data.csv", index=False)
+        return True, "", ""
+    else:
+        return False, header_check[1], ""
 
 
 def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
@@ -833,26 +919,16 @@ def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]
     if not is_valid[0]:
         return False, is_valid[1], ""
     if filename == "spatial-map-data.xlsx":
-        header_check = check_excel_headers(file, "spatial-map")
-        # (success, error message, dict of DataFrames if successful)
-        if header_check[0]:
-            # get block name
-            block = header_check[2]["meta"]["Block"].values[0]
-            loc = f"{FD["spatial-map"]["meta"]["depot"]}/{block}"
-            return write_excel(header_check[2], filename, loc)
-        else:
-            return False, header_check[1], ""
+        return check_spatial_map_data_xlsx(file)
     elif filename == "downloads.xlsx":
         return check_downloads_xlsx(file, filename)
     elif Path(filename).suffix == ".xlsx":
-        # need to get save location from downloads.csv
         open_results = open_excel_from_bytes(file)
         if open_results[0]:
             try:
                 block = get_spatial_map_folder(filename)
                 if not block[0]:
                     return False, block[1], ""
-                # config_portal/depot/spatial-map/spatial_measurement_map_example.xlsx
                 loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
                 return write_excel(open_results[2], filename, loc)
             except Exception as err:
@@ -867,7 +943,6 @@ def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]
             if not block[0]:
                 return False, block[1], ""
             dest = Path(f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}")
-            # save file
             if not Path.exists(dest):
                 Path.mkdir(dest, parents=True)
             with open(
@@ -896,15 +971,27 @@ def publish_spatial_map_data(is_open):
                 shutil.move(file, file_dest)
         # update entries in published downloads.csv
         new_entries = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
-        old_list = pd.read_csv(FD["spatial-map"]["downloads-file"]["publish"])
-        old_list = update_downloads_list(old_list, new_entries)
-        old_list.to_csv(FD["spatial-map"]["downloads-file"]["publish"], index=False)
+        publish_dl_path = Path(FD["spatial-map"]["downloads-file"]["publish"])
+        if not Path.exists(publish_dl_path.parent):
+            Path.mkdir(publish_dl_path.parent, parents=True)
+        if not Path.exists(publish_dl_path):
+            new_entries.to_csv(
+                FD["spatial-map"]["downloads-file"]["publish"], index=False
+            )
+        else:
+            old_list = pd.read_csv(FD["spatial-map"]["downloads-file"]["publish"])
+            old_list = update_downloads_list(old_list, new_entries)
+            old_list.to_csv(FD["spatial-map"]["downloads-file"]["publish"], index=False)
     except FileNotFoundError as err:
+        # print(traceback.print_exc(), file=sys.stdout, flush=True)
+        app_logger.debug(traceback.print_exc())
         return not is_open, ui.failure_toast(
             "Metadata not updated",
             f"{err}",
-            # "File not found. Please ensure you have uploaded a new configuration file."
         )
+    except Exception as err:
+        # print(traceback.print_exc(), file=sys.stdout, flush=True)
+        app_logger.debug(traceback.print_exc())
     return not is_open, ui.success_toast(
         "Metadata updated",
         "The configuration has been updated. Refresh the public-facing app to see the changes.",

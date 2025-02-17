@@ -107,6 +107,7 @@ if __name__ == "__main__":
         use_pages=True,
         server=server,
         title=header.get_title(),
+        suppress_callback_exceptions=True,
     )
     # server = app.server
     app.layout = serve_layout
@@ -123,6 +124,7 @@ else:
         use_pages=True,
         server=server,
         title=header.get_title(),
+        suppress_callback_exceptions=True,
     )
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.handlers = gunicorn_logger.handlers
