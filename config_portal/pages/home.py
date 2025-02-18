@@ -116,12 +116,83 @@ def layout(**kwargs):
                     [
                         ui.make_upload_card(
                             "Update spatial map data",
-                            ["For spatial map data file format, see example file:"],
+                            [
+                                "Spatial map data file format:",
+                                "Downloads file format:",
+                            ],
                             "spatial-map",
                             MAX_EXCEL_SIZE,
+                            accordion=True,
+                            acc_notes=[
+                                [
+                                    "Upload Requirements",
+                                    html.Ul(
+                                        [
+                                            html.Li("No files over 150 MB."),
+                                            html.Li(
+                                                [
+                                                    "Spatial map data must be in a file named ",
+                                                    html.Strong(
+                                                        "spatial-map-data.xlsx"
+                                                    ),
+                                                ]
+                                            ),
+                                            html.Li(
+                                                [
+                                                    "Downloads data must be in a file named ",
+                                                    html.Strong("downloads.xlsx"),
+                                                ]
+                                            ),
+                                        ]
+                                    ),
+                                    # "No files over 150 MB. Spatial map data must be in a file named spatial-map-data.xlsx, and downloads data must be in a file named downloads.xlsx.",
+                                ],
+                                [
+                                    "Supported File Types",
+                                    ", ".join(validate.VALID_EXTS["excel/vol"]),
+                                ],
+                                [
+                                    "Spatial Map Data Requirements",
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                "The spatial-map-data.xlsx file must include all of the tabs included in the example workbook"
+                                            ),
+                                            html.Li(
+                                                "All of the columns in the example workbook are required except for the value columns from Column I-O in the points_data worksheet"
+                                            ),
+                                            html.Li(
+                                                "The value columns are optional: provide as many as you like and name them as you see fit"
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                [
+                                    "Downloads Requirements",
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                "Filenames in downloads.xlsx must be unique and must match the name of a file provided to this interface exactly"
+                                            ),
+                                            html.Li(
+                                                "Do not use any characters besides a-z, A_Z, 0-9, -, _, and whitespace in the download filenames"
+                                            ),
+                                            html.Li(
+                                                "Files with the same block will be displayed on the same page"
+                                            ),
+                                            html.Li(
+                                                "New downloads.xlsx entries will be added to existing downloads.xlsx entries from previous uploads"
+                                            ),
+                                            html.Li(
+                                                "If you upload any other file with a name that matches a previously uploaded file exactly, it will replace the old version of that file"
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                            ],
                             upload_multiple=True,
                         ),
-                        html.Div(id="output-spatial-map-upload"),
+                        dcc.Loading(html.Div(id="output-spatial-map-upload")),
                     ],
                     id="spatial-map-data",
                 ),
@@ -160,13 +231,52 @@ def layout(**kwargs):
                         ui.make_upload_card(
                             "Update 3D model files",
                             [
+                                "Example summary file:",
                                 "Example .obj file of whole organ:",
-                                "Example .obj file of tissue blocks:",
+                                "Example .obj file of a tissue block within the organ:",
                             ],
                             "obj-files",
                             MAX_OBJ_SIZE,
                             # Add note about unsupported .obj features
-                            summary_note="Not all .obj features are supported",
+                            accordion=True,
+                            acc_notes=[
+                                [
+                                    "Upload Instructions",
+                                    "No files over 150 MB. Please upload model files in .obj format and a summary file called obj-files.xlsx that lists the model files",
+                                ],
+                                [
+                                    "Summary File",
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                "Please name the file obj-files.xlsx"
+                                            ),
+                                            html.Li(
+                                                "Files with the same value in the Organ column will be displayed together in the same figure"
+                                            ),
+                                            html.Li(
+                                                "When a file's Name value matches a tissue block exactly, information about that tissue block will be displayed to the user when they click on that element"
+                                            ),
+                                            html.Li("Specify color with a hex value"),
+                                            html.Li(
+                                                "Opacity is a number between 0 and 1"
+                                            ),
+                                        ]
+                                    ),
+                                ],
+                                [
+                                    "OBJ Files",
+                                    html.Ul(
+                                        [
+                                            html.Li(
+                                                "The app does not use texture coordinates, vertex normals, or parameter space vertices to display the models, so please only include v and f tags to reduce file size"
+                                            ),
+                                            html.Li("Model file names must be unique"),
+                                        ]
+                                    ),
+                                ],
+                            ],
+                            upload_multiple=True,
                         ),
                     ],
                     id="obj-files",
@@ -214,7 +324,16 @@ def update_si_block_output(list_of_contents, filename):
     prevent_initial_call=True,
 )
 def send_spatial_map_example(n_clicks):
-    return dcc.send_file("examples/spatial_measurement_map_example.xlsx")
+    return dcc.send_file("examples/spatial-map-data.xlsx")
+
+
+@callback(
+    Output("spatial-map-1-example-dl", "data"),
+    Input("spatial-map-1-example", "n_clicks"),
+    prevent_initial_call=True,
+)
+def send_spatial_map_downloads_example(n_clicks):
+    return dcc.send_file("examples/downloads.xlsx")
 
 
 @callback(
@@ -290,7 +409,7 @@ def upload_sci_images(list_of_contents, filenames):
     prevent_initial_call=True,
 )
 def send_obj_example_1(n_clicks):
-    return dcc.send_file("examples/images-example.xlsx")
+    return dcc.send_file("examples/obj-files.xlsx")
 
 
 @callback(
@@ -303,12 +422,22 @@ def send_obj_example_2(n_clicks):
 
 
 @callback(
+    Output("obj-files-2-example-dl", "data"),
+    Input("obj-files-2-example", "n_clicks"),
+    prevent_initial_call=True,
+)
+def send_obj_example_3(n_clicks):
+    return dcc.send_file("examples/images-example.xlsx")
+
+
+@callback(
     Output("output-obj-files-upload", "children"),
     Input("obj-files-upload", "contents"),
+    Input("obj-files-upload", "filename"),
 )
-def update_obj_files_output(list_of_contents):
+def update_obj_files_output(list_of_contents, filenames):
     if list_of_contents is not None:
-        return [list_of_contents[0:16]]
+        return no_update
 
 
 # Confirmation Modal

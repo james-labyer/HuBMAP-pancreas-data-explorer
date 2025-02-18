@@ -3,7 +3,7 @@ import logging
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
-
+from pages import alerts
 from pages.constants import FILE_DESTINATION as FD
 
 app_logger = logging.getLogger(__name__)
@@ -23,10 +23,16 @@ register_page(
     title=title,
 )
 
-thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
-
 
 def layout(block=None, **kwargs):
+    try:
+        thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
+    except FileNotFoundError:
+        return alerts.send_toast(
+            "Cannot load page",
+            "Missing required configuration, please contact an administrator to resolve the issue.",
+            "failure",
+        )
     app_logger.debug(
         f"Data columns imported for scientific image file summary:\n{thumbnails.columns}"
     )

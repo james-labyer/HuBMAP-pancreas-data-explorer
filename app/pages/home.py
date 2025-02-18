@@ -3,7 +3,7 @@ import logging
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
-
+from pages import alerts
 from pages.constants import FILE_DESTINATION as FD
 
 register_page(__name__, path="/")
@@ -34,7 +34,14 @@ def make_grid(blocks, columns, organ="P1"):
 
 
 def layout():
-    blocks = read_blocks()
+    try:
+        blocks = read_blocks()
+    except FileNotFoundError:
+        return alerts.send_toast(
+            "Cannot load page",
+            "Missing required configuration, please contact an administrator to resolve the issue.",
+            "failure",
+        )
     organs = blocks["Organ ID"].unique()
 
     app_logger.debug(f"Data columns imported for home page grid:\n{blocks.columns}")

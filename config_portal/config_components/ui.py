@@ -152,28 +152,34 @@ def make_upload_card(
     body_items = []
     if accordion:
         body_items.append(make_accordion(acc_notes))
-    else:
-        if summary_note:
-            body_items.append(html.P(summary_note))
-        for i in range(len(dl_notes)):
-            row_contents = [
-                dbc.Col(html.P(dl_notes[i])),
-            ]
-            if example:
-                row_contents.append(
-                    dbc.Col(
-                        make_download("Download example", f"{prefix}-{i}"),
-                        width="auto",
-                    ),
-                )
+    if summary_note:
+        body_items.append(html.P(summary_note))
+    for i in range(len(dl_notes)):
+        row_contents = [
+            dbc.Col(html.P(dl_notes[i])),
+        ]
+        if example:
+            row_contents.append(
+                dbc.Col(
+                    make_download("Download example", f"{prefix}-{i}"),
+                    width="auto",
+                ),
+            )
+        if i == 0 and accordion:
+            dl_row = dbc.Row(
+                row_contents,
+                align="center",
+                style={"height": f"{dl_height}px", "margin-top": "15px"},
+            )
+        else:
             dl_row = dbc.Row(
                 row_contents,
                 align="center",
                 style={"height": f"{dl_height}px"},
             )
-            body_items.append(dl_row)
-        if example:
-            body_items.append(html.Hr())
+        body_items.append(dl_row)
+    if example and not accordion:
+        body_items.append(html.Hr())
     if upload_multiple:
         body_items.append(
             dbc.Row(
@@ -202,9 +208,7 @@ def make_accordion(items):
     accordion_items = []
     for item in items:
         this_item = dbc.AccordionItem(
-            [
-                html.P([item[1]]),
-            ],
+            [item[1]],
             title=item[0],
         )
         accordion_items.append(this_item)

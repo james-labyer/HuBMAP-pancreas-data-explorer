@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from pages.constants import FILE_DESTINATION as FD
+from pages import alerts
 import pages.ui as ui
 import json
 import math
@@ -40,7 +41,6 @@ register_page(
 
 
 # Initial data retrieval tasks
-DOWNLOADS = pd.read_csv(f"{FD["spatial-map"]}/downloads.csv")
 
 
 def make_defaults(ranges_df: pd.DataFrame) -> dict:
@@ -78,6 +78,7 @@ def load_data(block: str) -> tuple[dict, dict, list, list, list, dict]:
     value_ranges = pd.read_csv(f"{dir}/value_ranges.csv", index_col="Row Label")
     category_labels = pd.read_csv(f"{dir}/category_labels.csv")
     vol_measurements = pd.read_csv(f"{dir}/vol_measurements.csv")
+    downloads = pd.read_csv(f"{FD["spatial-map"]}/downloads.csv")
 
     # Get title and desc
     page_info = meta.iloc[0].to_dict()
@@ -97,7 +98,7 @@ def load_data(block: str) -> tuple[dict, dict, list, list, list, dict]:
     # get value labels and min/maxes
     value_info = value_ranges.iloc[0:2].to_dict()
 
-    return page_info, defaults, layers, category_opts, value_info, axes
+    return page_info, defaults, layers, category_opts, value_info, axes, downloads
 
 
 def find_global_value_bounds(value_info: dict) -> tuple[float, float]:
@@ -108,13 +109,23 @@ def find_global_value_bounds(value_info: dict) -> tuple[float, float]:
 
 
 def layout(block=None, **kwargs):
-    page_info, defaults, layers, category_opts, value_info, axes = load_data(block)
+    try:
+        page_info, defaults, layers, category_opts, value_info, axes, downloads = (
+            load_data(block)
+        )
+    except FileNotFoundError:
+        return alerts.send_toast(
+            "Cannot load page",
+            "Missing required configuration, please contact an administrator to resolve the issue.",
+            "failure",
+        )
+
     values = list(value_info.keys())
     category_opts["Selected"] = defaults["d_category"]
     value_min_max = find_global_value_bounds(value_info)
 
     download_content = ui.make_downloads_ui_elements(
-        DOWNLOADS[DOWNLOADS["Block"] == block]
+        downloads[downloads["Block"] == block]
     )
 
     content = html.Div(
@@ -257,7 +268,15 @@ def update_fig(
             settings[key] = props[key]
 
     if tab == "cube-tab":
-        df = pd.read_csv(f"{FD["spatial-map"]}/{block}/cube_data.csv")
+        try:
+            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/cube_data.csv")
+        except FileNotFoundError:
+            return alerts.send_toast(
+                "Cannot load page",
+                "Missing required configuration, please contact an administrator to resolve the issue.",
+                "failure",
+            )
+
         return ui.make_cube_fig(
             axes,
             value_ranges,
@@ -270,7 +289,14 @@ def update_fig(
             category_opt=settings["category_selected"],
         )
     elif tab == "point-tab":
-        df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        try:
+            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        except FileNotFoundError:
+            return alerts.send_toast(
+                "Cannot load page",
+                "Missing required configuration, please contact an administrator to resolve the issue.",
+                "failure",
+            )
         return ui.make_point_fig(
             axes,
             value_ranges,
@@ -281,7 +307,14 @@ def update_fig(
             layer=settings["layer"],
         )
     elif tab == "layer-tab":
-        df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        try:
+            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        except FileNotFoundError:
+            return alerts.send_toast(
+                "Cannot load page",
+                "Missing required configuration, please contact an administrator to resolve the issue.",
+                "failure",
+            )
         return ui.make_layer_fig(
             axes,
             value_ranges,
@@ -291,7 +324,14 @@ def update_fig(
             layer=settings["layer"],
         )
     elif tab == "sphere-tab":
-        df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        try:
+            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+        except FileNotFoundError:
+            return alerts.send_toast(
+                "Cannot load page",
+                "Missing required configuration, please contact an administrator to resolve the issue.",
+                "failure",
+            )
         return ui.make_sphere_fig(
             axes,
             value_ranges,
@@ -338,7 +378,15 @@ def update_test(data):
     prevent_initial_call=True,
 )
 def display_output(n_clicks, id):
-    row = DOWNLOADS.loc[id["index"]]
+    try:
+        downloads = pd.read_csv(f"{FD["spatial-map"]}/downloads.csv")
+    except FileNotFoundError:
+        return alerts.send_toast(
+            "Cannot load page",
+            "Missing required configuration, please contact an administrator to resolve the issue.",
+            "failure",
+        )
+    row = downloads.loc[id["index"]]
     file_path = Path(f"{FD["spatial-map"]}/{row["Block"]}/{row["Name"]}")
     if not Path.exists(file_path):
         return no_update
