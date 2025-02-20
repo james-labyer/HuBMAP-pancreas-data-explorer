@@ -1,15 +1,15 @@
 import logging
-
+import sys
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from dash import Input, Output, callback, dcc, html, register_page
+from dash import Input, Output, callback, dcc, html, register_page, ALL
 from pywavefront import Wavefront
 
 from pages.constants import FILE_DESTINATION as FD
 
-register_page(__name__, path="/3d", title="3D Pancreas Model")
+register_page(__name__, path="/3d", title="3D Tissue Sample Model")
 
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
@@ -17,7 +17,7 @@ app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
 blocks = pd.read_csv(FD["si-block"]["block-data"])
-traces = pd.read_csv("assets/obj/obj-files.csv")
+traces = pd.read_csv(f"{FD["obj-files"]["summary"]}/obj-files.csv")
 
 
 def read_obj(file):
@@ -78,62 +78,82 @@ def make_mesh_data(name, file, color=None, opacity=1):
     return data
 
 
-def make_mesh_fig(pancreas=1):
-    pancreas_traces = traces.loc[traces["pancreas"] == pancreas]
-    for i in range(pancreas_traces.shape[0]):
-        if i == 0:
-            data1 = make_mesh_data(
-                pancreas_traces.at[i, "name"],
-                pancreas_traces.at[i, "file"],
-                pancreas_traces.at[i, "color"],
-                pancreas_traces.at[i, "opacity"],
+def make_mesh_fig(organ=1):
+    organ_traces = traces.loc[traces["Organ"] == organ]
+    if organ_traces.shape[0] == 0:
+        return
+    start = True
+    for i in organ_traces.index:
+        try:
+            file_loc = f"{FD["obj-files"]["volumes"]}/{organ_traces.at[i, "File"]}"
+            if start:
+                data1 = make_mesh_data(
+                    organ_traces.at[i, "Name"],
+                    file_loc,
+                    organ_traces.at[i, "Color"],
+                    organ_traces.at[i, "Opacity"],
+                )
+                fig = go.Figure(data1)
+                name = data1[0]["name"]
+                app_logger.debug(f"Added trace for {name} to 3D Model of {organ}")
+                start = False
+            else:
+                data = make_mesh_data(
+                    organ_traces.at[i, "Name"],
+                    file_loc,
+                    organ_traces.at[i, "Color"],
+                    organ_traces.at[i, "Opacity"],
+                )
+                fig.add_trace(go.Mesh3d(data[0]))
+                name = data[0]["name"]
+                app_logger.debug(f"Added trace for {name} to 3D Model of {organ}")
+            print(
+                f"trace added for {organ_traces.at[i, "File"]}",
+                file=sys.stdout,
+                flush=True,
             )
-            fig = go.Figure(data1)
-            name = data1[0]["name"]
-            app_logger.debug(
-                f"Added trace for {name} to 3D Model of Pancreas {pancreas}"
+        except FileNotFoundError:
+            # try to add the other traces
+            print(
+                f"trace not added for {organ_traces.at[i, "File"]}",
+                file=sys.stdout,
+                flush=True,
             )
-        else:
-            data = make_mesh_data(
-                pancreas_traces.at[i, "name"],
-                pancreas_traces.at[i, "file"],
-                pancreas_traces.at[i, "color"],
-                pancreas_traces.at[i, "opacity"],
-            )
-            fig.add_trace(go.Mesh3d(data[0]))
-            name = data[0]["name"]
-            app_logger.debug(
-                f"Added trace for {name} to 3D Model of Pancreas {pancreas}"
-            )
-    fig.update_layout(
-        height=500,
-        scene=dict(
-            xaxis=dict(visible=False),
-            yaxis=dict(visible=False),
-            zaxis=dict(visible=False),
-        ),
-        margin=dict(l=20, r=20, t=20, b=20),
-    )
-    return fig
+            continue
+    try:
+        fig.update_layout(
+            height=500,
+            scene=dict(
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                zaxis=dict(visible=False),
+            ),
+            margin=dict(l=20, r=20, t=20, b=20),
+        )
+        return fig
+    # This means none of the traces were added
+    except UnboundLocalError:
+        return False
 
 
-def make_graph_layout(pancreas=1):
+def make_graph_layout(organ=1, idx=0):
+    fig = make_mesh_fig(organ)
+    if not fig:
+        card_content = "No models could be loaded for this organ"
+    else:
+        card_content = dcc.Graph(
+            id={"type": "organ-graph", "index": idx},
+            figure=fig,
+            config={"scrollZoom": False},
+            className="centered-graph",
+        )
     container = html.Section(
         [
-            dbc.Row(dbc.Col(html.Header(html.H2(f"3D Model of Pancreas {pancreas}")))),
+            dbc.Row(dbc.Col(html.Header(html.H2(f"3D Model of {organ}")))),
             dbc.Row(
                 [
                     dbc.Col(
-                        [
-                            dbc.Card(
-                                dcc.Graph(
-                                    id="pancreas-graph",
-                                    figure=make_mesh_fig(pancreas),
-                                    config={"scrollZoom": False},
-                                    className="centered-graph",
-                                )
-                            )
-                        ],
+                        [dbc.Card(card_content)],
                         width=9,
                     ),
                     dbc.Col(
@@ -152,15 +172,29 @@ def make_graph_layout(pancreas=1):
     return container
 
 
-layout = html.Div([make_graph_layout(1)])
+def layout(**kwargs):
+    # get unique organs from traces
+    organs = list(traces["Organ"].unique())
+    print("organs:", organs, file=sys.stdout, flush=True)
+    if len(organs) == 0:
+        return html.Div("No 3D models have been loaded.")
+    # add a model for each
+    graphs = []
+    for i in range(len(organs)):
+        graphs.append(make_graph_layout(organs[i], i))
+    return html.Div(graphs)
 
 
-@callback(Output("click-data", "children"), [Input("pancreas-graph", "clickData")])
+@callback(
+    Output("click-data", "children"),
+    Input({"type": "organ-graph", "index": ALL}, "clickData"),
+)
 def display_click_data(click_data):
-    if click_data and click_data["points"][0]["curveNumber"] > 3:
+    print("click_data:", click_data, file=sys.stdout, flush=True)
+    if click_data[0] and click_data[0]["points"][0]["curveNumber"] > 3:
         row = blocks.loc[
             blocks["Tissue Block"]
-            == traces.loc[click_data["points"][0]["curveNumber"], "name"]
+            == traces.loc[click_data[0]["points"][0]["curveNumber"], "Name"]
         ]
         block_name = row.iloc[0]["Tissue Block"]
         app_logger.debug(f"Displaying click data for {block_name}")
@@ -172,7 +206,7 @@ def display_click_data(click_data):
                 "value": row.iloc[0]["Images"],
             },
             {"label": "View reports", "value": row.iloc[0]["Reports"]},
-            {"label": "View proteomics data", "value": row.iloc[0]["Proteomics"]},
+            {"label": "View spatial map", "value": row.iloc[0]["Proteomics"]},
         ]
         card_content = []
         card_body_content = []

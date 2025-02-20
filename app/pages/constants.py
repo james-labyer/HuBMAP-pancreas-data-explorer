@@ -4,7 +4,10 @@ FILE_DESTINATION = {
         "si-files": "/app/assets/config/image-sets.csv",
     },
     "spatial-map": "assets/config/spatial-map",
-    "obj-files": "",
+    "obj-files": {
+        "summary": "/app/assets/config/obj",
+        "volumes": "/app/assets/config/obj/volumes",
+    },
     "sci-images": "/config/scientific-images",
     "thumbnails": {
         "publish": "/config/scientific-images/thumbnails",

@@ -127,7 +127,7 @@ def make_upload(prefix, max_size, allow_multiple=False):
                     max_size=max_size,
                     multiple=allow_multiple,
                 ),
-                # html.Div(id=f"output-{prefix}-upload"),
+                html.Div(id=f"output-{prefix}-upload"),
             ]
         ),
         dbc.Col(

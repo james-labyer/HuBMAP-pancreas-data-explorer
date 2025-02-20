@@ -17,7 +17,10 @@ FILE_DESTINATION = {
             "publish": "/config/spatial-map/downloads.csv",
         },
     },
-    "obj-files": {"depot": "", "publish": ""},
+    "obj-files": {
+        "summary": {"depot": "./depot/obj", "publish": "/config/obj"},
+        "volumes": {"depot": "./depot/obj/volumes", "publish": "/config/obj/volumes"},
+    },
     "sci-images": {
         "depot": "./depot/scientific-images",
         "publish": "/config/scientific-images",

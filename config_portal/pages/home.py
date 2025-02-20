@@ -12,7 +12,7 @@ from dash import (
 import dash_bootstrap_components as dbc
 from config_components import ui, validate
 from flask_login import current_user
-
+import sys
 
 title = "Update Configuration"
 MAX_EXCEL_SIZE = 150000000
@@ -237,7 +237,6 @@ def layout(**kwargs):
                             ],
                             "obj-files",
                             MAX_OBJ_SIZE,
-                            # Add note about unsupported .obj features
                             accordion=True,
                             acc_notes=[
                                 [
@@ -437,7 +436,20 @@ def send_obj_example_3(n_clicks):
 )
 def update_obj_files_output(list_of_contents, filenames):
     if list_of_contents is not None:
-        return no_update
+        for i in range(len(list_of_contents)):
+            upload_succeeded = validate.upload_content(
+                list_of_contents[i],
+                filenames[i],
+                "3d",
+                validate.process_obj_files,
+                filenames[i],
+            )
+            print("upload_succeeded:", upload_succeeded, file=sys.stdout, flush=True)
+            if not upload_succeeded[0]:
+                return ui.failure_toast("Model files not uploaded", upload_succeeded[1])
+        return ui.success_toast(
+            "Model files uploaded", "The files were uploaded successfully."
+        )
 
 
 # Confirmation Modal
@@ -447,9 +459,10 @@ def update_obj_files_output(list_of_contents, filenames):
     Input("si-block-publish", "n_clicks"),
     Input("sci-images-publish", "n_clicks"),
     Input("spatial-map-publish", "n_clicks"),
+    Input("obj-files-publish", "n_clicks"),
     prevent_initial_call=True,
 )
-def add_modal(title, si_block, sci_images, spatial_map):
+def add_modal(title, si_block, sci_images, spatial_map, obj_files):
     button_clicked = ctx.triggered_id
     publish_buttons = {
         "title-publish": [
@@ -467,6 +480,10 @@ def add_modal(title, si_block, sci_images, spatial_map):
         "spatial-map-publish": [
             "spatial-map",
             "Are you sure you want to update the spatial map data? This change will be immediately visible to the public.",
+        ],
+        "obj-files-publish": [
+            "obj-files",
+            "Are you sure you want to update the 3D model files? This change will be immediately visible to the public.",
         ],
     }
 
@@ -486,6 +503,7 @@ def add_modal(title, si_block, sci_images, spatial_map):
         Input("confirm-update-si-block", "n_clicks"),
         Input("confirm-update-sci-images", "n_clicks"),
         Input("confirm-update-spatial-map", "n_clicks"),
+        Input("confirm-update-obj-files", "n_clicks"),
         Input("cancel-update", "n_clicks"),
     ],
     [State("confirm-update-modal", "is_open"), State("title-input", "value")],
@@ -495,6 +513,7 @@ def toggle_modal(
     confirm_si_block,
     confirm_sci_images,
     confirm_spatial_map,
+    confirm_obj_files,
     cancel_update,
     is_open,
     value,
@@ -507,6 +526,8 @@ def toggle_modal(
         return validate.update_sci_images(is_open)
     elif confirm_spatial_map:
         return validate.publish_spatial_map_data(is_open)
+    elif confirm_obj_files:
+        return validate.publish_obj_files(is_open)
     elif cancel_update:
         return not is_open, no_update
     else:

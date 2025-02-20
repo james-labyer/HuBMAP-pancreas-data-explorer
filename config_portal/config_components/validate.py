@@ -24,6 +24,7 @@ NAMEREG = r"\.\w{3,8}"  # regex to check file name format
 VALID_EXTS = {
     "excel": ["xls", "xlsx"],
     "excel/vol": ["xls", "xlsx", "stl", "nrrd", "vti", "obj", "mtl"],
+    "3d": ["xls", "xlsx", "obj"],
     "image": [
         # Allows PNG, AVI, Image Cytometry Standard, OME-TIFF, TIFF, CZI, SVS, AFI, SCN, GDAL, ZVI, DCM, NDPI, and VSI extensions
         "png",
@@ -65,6 +66,11 @@ VALID_MIMES = {
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "application/octet-stream",
         "text/xml",
+    ],
+    "3d": [
+        "application/vnd.ms-excel",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
     ],
     "image": ["image/tiff", "image/png", "video/x-msvideo", "image/jpeg"],
 }
@@ -126,7 +132,7 @@ REQUIRED_HEADERS = {
         ],
     },
     "downloads": {"downloads": ["Name", "Label", "Desc", "Block"]},
-    "obj-files": {},
+    "obj-files": {"files": ["Organ", "Name", "File", "Color", "Opacity"]},
 }
 
 FD = constants.FILE_DESTINATION
@@ -140,7 +146,7 @@ app_logger.setLevel(gunicorn_logger.level)
 def check_file_type(file, valid_type, filename=None):
     ftype = filetype.guess(file)
     if ftype is None:
-        if valid_type == "image" or valid_type == "excel/vol":
+        if valid_type == "image" or valid_type == "excel/vol" or valid_type == "3d":
             ftype = magic.from_buffer(file)
             if ftype == "data":
                 if filename is None:
@@ -751,14 +757,16 @@ def write_excel(dfs, filename, loc):
         return False, str(err), ""
 
 
-def update_downloads_list(old_list: pd.DataFrame, new_entries: pd.DataFrame):
-    # TODO: add ability to delete downloads (list entries and files)
+def update_df_entries(
+    old_list: pd.DataFrame, new_entries: pd.DataFrame, key_column: str
+):
+    # TODO: add ability to delete entries (list entries and files)
     ol = old_list.copy()
-    valid_names = validate_filename_col(new_entries["Name"])
+    valid_names = validate_filename_col(new_entries[key_column])
     if not valid_names[0]:
         return False, valid_names[1], ""
     # drop duplicate names in existing data
-    ol.drop_duplicates(subset=["Name"], inplace=True)
+    ol.drop_duplicates(subset=[key_column], inplace=True)
     ol.index = range(len(ol))
     new_rows = new_entries.shape[0]
     existing_rows = ol.shape[0]
@@ -766,8 +774,8 @@ def update_downloads_list(old_list: pd.DataFrame, new_entries: pd.DataFrame):
     # add rows to downloads.csv
     for i in range(new_rows):
         # find names existing records that match names in new record
-        if ol["Name"].eq(new_entries["Name"].loc[i]).any():
-            matches = np.flatnonzero(ol["Name"].eq(new_entries["Name"].loc[i]))
+        if ol[key_column].eq(new_entries[key_column].loc[i]).any():
+            matches = np.flatnonzero(ol[key_column].eq(new_entries[key_column].loc[i]))
             to_drop.extend(matches[1:])
             ol.iloc[matches[0]] = new_entries.iloc[i]
         else:
@@ -777,27 +785,37 @@ def update_downloads_list(old_list: pd.DataFrame, new_entries: pd.DataFrame):
     return ol
 
 
+def update_entries(
+    old_loc: str, new_entries: pd.DataFrame, key_column: str
+) -> pd.DataFrame:
+    """Used with check_downloads_xlsx and process_obj_files"""
+    new = False
+    try:
+        df = pd.read_csv(old_loc)
+    except FileNotFoundError:
+        df = new_entries
+        new = True
+        valid_names = validate_filename_col(df[key_column])
+        if not valid_names[0]:
+            return False, valid_names[1], ""
+        # drop duplicate names
+        df.drop_duplicates(subset=[key_column], inplace=True)
+    if not new:
+        df = update_df_entries(df, new_entries, key_column)
+    return df
+
+
 def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str, str]:
     """Checks downloads.xlsx, which can be uploaded to spatial map files, for duplicates and
     unsafe filenames, then saves a csv in depot."""
     header_check = check_excel_headers(file, "downloads")
     # update downloads.csv
     if header_check[0]:
-        # check if downloads.csv exists
-        new = False
-        try:
-            df = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
-        except FileNotFoundError:
-            df = header_check[2]["downloads"]
-            new = True
-            valid_names = validate_filename_col(df["Name"])
-            if not valid_names[0]:
-                return False, valid_names[1], ""
-            # drop duplicate names
-            df.drop_duplicates(subset=["Name"], inplace=True)
-        if not new:
-            df1 = header_check[2]["downloads"]
-            df = update_downloads_list(df, df1)
+        df = update_entries(
+            FD["spatial-map"]["downloads-file"]["depot"],
+            header_check[2]["downloads"],
+            "Name",
+        )
         # save csv
         df.to_csv(FD["spatial-map"]["downloads-file"]["depot"], index=False)
         # no filename because this file's presence alone should not trigger name update
@@ -910,6 +928,15 @@ def check_spatial_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
         return False, header_check[1], ""
 
 
+def save_generic_file(loc: str, file: bytes, filename: str) -> tuple[bool, str, str]:
+    dest = Path(loc)
+    if not Path.exists(dest):
+        Path.mkdir(dest, parents=True)
+    with open(f"{loc}/{filename}", "wb") as f:
+        f.write(file)
+    return True, "", filename
+
+
 def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
     """Takes a file, checks the headers if metadata file, and saves them file to the depot.
     Overwrites file if it already exists.
@@ -942,18 +969,38 @@ def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]
             block = get_spatial_map_folder(filename)
             if not block[0]:
                 return False, block[1], ""
-            dest = Path(f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}")
-            if not Path.exists(dest):
-                Path.mkdir(dest, parents=True)
-            with open(
-                f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}/{filename}", "wb"
-            ) as f:
-                f.write(file)
-            return True, "", filename
+            loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
+            return save_generic_file(loc, file, filename)
         except Exception as err:
-            # (traceback.print_exc(), file=sys.stdout, flush=True)
+            # print(traceback.print_exc(), file=sys.stdout, flush=True)
             app_logger.debug(traceback.print_exc())
             return False, str(err), ""
+
+
+def move_dir(src: Path, dest: str) -> bool:
+    """Move the contents of one directory to another directory"""
+    dest_path = Path(dest)
+    if not Path.exists(dest_path):
+        Path.mkdir(dest_path, parents=True)
+    files_to_move = src.iterdir()
+    for file in files_to_move:
+        file_dest = dest_path / file.name
+        shutil.move(file, file_dest)
+    return True
+
+
+def publish_entries(src: str, dest: str, key_col: str):
+    """Publish new entries to a csv file."""
+    new_entries = pd.read_csv(src)
+    publish_dl_path = Path(dest)
+    if not Path.exists(publish_dl_path.parent):
+        Path.mkdir(publish_dl_path.parent, parents=True)
+    if not Path.exists(publish_dl_path):
+        new_entries.to_csv(dest, index=False)
+    else:
+        old_list = pd.read_csv(dest)
+        old_list = update_df_entries(old_list, new_entries, key_col)
+        old_list.to_csv(dest, index=False)
 
 
 def publish_spatial_map_data(is_open):
@@ -962,26 +1009,13 @@ def publish_spatial_map_data(is_open):
     dirs_to_move = [x for x in p.iterdir() if x.is_dir()]
     try:
         for item in dirs_to_move:
-            dest = Path(f"{FD["spatial-map"]["downloads"]["publish"]}/{item.name}")
-            if not Path.exists(dest):
-                Path.mkdir(dest, parents=True)
-            files_to_move = item.iterdir()
-            for file in files_to_move:
-                file_dest = dest / file.name
-                shutil.move(file, file_dest)
+            move_dir(item, f"{FD["spatial-map"]["downloads"]["publish"]}/{item.name}")
         # update entries in published downloads.csv
-        new_entries = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
-        publish_dl_path = Path(FD["spatial-map"]["downloads-file"]["publish"])
-        if not Path.exists(publish_dl_path.parent):
-            Path.mkdir(publish_dl_path.parent, parents=True)
-        if not Path.exists(publish_dl_path):
-            new_entries.to_csv(
-                FD["spatial-map"]["downloads-file"]["publish"], index=False
-            )
-        else:
-            old_list = pd.read_csv(FD["spatial-map"]["downloads-file"]["publish"])
-            old_list = update_downloads_list(old_list, new_entries)
-            old_list.to_csv(FD["spatial-map"]["downloads-file"]["publish"], index=False)
+        publish_entries(
+            FD["spatial-map"]["downloads-file"]["depot"],
+            FD["spatial-map"]["downloads-file"]["publish"],
+            "Name",
+        )
     except FileNotFoundError as err:
         # print(traceback.print_exc(), file=sys.stdout, flush=True)
         app_logger.debug(traceback.print_exc())
@@ -996,3 +1030,59 @@ def publish_spatial_map_data(is_open):
         "Metadata updated",
         "The configuration has been updated. Refresh the public-facing app to see the changes.",
     )
+
+
+def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
+    is_valid = is_valid_filename(filename)
+    if not is_valid[0]:
+        return False, is_valid[1], ""
+    # process summary file
+    if filename == "obj-files.xlsx":
+        header_check = check_excel_headers(file, "obj-files", fillna=False)
+        if header_check[0]:
+            try:
+                # add new entries to summary csv
+                df = update_entries(
+                    f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv",
+                    header_check[2]["files"],
+                    "File",
+                )
+                df.to_csv(
+                    f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv", index=False
+                )
+                return True, "", ""
+            except Exception as err:
+                return False, err, ""
+        else:
+            return False, header_check[1], ""
+    # process any other file
+    else:
+        loc = FD["obj-files"]["volumes"]["depot"]
+        try:
+            return save_generic_file(loc, file, filename)
+        except Exception as err:
+            print(traceback.print_exc(), file=sys.stdout, flush=True)
+            return False, f"{err}", ""
+
+
+def publish_obj_files(is_open):
+    try:
+        # move volumes directory
+        p = Path(FD["obj-files"]["volumes"]["depot"])
+        move_dir(p, FD["obj-files"]["volumes"]["publish"])
+        # update volume entries
+        publish_entries(
+            f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv",
+            f"{FD["obj-files"]["summary"]["publish"]}/obj-files.csv",
+            "File",
+        )
+        return not is_open, ui.success_toast(
+            "Model files updated",
+            "The configuration has been updated. Refresh the public-facing app to see the changes.",
+        )
+    except Exception as err:
+        print(traceback.print_exc(), file=sys.stdout, flush=True)
+        return not is_open, ui.failure_toast(
+            "Model files not updated",
+            f"{err}",
+        )
