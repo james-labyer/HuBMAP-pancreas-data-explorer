@@ -20,7 +20,7 @@ def title(pancreas="P1"):
 register_page(
     __name__,
     path_template="/geomx/<pancreas>",
-    path="/geomx/P1",
+    path="/reports",
     title=title,
 )
 

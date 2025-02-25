@@ -3,6 +3,7 @@ venv/*
 .pytest_cache*
 __pycache__*
 .coverage
+.env
 
 # files that are too large
 **/P1_14A1_ KRT19 green INS white stack.czi
@@ -32,8 +33,22 @@ __pycache__*
 **/app/assets/optical-clearing-czi/P2-13A/*/*.czi
 **/app/assets/optical-clearing-czi/P2-19A/*/*.czi
 **/app/assets/optical-clearing-czi/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2-1A/*/*.czi
+**/app/assets/scientific-images/P2-7A/*/*.czi
+**/app/assets/scientific-images/P2-7A/*/*.avi
+**/app/assets/scientific-images/P2-13A/*/*.czi
+**/app/assets/scientific-images/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2-19A/*/*.czi
+**/app/assets/scientific-images/P2*
 
 # script depots
 **/scripts/t-in
 **/scripts/t-out
 
+# config files
+**/blocks.csv
+**/image-sets.csv
+**/config/labels.csv
+
+# depot
+**/depot/**

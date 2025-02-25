@@ -1,30 +1,41 @@
 services:
-  nginx-proxy:
+  config-app:
     build:
       context: .
-      dockerfile: "./nginx/Dockerfile-nginx"
+      dockerfile: "./config_portal/Dockerfile-dev-config"
     ports:
-      - "80:80"
+      - "8040:8040"
+    expose:
+      - "8040"
     depends_on:
-      - dash-app
-    networks:
-      - inside
-      - outside
-  dash-app:
+      - display-app
+    volumes:
+      - type: bind
+        source: ./config_portal
+        target: /app
+      - config-data:/config
+    # networks:
+    #   - inside
+  display-app:
     build: 
       context: .
       dockerfile: "./app/Dockerfile-dev-dash"
     ports:
       - "8050:8050"
+    expose:
+      - "8050"
     stdin_open: true
     tty: true
     volumes:
       - type: bind
         source: ./app
         target: /app
-    networks:
-      - inside
-networks:
-  inside:
-    internal: true
-  outside:
+      - config-data:/app/assets/config
+#     networks:
+#       - inside
+# networks:
+#   inside:
+#     internal: true
+volumes:
+  config-data:
+    external: true

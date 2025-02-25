@@ -1,12 +1,8 @@
-import sys
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
-sys.path.append(str(Path(__file__).parent.parent.parent))
-import app.app
-from app.pages.proteomics import update_fig
+import app
+from pages.proteomics import update_fig
 
 D_PROTEIN = "INS"
 D_SCHEME = "jet"

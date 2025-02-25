@@ -4,7 +4,7 @@ from dash import html
 
 
 def get_title():
-    labels = pd.read_csv("../config/labels.csv")
+    labels = pd.read_csv("./config/labels.csv")
     return labels.at[0, "title"]
 
 

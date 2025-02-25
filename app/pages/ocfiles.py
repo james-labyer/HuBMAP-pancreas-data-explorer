@@ -3,6 +3,8 @@ import logging
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
+from pages import alerts
+from pages.constants import FILE_DESTINATION as FD
 
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
@@ -10,23 +12,29 @@ app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
 
-def title(block=None, pancreas=None):
-    return f"{block} optical clearing"
+def title(block=None):
+    return f"{block} scientific images"
 
 
 register_page(
     __name__,
-    path_template="/optical-clearing-files/<block>",
-    path="/optical-clearing-files/P1-19A",
+    path_template="/scientific-images-list/<block>",
+    path="/scientific-images-list/P1-19A",
     title=title,
 )
 
-thumbnails = pd.read_csv("assets/optical-clearing-czi/oc-thumbnails.csv")
-
 
 def layout(block=None, **kwargs):
+    try:
+        thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
+    except FileNotFoundError:
+        return alerts.send_toast(
+            "Cannot load page",
+            "Missing required configuration, please contact an administrator to resolve the issue.",
+            "failure",
+        )
     app_logger.debug(
-        f"Data columns imported for optical clearing file summary:\n{thumbnails.columns}"
+        f"Data columns imported for scientific image file summary:\n{thumbnails.columns}"
     )
 
     block_thumbnails = thumbnails.loc[thumbnails["Block"] == block]
@@ -54,7 +62,7 @@ def layout(block=None, **kwargs):
     return html.Div(
         html.Section(
             children=[
-                html.Header(html.H2(f"{block} Optical Clearing Files")),
+                html.Header(html.H2(f"{block} Scientific Image Sets")),
                 grid,
             ],
         )

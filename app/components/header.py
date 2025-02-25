@@ -1,10 +1,14 @@
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import html
+from pages import alerts
 
 
 def get_title():
-    labels = pd.read_csv("../config/labels.csv")
+    try:
+        labels = pd.read_csv("./assets/config/labels.csv")
+    except FileNotFoundError:
+        return ("Cannot load page",)
     return labels.at[0, "title"]
 
 

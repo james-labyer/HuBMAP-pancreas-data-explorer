@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from dash import Input, Output, callback, dcc, html, register_page
 
-register_page(__name__, title="Block P1-20C Proteomics")
+register_page(__name__, title="Block P1-20C Proteomics", path="/proteomics/P1-20C")
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers

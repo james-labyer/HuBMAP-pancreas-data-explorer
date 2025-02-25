@@ -1,35 +1,46 @@
 import logging
+import sys
 
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import Input, Output, State, callback, dcc, html, no_update, register_page
 from PIL import Image
 
+from pages.constants import FILE_DESTINATION as FD
+
 app_logger = logging.getLogger(__name__)
 gunicorn_logger = logging.getLogger("gunicorn.error")
 app_logger.handlers = gunicorn_logger.handlers
 app_logger.setLevel(gunicorn_logger.level)
 
+s_imgs = pd.read_csv(FD["si-block"]["si-files"])
 
-def title(oc=None, pancreas=None, block=None):
-    return f"{oc} optical clearing"
+
+def title(iset=None, block=None):
+    if iset:
+        img = s_imgs.loc[(s_imgs["Image Set"] == iset)]
+        if img.empty:
+            return "Scientific Images"
+        else:
+            cat = img.at[img.index[0], "Image Category"]
+            return f"{iset} {cat}"
+    else:
+        return "Scientific Images"
 
 
 register_page(
     __name__,
-    path_template="/optical-clearing/<pancreas>/<block>/<oc>",
-    path="/optical-clearing/P1/P1-19A/P1-19A-1",
+    path_template="/scientific-images/<block>/<iset>",
+    path="/scientific-images/P1-19A/P1-19A-1",
     title=title,
 )
-
-oc_imgs = pd.read_csv("assets/optical-clearing-czi/oc-files.csv")
 
 
 def make_tab_content(slider=False, points=0, channels=1):
     card_content = []
     body_content = [
         html.Div(
-            id="oc-slider-output",
+            id="si-slider-output",
             className="custom-slicer-div",
         ),
     ]
@@ -60,7 +71,7 @@ def make_tab_content(slider=False, points=0, channels=1):
                 points,
                 1,
                 value=1,
-                id="oc-slider",
+                id="si-slider",
             ),
         )
 
@@ -75,45 +86,49 @@ def make_download_section(filename):
             html.P(filename),
             dbc.Button(
                 "Download",
-                id="btn-download-oc",
+                id="btn-download-si",
                 className="download-button",
             ),
-            dcc.Download(id="download-oc"),
+            dcc.Download(id="download-si"),
         ],
         style={"min-height": 155},
     )
 
 
-def layout(oc=None, **kwargs):
-    # handle bad oc values
-    img = oc_imgs.loc[(oc_imgs["oc"] == oc)]
+def layout(iset=None, **kwargs):
+    # handle bad image set values
+    img = s_imgs.loc[(s_imgs["Image Set"] == iset)]
     if img.empty:
-        return html.Div(html.P("Invalid optical clearing requested"))
+        return html.Div(html.P("Invalid image set requested"))
+
+    ext_pos = img.at[img.index[0], "File"].rfind(".")
+    basefile = img.at[img.index[0], "File"][0:ext_pos]
 
     # flatten dict since there is only one row
     img_dict = {
-        "block": img.at[img.index[0], "block"],
-        "oc": img.at[img.index[0], "oc"],
-        "file": img.at[img.index[0], "file"],
-        "basefile": img.at[img.index[0], "basefile"],
-        "slices": img.at[img.index[0], "slices"],
-        "channels": img.at[img.index[0], "channels"],
-        "height": img.at[img.index[0], "height"],
-        "width": img.at[img.index[0], "width"],
+        "block": img.at[img.index[0], "Tissue Block"],
+        "iset": img.at[img.index[0], "Image Set"],
+        "cat": img.at[img.index[0], "Image Category"],
+        "file": img.at[img.index[0], "File"],
+        "basefile": basefile,
+        "slices": img.at[img.index[0], "Slices"],
+        "channels": img.at[img.index[0], "Channels"],
+        "height": img.at[img.index[0], "Height"],
+        "width": img.at[img.index[0], "Width"],
     }
-    oc = img_dict["oc"].split("-")
+
     return html.Div(
         [
             html.Section(
                 [
-                    html.H2(f"{img_dict['block']} Optical Clearing {oc[-1]}"),
+                    html.H2(f"{img_dict['iset']} {img_dict['cat']}"),
                     make_tab_content(
                         (img_dict["slices"] > 1),
                         img_dict["slices"],
                         img_dict["channels"],
                     ),
-                    dcc.Store(id="oc-slider-store"),
-                    dcc.Store(id="oc-file-store", data=img_dict),
+                    dcc.Store(id="si-slider-store"),
+                    dcc.Store(id="si-file-store", data=img_dict),
                 ]
             ),
             html.Section(
@@ -126,16 +141,16 @@ def layout(oc=None, **kwargs):
     )
 
 
-@callback(Output("oc-slider-store", "data"), Input("oc-slider", "value"))
+@callback(Output("si-slider-store", "data"), Input("si-slider", "value"))
 def save_slider_pos(value):
     return value
 
 
 @callback(
-    Output("oc-slider-output", "children"),
+    Output("si-slider-output", "children"),
     Input("tabs", "active_tab"),
-    Input("oc-slider-store", "data"),
-    State("oc-file-store", "data"),
+    Input("si-slider-store", "data"),
+    State("si-file-store", "data"),
 )
 def update_pic(tab, slider, data):
     # callbacks must be included in the page even though not all layouts need them
@@ -155,11 +170,11 @@ def update_pic(tab, slider, data):
 
     if data["file"][-3:] == "jpg":
         pic = Image.open(
-            f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data["file"]}"
+            f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data["file"]}"
         )
     else:
         pic = Image.open(
-            f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
+            f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data['basefile']}_C{c}{val_str}.png"
         )
     # add max-height and max-width to style based on image's dimensions
     if int(data["height"]) > 600:
@@ -178,13 +193,13 @@ def update_pic(tab, slider, data):
 
 
 @callback(
-    Output("download-oc", "data"),
-    Input("btn-download-oc", "n_clicks"),
-    State("oc-file-store", "data"),
+    Output("download-si", "data"),
+    Input("btn-download-si", "n_clicks"),
+    State("si-file-store", "data"),
     prevent_initial_call=True,
 )
 def download_file(n_clicks, data):
     app_logger.debug(f"Sending {data['file']}")
     return dcc.send_file(
-        f"assets/optical-clearing-czi/{data['block']}/{data['basefile']}/{data['file']}"
+        f"assets/config/scientific-images/{data['block']}/{data['basefile']}/{data['file']}"
     )

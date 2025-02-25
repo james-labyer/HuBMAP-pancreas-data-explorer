@@ -172,3 +172,17 @@ p {
     padding-left: 17px;
     padding-right: 17px;
 }
+
+.form-card {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.result-toast {
+    z-index: 1;
+    position: fixed;
+    top: 110px;
+    right: 10px; 
+    width: 350px;
+    font-size: 16px;
+  }
