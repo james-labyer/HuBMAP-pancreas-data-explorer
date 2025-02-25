@@ -1,8 +1,6 @@
 import argparse
 import logging
-import os
 import socket
-import sys
 
 import dash_bootstrap_components as dbc
 from dash import (
