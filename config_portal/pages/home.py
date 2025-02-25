@@ -1,10 +1,18 @@
-import os
 import sys
-from dash import html, register_page, dcc, Output, Input, State, callback, no_update, ctx,
+from dash import (
+    html,
+    register_page,
+    dcc,
+    Output,
+    Input,
+    State,
+    callback,
+    no_update,
+    ctx,
+)
 import dash_bootstrap_components as dbc
 from config_components import ui, validate
 from flask_login import current_user
-import sys
 
 title = "Update Configuration"
 MAX_EXCEL_SIZE = 150000000

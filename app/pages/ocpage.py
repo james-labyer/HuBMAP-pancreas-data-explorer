@@ -1,5 +1,4 @@
 import logging
-import sys
 
 import dash_bootstrap_components as dbc
 import pandas as pd

@@ -103,45 +103,45 @@ def test_display_click_data():
     test1 = json.loads(json.dumps(testlayout1, cls=plotly.utils.PlotlyJSONEncoder))
     assert layout1 == test1
 
-    click2 = {
-        "points": [
-            {
-                "x": -392,
-                "y": 1749.50244140625,
-                "z": 746,
-                "curveNumber": 4,
-                "pointNumber": 52662,
-                "i": 28916,
-                "j": 28769,
-                "k": 28768,
-                "bbox": {
-                    "x0": 539.0667184592023,
-                    "x1": 539.0667184592023,
-                    "y0": 401.4491349814796,
-                    "y1": 401.4491349814796,
-                },
-            }
-        ]
-    }
-    layout2 = json.loads(
-        json.dumps(display_click_data(click2), cls=plotly.utils.PlotlyJSONEncoder)
-    )
-    testlayout2 = [
-        dbc.CardHeader("Block P1-4A", class_name="card-title"),
-        dbc.CardBody(
-            [
-                html.P("Anatomical region: Pancreatic head"),
-                html.P(
-                    [
-                        dcc.Link(
-                            "View scientific images",
-                            href="/optical-clearing-files/P1-4A",
-                        )
-                    ]
-                ),
-                html.P([dcc.Link("View reports", href="/geomx/P1")]),
-            ]
-        ),
-    ]
-    test2 = json.loads(json.dumps(testlayout2, cls=plotly.utils.PlotlyJSONEncoder))
+    # click2 = {
+    #     "points": [
+    #         {
+    #             "x": -392,
+    #             "y": 1749.50244140625,
+    #             "z": 746,
+    #             "curveNumber": 4,
+    #             "pointNumber": 52662,
+    #             "i": 28916,
+    #             "j": 28769,
+    #             "k": 28768,
+    #             "bbox": {
+    #                 "x0": 539.0667184592023,
+    #                 "x1": 539.0667184592023,
+    #                 "y0": 401.4491349814796,
+    #                 "y1": 401.4491349814796,
+    #             },
+    #         }
+    #     ]
+    # }
+    # layout2 = json.loads(
+    #     json.dumps(display_click_data(click2), cls=plotly.utils.PlotlyJSONEncoder)
+    # )
+    # testlayout2 = [
+    #     dbc.CardHeader("Block P1-4A", class_name="card-title"),
+    #     dbc.CardBody(
+    #         [
+    #             html.P("Anatomical region: Pancreatic head"),
+    #             html.P(
+    #                 [
+    #                     dcc.Link(
+    #                         "View scientific images",
+    #                         href="/optical-clearing-files/P1-4A",
+    #                     )
+    #                 ]
+    #             ),
+    #             html.P([dcc.Link("View reports", href="/geomx/P1")]),
+    #         ]
+    #     ),
+    # ]
+    # test2 = json.loads(json.dumps(testlayout2, cls=plotly.utils.PlotlyJSONEncoder))
     # assert layout2 == test2

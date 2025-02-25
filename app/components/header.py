@@ -1,7 +1,7 @@
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import html
-from pages import alerts
+# from pages import alerts
 
 
 def get_title():

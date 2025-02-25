@@ -6,7 +6,6 @@ import magic
 from pathlib import Path
 import os
 import re
-import sys
 from config_components import ui, constants
 import shutil
 import traceback
@@ -326,7 +325,7 @@ def check_image_name(
             )
         try:
             channel = int(nameparts[-1][0])
-        except ValueError as err:
+        except ValueError:
             return (
                 0,
                 False,
@@ -392,7 +391,6 @@ def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
             return (nums_check[0], nums_check[1], "")
     with open(os.path.join(FD["sci-images"]["depot"], filename), "wb") as fp:
         fp.write(file)
-    p = Path(f"{FD["sci-images"]["depot"]}")
 
     return True, "", ""
 
@@ -608,8 +606,7 @@ def publish_sci_images(src_path: Path, dest_dir: str, filename: str) -> None:
         # move to publish dir
         dest_name = Path(f"{dest_dir}/{filename}")
         shutil.move(src_path, dest_name)
-    except Exception as err:
-        # print(err, file=sys.stdout, flush=True)
+    except Exception:
         app_logger.debug(traceback.print_exc())
 
 
@@ -726,7 +723,6 @@ def is_valid_filename(*args, fn="") -> bool:
 def validate_filename_col(col):
     for i in range(col.shape[0]):
         is_valid = is_valid_filename(col.loc[i])
-        # print(col.loc[i], is_valid, file=sys.stdout, flush=True)
         if not is_valid[0]:
             return False, is_valid[1]
     return True, ""
@@ -752,7 +748,6 @@ def write_excel(dfs, filename, loc):
                 df.to_excel(writer, sheet_name=key, index=False)
         return True, "", filename
     except Exception as err:
-        # print(traceback.print_exc(), file=sys.stdout, flush=True)
         app_logger.debug(traceback.print_exc())
         return False, str(err), ""
 
@@ -959,7 +954,6 @@ def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]
                 loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
                 return write_excel(open_results[2], filename, loc)
             except Exception as err:
-                # print(traceback.print_exc(), file=sys.stdout, flush=True)
                 app_logger.debug(traceback.print_exc())
                 return False, str(err), ""
         else:
@@ -972,7 +966,6 @@ def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]
             loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
             return save_generic_file(loc, file, filename)
         except Exception as err:
-            # print(traceback.print_exc(), file=sys.stdout, flush=True)
             app_logger.debug(traceback.print_exc())
             return False, str(err), ""
 
@@ -1017,14 +1010,12 @@ def publish_spatial_map_data(is_open):
             "Name",
         )
     except FileNotFoundError as err:
-        # print(traceback.print_exc(), file=sys.stdout, flush=True)
         app_logger.debug(traceback.print_exc())
         return not is_open, ui.failure_toast(
             "Metadata not updated",
             f"{err}",
         )
-    except Exception as err:
-        # print(traceback.print_exc(), file=sys.stdout, flush=True)
+    except Exception:
         app_logger.debug(traceback.print_exc())
     return not is_open, ui.success_toast(
         "Metadata updated",
@@ -1052,7 +1043,7 @@ def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
                 )
                 return True, "", ""
             except Exception as err:
-                return False, err, ""
+                return False, str(err), ""
         else:
             return False, header_check[1], ""
     # process any other file
@@ -1061,7 +1052,7 @@ def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
         try:
             return save_generic_file(loc, file, filename)
         except Exception as err:
-            print(traceback.print_exc(), file=sys.stdout, flush=True)
+            app_logger.debug(traceback.print_exc())
             return False, f"{err}", ""
 
 
@@ -1081,7 +1072,7 @@ def publish_obj_files(is_open):
             "The configuration has been updated. Refresh the public-facing app to see the changes.",
         )
     except Exception as err:
-        print(traceback.print_exc(), file=sys.stdout, flush=True)
+        app_logger.debug(traceback.print_exc())
         return not is_open, ui.failure_toast(
             "Model files not updated",
             f"{err}",

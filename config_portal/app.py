@@ -4,14 +4,13 @@ from dash import (
     dcc,
     html,
     page_container,
-    no_update, 
+    no_update,
     Input,
     Output,
     State,
 )
 import json
 import os
-import sys
 from flask import Flask, session
 import logging
 import socket
