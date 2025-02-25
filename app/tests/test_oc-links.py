@@ -1,6 +1,14 @@
+import os
+import sys
+import pandas as pd
+
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 import app
-from pages.ocfiles import thumbnails
 from pages.ocpage import s_imgs
+from pages.constants import FILE_DESTINATION as FD
+
+thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
 
 
 def test_oc_page_links():

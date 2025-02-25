@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from pages.constants import FILE_DESTINATION as FD
-from pages import alerts
+from components import alerts
 import pages.ui as ui
 import json
 import math

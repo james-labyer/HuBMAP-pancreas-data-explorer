@@ -1,10 +1,16 @@
 from dash import page_registry
+import os
+import sys
+import pandas as pd
 
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 import app
 from pages.geomx import reports
 from pages.home import read_blocks
-from pages.ocfiles import thumbnails
+from pages.constants import FILE_DESTINATION as FD
 
+thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
 blocks = read_blocks()
 
 

@@ -13,6 +13,12 @@ services:
       - type: bind
         source: ./config_portal
         target: /app
+      - type: bind
+        source: ./components
+        target: /app/components
+      - type: bind
+        source: ./styles
+        target: /app/assets/styles
       - config-data:/config
     # networks:
     #   - inside
@@ -30,6 +36,12 @@ services:
       - type: bind
         source: ./app
         target: /app
+      - type: bind
+        source: ./components
+        target: /app/components
+      - type: bind
+        source: ./styles
+        target: /app/assets/styles
       - config-data:/app/assets/config
 #     networks:
 #       - inside

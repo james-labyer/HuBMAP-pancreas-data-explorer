@@ -13,5 +13,5 @@ FILE_DESTINATION = {
         "publish": "/config/scientific-images/thumbnails",
         "catalog": "/app/assets/config/scientific-images/thumbnails/thumbnails.csv",
     },
-    "title": "/config/labels.csv",
+    "title": {"publish": "/app/assets/config/labels.csv"},
 }

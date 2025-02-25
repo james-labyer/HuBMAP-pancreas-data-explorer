@@ -2,9 +2,13 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import html
 
+# This import is reported as incorrect in the editor, but is correct in the
+# Docker container because this folder is copied into each of the app folders
+from pages.constants import FILE_DESTINATION as FD
+
 
 def get_title():
-    labels = pd.read_csv("../config/labels.csv")
+    labels = pd.read_csv(FD["title"]["publish"])
     return labels.at[0, "title"]
 
 

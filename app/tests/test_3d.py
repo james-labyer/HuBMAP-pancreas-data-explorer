@@ -1,10 +1,13 @@
 import json
-
 import dash_bootstrap_components as dbc
 import plotly
 import pytest
 from dash import dcc, html
+import os
+import sys
 
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 import app
 from pages.model3d import (
     display_click_data,

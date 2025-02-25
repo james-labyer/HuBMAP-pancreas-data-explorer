@@ -1,6 +1,10 @@
 import pandas as pd
 import pytest
+import os
+import sys
 
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 import app
 from pages.proteomics import update_fig
 

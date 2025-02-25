@@ -17,10 +17,10 @@ from dash import (
 )
 from flask import Flask
 
-os.chdir("..")
-if os.getcwd() not in sys.path:
-    sys.path.append(os.getcwd())
-os.chdir("./app")
+# os.chdir("..")
+# if os.getcwd() not in sys.path:
+#     sys.path.append(os.getcwd())
+# os.chdir("./app")
 from components import header
 
 

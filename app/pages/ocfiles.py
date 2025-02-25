@@ -3,7 +3,7 @@ import logging
 import dash_ag_grid as dag
 import pandas as pd
 from dash import html, register_page
-from pages import alerts
+from components import alerts
 from pages.constants import FILE_DESTINATION as FD
 
 app_logger = logging.getLogger(__name__)

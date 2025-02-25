@@ -12,6 +12,7 @@ from dash import (
 )
 import dash_bootstrap_components as dbc
 from config_components import ui, validate
+from components import alerts
 from flask_login import current_user
 
 title = "Update Configuration"
@@ -301,7 +302,7 @@ def send_images_example(n_clicks):
 )
 def update_si_block_output(list_of_contents, filename):
     if list_of_contents is not None:
-        upload_succeeded = validate.upload_content(
+        upload_succeeded = validate.process_content(
             list_of_contents,
             filename,
             "excel",
@@ -309,10 +310,12 @@ def update_si_block_output(list_of_contents, filename):
             "si-block",
         )
         if not upload_succeeded[0]:
-            return ui.failure_toast("Metadata not updated", upload_succeeded[1])
+            return alerts.send_toast(
+                "Metadata not updated", upload_succeeded[1], "failure"
+            )
         else:
-            return ui.success_toast(
-                "Metadata updated", "The file was uploaded successfully."
+            return alerts.send_toast(
+                "Metadata updated", "The file was uploaded successfully.", "success"
             )
 
 
@@ -344,39 +347,41 @@ def upload_spatial_map(list_of_contents, filenames):
     if list_of_contents is not None:
         files_iter = [x for x in range(len(list_of_contents))]
         # make sure downloads.xlsx gets processed first if included
-        if len(list_of_contents) > 1 and "downloads.xlsx" in filenames:
+        if "downloads.xlsx" in filenames:
             # get index to use for contents and filenames
             idx = filenames.index("downloads.xlsx")
-            # call upload_content
-            upload_succeeded = validate.upload_content(
+            upload_succeeded = validate.process_content(
                 list_of_contents[idx],
                 filenames[idx],
                 "excel/vol",
-                validate.upload_spatial_map_data,
+                validate.process_spatial_map_data,
                 filenames[idx],
             )
             if not upload_succeeded[0]:
-                return ui.failure_toast(
-                    "Spatial map data not uploaded", upload_succeeded[1]
+                return alerts.send_toast(
+                    "Spatial map data not uploaded", upload_succeeded[1], "failure"
                 )
             # delete that index from files_iter so it doesn't get re-processed
             files_iter.remove(idx)
-        for i in files_iter:
-            upload_succeeded = validate.upload_content(
-                list_of_contents[i],
-                filenames[i],
-                "excel/vol",
-                validate.upload_spatial_map_data,
-                filenames[i],
-            )
-            if not upload_succeeded[0]:
-                return ui.failure_toast(
-                    "Spatial map data not uploaded", upload_succeeded[1]
+        if len(files_iter) > 0:
+            for i in files_iter:
+                upload_succeeded = validate.process_content(
+                    list_of_contents[i],
+                    filenames[i],
+                    "excel/vol",
+                    validate.process_spatial_map_data,
+                    filenames[i],
                 )
-            else:
-                return ui.success_toast(
-                    "Spatial map data uploaded", "The files were uploaded successfully."
-                )
+                if not upload_succeeded[0]:
+                    return alerts.send_toast(
+                        "Spatial map data not uploaded", upload_succeeded[1], "failure"
+                    )
+                else:
+                    return alerts.send_toast(
+                        "Spatial map data uploaded",
+                        "The files were uploaded successfully.",
+                        "success",
+                    )
 
 
 @callback(
@@ -387,7 +392,7 @@ def upload_spatial_map(list_of_contents, filenames):
 def upload_sci_images(list_of_contents, filenames):
     if list_of_contents is not None:
         for i in range(len(list_of_contents)):
-            upload_succeeded = validate.upload_content(
+            upload_succeeded = validate.process_content(
                 list_of_contents[i],
                 filenames[i],
                 "image",
@@ -395,9 +400,11 @@ def upload_sci_images(list_of_contents, filenames):
                 filenames[i],
             )
             if not upload_succeeded[0]:
-                return ui.failure_toast("Image(s) not uploaded", upload_succeeded[1])
-        return ui.success_toast(
-            "Images uploaded", "The files were uploaded successfully."
+                return alerts.send_toast(
+                    "Image(s) not uploaded", upload_succeeded[1], "failure"
+                )
+        return alerts.send_toast(
+            "Images uploaded", "The files were uploaded successfully.", "success"
         )
 
 
@@ -437,7 +444,7 @@ def send_obj_example_3(n_clicks):
 def update_obj_files_output(list_of_contents, filenames):
     if list_of_contents is not None:
         for i in range(len(list_of_contents)):
-            upload_succeeded = validate.upload_content(
+            upload_succeeded = validate.process_content(
                 list_of_contents[i],
                 filenames[i],
                 "3d",
@@ -446,9 +453,11 @@ def update_obj_files_output(list_of_contents, filenames):
             )
             print("upload_succeeded:", upload_succeeded, file=sys.stdout, flush=True)
             if not upload_succeeded[0]:
-                return ui.failure_toast("Model files not uploaded", upload_succeeded[1])
-        return ui.success_toast(
-            "Model files uploaded", "The files were uploaded successfully."
+                return alerts.send_toast(
+                    "Model files not uploaded", upload_succeeded[1], "failure"
+                )
+        return alerts.send_toast(
+            "Model files uploaded", "The files were uploaded successfully.", "success"
         )
 
 
@@ -519,15 +528,20 @@ def toggle_modal(
     value,
 ):
     if confirm_title:
-        return validate.update_title(value, is_open)
+        results = validate.update_title(value)
+        return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif confirm_si_block:
-        return validate.update_si_block(is_open)
+        results = validate.publish_si_block()
+        return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif confirm_sci_images:
-        return validate.update_sci_images(is_open)
+        results = validate.publish_sci_images()
+        return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif confirm_spatial_map:
-        return validate.publish_spatial_map_data(is_open)
+        results = validate.publish_spatial_map_data()
+        return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif confirm_obj_files:
-        return validate.publish_obj_files(is_open)
+        results = validate.publish_obj_files()
+        return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif cancel_update:
         return not is_open, no_update
     else:

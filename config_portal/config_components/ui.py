@@ -71,36 +71,6 @@ def failure_alert(message, className=None):
     )
 
 
-def success_toast(header, message):
-    return (
-        dbc.Toast(
-            message,
-            id="success-toast",
-            header=header,
-            is_open=True,
-            dismissable=True,
-            class_name="result-toast",
-            header_class_name="text-success",
-            duration=4000,
-        ),
-    )
-
-
-def failure_toast(header, message):
-    return (
-        dbc.Toast(
-            message,
-            id="failure-toast",
-            header=header,
-            is_open=True,
-            dismissable=True,
-            class_name="result-toast",
-            header_class_name="text-danger",
-            duration=4000,
-        ),
-    )
-
-
 def make_download(button_text, prefix):
     return [
         dbc.Button(

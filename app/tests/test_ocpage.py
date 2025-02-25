@@ -5,7 +5,11 @@ import dash_bootstrap_components as dbc
 import plotly
 from dash import dcc, html
 from PIL import Image
+import os
+import sys
 
+if os.getcwd() not in sys.path:
+    sys.path.append(os.getcwd())
 import app
 from pages.ocpage import make_tab_content, update_pic
 

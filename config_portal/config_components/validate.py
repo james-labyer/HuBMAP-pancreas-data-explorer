@@ -6,7 +6,6 @@ import magic
 from pathlib import Path
 import os
 import re
-from config_components import ui, constants
 import shutil
 import traceback
 from PIL import Image, ImageDraw, ImageOps
@@ -14,6 +13,8 @@ import logging
 import base64
 from collections.abc import Callable
 import numpy as np
+
+from pages import constants
 
 MAX_TITLE_LENGTH = 2048
 MAX_FILENAME_LENGTH = 255
@@ -372,7 +373,7 @@ def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
     saves the image to the depot.
 
     Returns (check results, error message, str)
-    Third return value is for compatibility with upload_content, the function that calls it
+    Third return value is for compatibility with process_content, the function that calls it
     """
 
     # should validation function clear depot before adding new stuff?
@@ -395,12 +396,15 @@ def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
     return True, "", ""
 
 
-def update_title(value, is_open):
+def update_title(value: str) -> tuple[str, str, str]:
+    """Validate and publish a new app title.
+    Returns (title of update toast, description of update, success status)"""
     if value:
         if len(value) > MAX_TITLE_LENGTH:
-            return not is_open, ui.failure_toast(
+            return (
                 "Title not updated",
                 f"Title must be shorter than {MAX_TITLE_LENGTH} characters. Please try again.",
+                "failure",
             )
         else:
             try:
@@ -411,35 +415,32 @@ def update_title(value, is_open):
                 p = Path(FD["title"]["depot"])
                 t = Path(FD["title"]["publish"])
                 shutil.copy2(p, t)
-                return not is_open, ui.success_toast(
+                return (
                     "Title updated",
                     "The configuration has been updated. Refresh the public-facing app to see the changes.",
+                    "success",
                 )
             except Exception as err:
                 app_logger.debug(traceback.print_exc())
-                return not is_open, ui.failure_toast(
-                    "Title not updated", f"{type(err)} {err}"
-                )
+                return ("Title not updated", f"{type(err)} {err}", "failure")
     else:
-        return not is_open, ui.failure_toast(
-            "Title not updated", "Please provide a name."
-        )
+        return ("Title not updated", "Please provide a name.", "failure")
 
 
-def update_si_block(is_open):
+def publish_si_block() -> tuple[str, str, str]:
+    """Publish scientific images metadata.
+    Returns (title of update toast, description of update, success status)"""
     try:
         for key in FD["si-block"].keys():
             p = Path(FD["si-block"][key]["depot"])
             t = Path(FD["si-block"][key]["publish"])
             shutil.move(p, t)
     except FileNotFoundError as err:
-        return not is_open, ui.failure_toast(
-            "Metadata not updated",
-            f"{err}",
-        )
-    return not is_open, ui.success_toast(
+        return ("Metadata not updated", f"{err}", "failure")
+    return (
         "Metadata updated",
         "The configuration has been updated. Refresh the public-facing app to see the changes.",
+        "success",
     )
 
 
@@ -597,8 +598,8 @@ def update_new_thumbnails_list(
     return tdf, tdi
 
 
-def publish_sci_images(src_path: Path, dest_dir: str, filename: str) -> None:
-    """Moves a file to a new location, after ensuring the new location exists."""
+def move_sci_images(src_path: Path, dest_dir: str, filename: str) -> None:
+    """Moves a file to a new location after ensuring the new location exists."""
     try:
         dest = Path(dest_dir)
         if not Path.exists(dest):
@@ -610,18 +611,22 @@ def publish_sci_images(src_path: Path, dest_dir: str, filename: str) -> None:
         app_logger.debug(traceback.print_exc())
 
 
-def update_sci_images(is_open: bool) -> tuple[bool, object]:
+def publish_sci_images() -> tuple[str, str, str]:
     """This function is called when the user clicks "Publish" in the Scientific Images section.
     It checks that there is image metadata, then processes each image by checking that the image
     name is valid & present in metadata, then capturing any info needed to create thumbnails, and
     moving the image to the public location. It then calls another function to generate thumbnails.
 
-    Return (all tasks succeeded, dbc.Alert with error or success message)
+    Returns (title of update toast, description of update, success status)
     """
     # get image location info
     df = pd.read_csv(FD["si-block"]["si-files"]["publish"])
     if df.empty:
-        return False, "You must upload image metadata before uploading images"
+        return (
+            "Image not published",
+            "You must upload image metadata before uploading images",
+            "failure",
+        )
 
     p = Path(FD["sci-images"]["depot"])
 
@@ -640,14 +645,13 @@ def update_sci_images(is_open: bool) -> tuple[bool, object]:
             # if file, look up info about destination dir structure
             match_info = check_image_name(child.name, df)
             if match_info[0] == 0:
-                return not is_open, ui.failure_toast(
-                    "Image not published", match_info[4]
-                )
+                return ("Image not published", match_info[4], "failure")
             row = match_info[2]
             if row.empty:
-                return not is_open, ui.failure_toast(
+                return (
                     "Image not published",
                     "All images must be present in the image metadata.",
+                    "failure",
                 )
             try:
                 dest_dir = f"{FD["sci-images"]["publish"]}/{row["Tissue Block"].values[0]}/{match_info[1]}"
@@ -659,18 +663,16 @@ def update_sci_images(is_open: bool) -> tuple[bool, object]:
                     str(match_info[3]),
                     dest_dir,
                 )
-                publish_sci_images(child, dest_dir, child.name)
+                move_sci_images(child, dest_dir, child.name)
             except Exception as err:
                 app_logger.debug(traceback.print_exc())
-                return not is_open, ui.failure_toast("Image not published", f"{err}")
+                return ("Image not published", f"{err}", "failure")
     # create thumbnails
     generate_thumbnails(tdi, tdf)
-    return not is_open, ui.success_toast(
-        "Images published", "Images transferred successfully"
-    )
+    return ("Images published", "Images transferred successfully", "success")
 
 
-def upload_content(
+def process_content(
     content: str,
     filename: str,
     filetype: str,
@@ -932,7 +934,7 @@ def save_generic_file(loc: str, file: bytes, filename: str) -> tuple[bool, str, 
     return True, "", filename
 
 
-def upload_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
+def process_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
     """Takes a file, checks the headers if metadata file, and saves them file to the depot.
     Overwrites file if it already exists.
     Returns (success, error message, empty str for compatibility with other functions)"""
@@ -996,7 +998,9 @@ def publish_entries(src: str, dest: str, key_col: str):
         old_list.to_csv(dest, index=False)
 
 
-def publish_spatial_map_data(is_open):
+def publish_spatial_map_data() -> tuple[str, str, str]:
+    """Publishes spatial map data.
+    Returns (title of update toast, description of update, success status)"""
     # move each folder in the spatial map depot to shared volume /config
     p = Path(FD["spatial-map"]["downloads"]["depot"])
     dirs_to_move = [x for x in p.iterdir() if x.is_dir()]
@@ -1011,15 +1015,13 @@ def publish_spatial_map_data(is_open):
         )
     except FileNotFoundError as err:
         app_logger.debug(traceback.print_exc())
-        return not is_open, ui.failure_toast(
-            "Metadata not updated",
-            f"{err}",
-        )
+        return ("Metadata not updated", f"{err}", "failure")
     except Exception:
         app_logger.debug(traceback.print_exc())
-    return not is_open, ui.success_toast(
+    return (
         "Metadata updated",
         "The configuration has been updated. Refresh the public-facing app to see the changes.",
+        "success",
     )
 
 
@@ -1056,7 +1058,9 @@ def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
             return False, f"{err}", ""
 
 
-def publish_obj_files(is_open):
+def publish_obj_files():
+    """Publishes 3D model files.
+    Returns (title of update toast, description of update, success status)"""
     try:
         # move volumes directory
         p = Path(FD["obj-files"]["volumes"]["depot"])
@@ -1067,13 +1071,11 @@ def publish_obj_files(is_open):
             f"{FD["obj-files"]["summary"]["publish"]}/obj-files.csv",
             "File",
         )
-        return not is_open, ui.success_toast(
+        return (
             "Model files updated",
             "The configuration has been updated. Refresh the public-facing app to see the changes.",
+            "success",
         )
     except Exception as err:
         app_logger.debug(traceback.print_exc())
-        return not is_open, ui.failure_toast(
-            "Model files not updated",
-            f"{err}",
-        )
+        return ("Model files not updated", f"{err}", "failure")
