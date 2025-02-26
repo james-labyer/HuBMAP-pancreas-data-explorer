@@ -15,9 +15,7 @@ from components import alerts
 from flask_login import current_user
 
 title = "Update Configuration"
-MAX_EXCEL_SIZE = 150000000
-MAX_IMG_SIZE = MAX_EXCEL_SIZE  # * 150
-MAX_OBJ_SIZE = MAX_EXCEL_SIZE  # * 50
+MAX_FILE_SIZE = 150000000
 
 register_page(__name__, path="/", title=title)
 
@@ -106,7 +104,7 @@ def layout(**kwargs):
                                 "For tissue block and scientific metadata file format, see example file:"
                             ],
                             "si-block",
-                            MAX_EXCEL_SIZE,
+                            MAX_FILE_SIZE,
                         ),
                         html.Div(id="output-si-block-upload"),
                     ],
@@ -121,7 +119,7 @@ def layout(**kwargs):
                                 "Downloads file format:",
                             ],
                             "volumetric-map",
-                            MAX_EXCEL_SIZE,
+                            MAX_FILE_SIZE,
                             accordion=True,
                             acc_notes=[
                                 [
@@ -201,7 +199,7 @@ def layout(**kwargs):
                             "Update scientific images",
                             [],
                             "sci-images",
-                            MAX_IMG_SIZE,
+                            MAX_FILE_SIZE,
                             90,
                             example=False,
                             accordion=True,
@@ -235,7 +233,7 @@ def layout(**kwargs):
                                 "Example .obj file of a tissue block within the organ:",
                             ],
                             "obj-files",
-                            MAX_OBJ_SIZE,
+                            MAX_FILE_SIZE,
                             accordion=True,
                             acc_notes=[
                                 [

@@ -251,7 +251,7 @@ def check_excel_headers(
     return True, "", dfs
 
 
-def process_si_block_file(file: bytes, which_headers: str) -> tuple[bool, str, object]:
+def process_si_block_file(file: bytes, which_headers: str) -> tuple[bool, str]:
     header_check = check_excel_headers(file, which_headers)
     if header_check[0]:
         for key in REQUIRED_HEADERS[which_headers].keys():
@@ -267,9 +267,12 @@ def process_si_block_file(file: bytes, which_headers: str) -> tuple[bool, str, o
                     # calculate link values for main page links
                     update_links(col, header_check[2][key])
             header_check[2][key].to_csv(FD[which_headers][key]["depot"], index=False)
-        return True, "", ""
+        return (
+            True,
+            "",
+        )
     else:
-        return (header_check[0], header_check[1], "")
+        return (header_check[0], header_check[1])
 
 
 def check_image_name(
@@ -372,28 +375,31 @@ def process_sci_image(file: bytes, filename: str) -> tuple[bool, str, str]:
     It checks that image metadata exists and the image name conforms to naming conventions, then
     saves the image to the depot.
 
-    Returns (check results, error message, str)
-    Third return value is for compatibility with process_content, the function that calls it
+    Returns (check results, error message)
     """
 
     # should validation function clear depot before adding new stuff?
     df = pd.read_csv(FD["si-block"]["si-files"]["publish"])
     if df.empty:
-        return False, "You must upload image metadata before uploading images", ""
+        return False, "You must upload image metadata before uploading images"
     ext = Path(filename).suffix
     # if not a PNG, search for the name exactly
     name_info = check_image_name(filename, df)
     if name_info[0] == 0:
-        return False, name_info[4], ""
+        return False, name_info[4]
     # if PNG, check naming scheme
     if ext == ".png":
         nums_check = check_png_name_ending(filename)
         if not nums_check[0]:
-            return (nums_check[0], nums_check[1], "")
+            return nums_check
+    # check if destination path exists
+    dest = Path(FD["sci-images"]["depot"])
+    if not Path.exists(dest):
+        Path.mkdir(dest, parents=True)
     with open(os.path.join(FD["sci-images"]["depot"], filename), "wb") as fp:
         fp.write(file)
 
-    return True, "", ""
+    return True, ""
 
 
 def update_title(value: str) -> tuple[str, str, str]:
@@ -673,28 +679,24 @@ def publish_sci_images() -> tuple[str, str, str]:
 
 
 def process_content(
-    content: str,
-    filename: str,
-    filetype: str,
-    which_function: Callable,
-    param=None,
-) -> tuple[bool, str, object]:
+    content: str, filename: str, filetype: str, which_function: Callable, param=None
+) -> tuple[bool, str]:
     """For a given base64 file string, converts the data to bytes, checks the file type for validity,
     and runs the given file processing function.
-    Returns (success, error message, optional object from processing function.)"""
+    Returns (success, error message)"""
     if content == "":
-        return False, "One or more files were too large.", ""
+        return False, "One or more files were too large."
     content_type, content_string = content.split(",")
     decoded = base64.b64decode(content_string)
     is_valid_type = check_file_type(decoded, filetype, filename)
     if is_valid_type[0]:
         is_processed = which_function(decoded, param)
         if not is_processed[0]:
-            return False, is_processed[1], ""
+            return False, is_processed[1]
         else:
-            return True, "", is_processed[2]
+            return True, ""
     else:
-        return False, is_valid_type[1], ""
+        return False, is_valid_type[1]
 
 
 def is_valid_filename(*args, fn="") -> bool:
@@ -730,7 +732,7 @@ def validate_filename_col(col):
     return True, ""
 
 
-def write_excel(dfs, filename, loc):
+def write_excel(dfs: dict, filename: str, loc: str) -> tuple[bool, str]:
     # check that loc exists
     p = Path(loc)
     if not Path.exists(p):
@@ -748,10 +750,10 @@ def write_excel(dfs, filename, loc):
             for key in dfs.keys():
                 df = sanitize_df(dfs[key])
                 df.to_excel(writer, sheet_name=key, index=False)
-        return True, "", filename
+        return True, ""
     except Exception as err:
         app_logger.debug(traceback.print_exc())
-        return False, str(err), ""
+        return False, str(err)
 
 
 def update_df_entries(
@@ -802,7 +804,7 @@ def update_entries(
     return df
 
 
-def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str, str]:
+def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str]:
     """Checks downloads.xlsx, which can be uploaded to volumetric map files, for duplicates and
     unsafe filenames, then saves a csv in depot."""
     header_check = check_excel_headers(file, "downloads")
@@ -816,9 +818,9 @@ def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str, str]:
         # save csv
         df.to_csv(FD["volumetric-map"]["downloads-file"]["depot"], index=False)
         # no filename because this file's presence alone should not trigger name update
-        return True, "", ""
+        return True, ""
     else:
-        return False, header_check[1], ""
+        return False, header_check[1]
 
 
 def get_volumetric_map_folder(filename):
@@ -904,7 +906,7 @@ def make_cubes_df(
     return cubes_df
 
 
-def check_volumetric_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
+def check_volumetric_map_data_xlsx(file: bytes) -> tuple[bool, str]:
     header_check = check_excel_headers(file, "volumetric-map", fillna=False)
     if header_check[0]:
         # get block name
@@ -924,28 +926,28 @@ def check_volumetric_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
             header_check[2]["points_data"], header_check[2]["vol_measurements"]
         )
         cubes_df.to_csv(f"{loc}/cube_data.csv", index=False)
-        return True, "", ""
+        return True, ""
     else:
-        return False, header_check[1], ""
+        return False, header_check[1]
 
 
-def save_generic_file(loc: str, file: bytes, filename: str) -> tuple[bool, str, str]:
+def save_generic_file(loc: str, file: bytes, filename: str) -> tuple[bool, str]:
     dest = Path(loc)
     if not Path.exists(dest):
         Path.mkdir(dest, parents=True)
     with open(f"{loc}/{filename}", "wb") as f:
         f.write(file)
-    return True, "", filename
+    return True, ""
 
 
-def process_volumetric_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
+def process_volumetric_map_data(file: bytes, filename: str) -> tuple[bool, str]:
     """Takes a file, checks the headers if metadata file, and saves them file to the depot.
     Overwrites file if it already exists.
-    Returns (success, error message, empty str for compatibility with other functions)"""
+    Returns (success, error message)"""
     # throw an error if filename is not valid
     is_valid = is_valid_filename(filename)
     if not is_valid[0]:
-        return False, is_valid[1], ""
+        return False, is_valid[1]
     if filename == "volumetric-map-data.xlsx":
         return check_volumetric_map_data_xlsx(file)
     elif filename == "downloads.xlsx":
@@ -956,24 +958,24 @@ def process_volumetric_map_data(file: bytes, filename: str) -> tuple[bool, str, 
             try:
                 block = get_volumetric_map_folder(filename)
                 if not block[0]:
-                    return False, block[1], ""
+                    return False, block[1]
                 loc = f"{FD["volumetric-map"]["downloads"]["depot"]}/{block[1]}"
                 return write_excel(open_results[2], filename, loc)
             except Exception as err:
                 app_logger.debug(traceback.print_exc())
-                return False, str(err), ""
+                return False, str(err)
         else:
-            return False, open_results[1], ""
+            return False, open_results[1]
     else:
         try:
             block = get_volumetric_map_folder(filename)
             if not block[0]:
-                return False, block[1], ""
+                return False, block[1]
             loc = f"{FD["volumetric-map"]["downloads"]["depot"]}/{block[1]}"
             return save_generic_file(loc, file, filename)
         except Exception as err:
             app_logger.debug(traceback.print_exc())
-            return False, str(err), ""
+            return False, str(err)
 
 
 def move_dir(src: Path, dest: str) -> bool:
@@ -1031,16 +1033,19 @@ def publish_volumetric_map_data() -> tuple[str, str, str]:
     )
 
 
-def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
+def process_obj_files(file: bytes, filename: str) -> tuple[bool, str]:
     is_valid = is_valid_filename(filename)
     if not is_valid[0]:
-        return False, is_valid[1], ""
+        return False, is_valid[1]
     # process summary file
     if filename == "obj-files.xlsx":
         header_check = check_excel_headers(file, "obj-files", fillna=False)
         if header_check[0]:
             try:
                 # add new entries to summary csv
+                dest = Path(FD["obj-files"]["summary"]["depot"])
+                if not Path.exists(dest):
+                    Path.mkdir(dest, parents=True)
                 df = update_entries(
                     f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv",
                     header_check[2]["files"],
@@ -1049,11 +1054,11 @@ def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
                 df.to_csv(
                     f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv", index=False
                 )
-                return True, "", ""
+                return True, ""
             except Exception as err:
-                return False, str(err), ""
+                return False, str(err)
         else:
-            return False, header_check[1], ""
+            return False, header_check[1]
     # process any other file
     else:
         loc = FD["obj-files"]["volumes"]["depot"]
@@ -1061,7 +1066,7 @@ def process_obj_files(file: bytes, filename: str) -> tuple[bool, str, str]:
             return save_generic_file(loc, file, filename)
         except Exception as err:
             app_logger.debug(traceback.print_exc())
-            return False, f"{err}", ""
+            return False, f"{err}"
 
 
 def publish_obj_files():
@@ -1070,7 +1075,8 @@ def publish_obj_files():
     try:
         # move volumes directory
         p = Path(FD["obj-files"]["volumes"]["depot"])
-        move_dir(p, FD["obj-files"]["volumes"]["publish"])
+        if Path.exists(p):
+            move_dir(p, FD["obj-files"]["volumes"]["publish"])
         # update volume entries
         publish_entries(
             f"{FD["obj-files"]["summary"]["depot"]}/obj-files.csv",
