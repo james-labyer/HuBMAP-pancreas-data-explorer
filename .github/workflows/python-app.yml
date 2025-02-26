@@ -44,7 +44,7 @@ jobs:
         docker compose -f docker-compose-dev.yaml build
     - name: copy starter data into docker volume
       run : |
-        cp -a ./start/ hubmap-pancreas-data-explorer-display-app-1:/app/assets/config/
+        docker cp -a ./start/ hubmap-pancreas-data-explorer-display-app-1:/app/assets/config/
     - name: run tests
       run: |
         docker exec hubmap-pancreas-data-explorer-display-app-1 pytest
