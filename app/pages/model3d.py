@@ -206,7 +206,7 @@ def display_click_data(click_data):
                 "value": row.iloc[0]["Images"],
             },
             {"label": "View reports", "value": row.iloc[0]["Reports"]},
-            {"label": "View spatial map", "value": row.iloc[0]["Proteomics"]},
+            {"label": "View volumetric map", "value": row.iloc[0]["Proteomics"]},
         ]
         card_content = []
         card_body_content = []

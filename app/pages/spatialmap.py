@@ -29,13 +29,13 @@ def title(block=None):
     if not block:
         return "Invalid request"
     else:
-        return f"{block} Spatial Map"
+        return f"{block} Volumetric Map"
 
 
 register_page(
     __name__,
-    path_template="/spatial-map/<block>",
-    path="/spatial-map/1",
+    path_template="/volumetric-map/<block>",
+    path="/volumetric-map/1",
     title=title,
 )
 
@@ -73,12 +73,12 @@ def make_layers(z_axis: list) -> list:
 
 def load_data(block: str) -> tuple[dict, dict, list, list, list, dict]:
     # page info dict, defaults dict, layers, category options, values, axes
-    dir = f"{FD["spatial-map"]}/{block}"
+    dir = f"{FD["volumetric-map"]}/{block}"
     meta = pd.read_csv(f"{dir}/meta.csv")
     value_ranges = pd.read_csv(f"{dir}/value_ranges.csv", index_col="Row Label")
     category_labels = pd.read_csv(f"{dir}/category_labels.csv")
     vol_measurements = pd.read_csv(f"{dir}/vol_measurements.csv")
-    downloads = pd.read_csv(f"{FD["spatial-map"]}/downloads.csv")
+    downloads = pd.read_csv(f"{FD["volumetric-map"]}/downloads.csv")
 
     # Get title and desc
     page_info = meta.iloc[0].to_dict()
@@ -135,9 +135,9 @@ def layout(block=None, **kwargs):
                 children=[
                     html.Header(html.H2(page_info["Title"])),
                     html.P(page_info["Description"]),
-                    ui.make_spatial_map_filters(defaults, layers, values),
+                    ui.make_volumetric_map_filters(defaults, layers, values),
                     html.Div(id="current-filters"),
-                    ui.spatial_map_tab_content,
+                    ui.volumetric_map_tab_content,
                     dcc.Store(id="value-store"),
                     dcc.Store(id="color-store-sm"),
                     dcc.Store(id="cube-opacity-store-sm"),
@@ -193,7 +193,7 @@ def save_point_opacity(value):
 
 
 @callback(
-    Output("extra-spatial-map-filters", "children"),
+    Output("extra-volumetric-map-filters", "children"),
     Input("tabs", "active_tab"),
     State("category-selected", "data"),
     State("category-store", "data"),
@@ -220,7 +220,7 @@ def update_controls(at, category_selected, category_data, point_opacity, cube_op
 
 
 @callback(
-    Output("spatial-map-graph", "figure"),
+    Output("volumetric-map-graph", "figure"),
     Input("tabs", "active_tab"),
     Input("color-store-sm", "data"),
     Input("value-store", "data"),
@@ -269,7 +269,7 @@ def update_fig(
 
     if tab == "cube-tab":
         try:
-            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/cube_data.csv")
+            df = pd.read_csv(f"{FD["volumetric-map"]}/{block}/cube_data.csv")
         except FileNotFoundError:
             return alerts.send_toast(
                 "Cannot load page",
@@ -290,7 +290,7 @@ def update_fig(
         )
     elif tab == "point-tab":
         try:
-            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+            df = pd.read_csv(f"{FD["volumetric-map"]}/{block}/points_data.csv")
         except FileNotFoundError:
             return alerts.send_toast(
                 "Cannot load page",
@@ -308,7 +308,7 @@ def update_fig(
         )
     elif tab == "layer-tab":
         try:
-            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+            df = pd.read_csv(f"{FD["volumetric-map"]}/{block}/points_data.csv")
         except FileNotFoundError:
             return alerts.send_toast(
                 "Cannot load page",
@@ -325,7 +325,7 @@ def update_fig(
         )
     elif tab == "sphere-tab":
         try:
-            df = pd.read_csv(f"{FD["spatial-map"]}/{block}/points_data.csv")
+            df = pd.read_csv(f"{FD["volumetric-map"]}/{block}/points_data.csv")
         except FileNotFoundError:
             return alerts.send_toast(
                 "Cannot load page",
@@ -379,7 +379,7 @@ def update_test(data):
 )
 def display_output(n_clicks, id):
     try:
-        downloads = pd.read_csv(f"{FD["spatial-map"]}/downloads.csv")
+        downloads = pd.read_csv(f"{FD["volumetric-map"]}/downloads.csv")
     except FileNotFoundError:
         return alerts.send_toast(
             "Cannot load page",
@@ -387,7 +387,7 @@ def display_output(n_clicks, id):
             "failure",
         )
     row = downloads.loc[id["index"]]
-    file_path = Path(f"{FD["spatial-map"]}/{row["Block"]}/{row["Name"]}")
+    file_path = Path(f"{FD["volumetric-map"]}/{row["Block"]}/{row["Name"]}")
     if not Path.exists(file_path):
         return no_update
-    return dcc.send_file(f"{FD["spatial-map"]}/{row["Block"]}/{row["Name"]}")
+    return dcc.send_file(f"{FD["volumetric-map"]}/{row["Block"]}/{row["Name"]}")

@@ -1,7 +1,7 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 
-PUBLISH_BUTTONS = ["title", "si-block", "spatial-map", "obj-files", "sci-images"]
+PUBLISH_BUTTONS = ["title", "si-block", "volumetric-map", "obj-files", "sci-images"]
 
 
 def confirm_update_modal(message, suffix):

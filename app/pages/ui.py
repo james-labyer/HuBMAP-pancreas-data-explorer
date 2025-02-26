@@ -25,7 +25,7 @@ C_SCHEMES = [
 
 
 # Layout functions
-def make_spatial_map_filters(defaults: dict, layers: dict, values: list):
+def make_volumetric_map_filters(defaults: dict, layers: dict, values: list):
     return dbc.Card(
         dbc.CardBody(
             dbc.Row(
@@ -83,13 +83,13 @@ def make_downloads_ui_elements(downloads: pd.DataFrame) -> list:
     return download_items
 
 
-spatial_map_fig = dbc.Row(
+volumetric_map_fig = dbc.Row(
     dbc.Col(
         dcc.Loading(
             dcc.Graph(
                 figure={},
                 className="dcc-graph",
-                id="spatial-map-graph",
+                id="volumetric-map-graph",
             ),
             style={
                 "visibility": "visible",
@@ -102,7 +102,7 @@ spatial_map_fig = dbc.Row(
     )
 )
 
-spatial_map_tab_content = dbc.Card(
+volumetric_map_tab_content = dbc.Card(
     [
         dbc.CardHeader(
             dbc.Tabs(
@@ -118,9 +118,9 @@ spatial_map_tab_content = dbc.Card(
         ),
         dbc.CardBody(
             [
-                spatial_map_fig,
-                html.Div(id="spatial-map-fig"),
-                html.Div(id="extra-spatial-map-filters"),
+                volumetric_map_fig,
+                html.Div(id="volumetric-map-fig"),
+                html.Div(id="extra-volumetric-map-filters"),
             ]
         ),
     ]

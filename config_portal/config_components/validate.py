@@ -97,7 +97,7 @@ REQUIRED_HEADERS = {
             "Channels",
         ],
     },
-    "spatial-map": {
+    "volumetric-map": {
         "meta": [
             "Block",
             "Title",
@@ -193,7 +193,7 @@ def update_links(column, df):
             links = {
                 "Images": f"/scientific-images-list/{df["Tissue Block"].at[i]}",
                 "Reports": "/reports",
-                "Proteomics": f"/spatial-map/{df["Tissue Block"].at[i]}",
+                "Proteomics": f"volumetric-map/{df["Tissue Block"].at[i]}",
             }
             if not (df[column].at[i] == " "):
                 df[column].at[i] = links[column]
@@ -803,28 +803,28 @@ def update_entries(
 
 
 def check_downloads_xlsx(file: bytes, filename: str) -> tuple[bool, str, str]:
-    """Checks downloads.xlsx, which can be uploaded to spatial map files, for duplicates and
+    """Checks downloads.xlsx, which can be uploaded to volumetric map files, for duplicates and
     unsafe filenames, then saves a csv in depot."""
     header_check = check_excel_headers(file, "downloads")
     # update downloads.csv
     if header_check[0]:
         df = update_entries(
-            FD["spatial-map"]["downloads-file"]["depot"],
+            FD["volumetric-map"]["downloads-file"]["depot"],
             header_check[2]["downloads"],
             "Name",
         )
         # save csv
-        df.to_csv(FD["spatial-map"]["downloads-file"]["depot"], index=False)
+        df.to_csv(FD["volumetric-map"]["downloads-file"]["depot"], index=False)
         # no filename because this file's presence alone should not trigger name update
         return True, "", ""
     else:
         return False, header_check[1], ""
 
 
-def get_spatial_map_folder(filename):
+def get_volumetric_map_folder(filename):
     """Determines the block name for the download file so that the file can be saved in the
     correct folder"""
-    df = pd.read_csv(FD["spatial-map"]["downloads-file"]["depot"])
+    df = pd.read_csv(FD["volumetric-map"]["downloads-file"]["depot"])
     block = df["Block"][df["Name"] == filename]
     if block.empty:
         return (
@@ -904,12 +904,16 @@ def make_cubes_df(
     return cubes_df
 
 
-def check_spatial_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
-    header_check = check_excel_headers(file, "spatial-map", fillna=False)
+def check_volumetric_map_data_xlsx(file: bytes) -> tuple[bool, str, str]:
+    header_check = check_excel_headers(file, "volumetric-map", fillna=False)
     if header_check[0]:
         # get block name
         block = header_check[2]["meta"]["Block"].values[0]
-        loc = f"{FD["spatial-map"]["meta"]["depot"]}/{block}"
+        loc = f"{FD["volumetric-map"]["meta"]["depot"]}/{block}"
+        # check if loc exists
+        dest = Path(loc)
+        if not Path.exists(dest):
+            Path.mkdir(dest, parents=True)
         for key, item in header_check[2].items():
             if key == "points_data":
                 # data must be sorted for Dash to display it correctly
@@ -934,7 +938,7 @@ def save_generic_file(loc: str, file: bytes, filename: str) -> tuple[bool, str, 
     return True, "", filename
 
 
-def process_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
+def process_volumetric_map_data(file: bytes, filename: str) -> tuple[bool, str, str]:
     """Takes a file, checks the headers if metadata file, and saves them file to the depot.
     Overwrites file if it already exists.
     Returns (success, error message, empty str for compatibility with other functions)"""
@@ -942,18 +946,18 @@ def process_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str
     is_valid = is_valid_filename(filename)
     if not is_valid[0]:
         return False, is_valid[1], ""
-    if filename == "spatial-map-data.xlsx":
-        return check_spatial_map_data_xlsx(file)
+    if filename == "volumetric-map-data.xlsx":
+        return check_volumetric_map_data_xlsx(file)
     elif filename == "downloads.xlsx":
         return check_downloads_xlsx(file, filename)
     elif Path(filename).suffix == ".xlsx":
         open_results = open_excel_from_bytes(file)
         if open_results[0]:
             try:
-                block = get_spatial_map_folder(filename)
+                block = get_volumetric_map_folder(filename)
                 if not block[0]:
                     return False, block[1], ""
-                loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
+                loc = f"{FD["volumetric-map"]["downloads"]["depot"]}/{block[1]}"
                 return write_excel(open_results[2], filename, loc)
             except Exception as err:
                 app_logger.debug(traceback.print_exc())
@@ -962,10 +966,10 @@ def process_spatial_map_data(file: bytes, filename: str) -> tuple[bool, str, str
             return False, open_results[1], ""
     else:
         try:
-            block = get_spatial_map_folder(filename)
+            block = get_volumetric_map_folder(filename)
             if not block[0]:
                 return False, block[1], ""
-            loc = f"{FD["spatial-map"]["downloads"]["depot"]}/{block[1]}"
+            loc = f"{FD["volumetric-map"]["downloads"]["depot"]}/{block[1]}"
             return save_generic_file(loc, file, filename)
         except Exception as err:
             app_logger.debug(traceback.print_exc())
@@ -998,19 +1002,21 @@ def publish_entries(src: str, dest: str, key_col: str):
         old_list.to_csv(dest, index=False)
 
 
-def publish_spatial_map_data() -> tuple[str, str, str]:
-    """Publishes spatial map data.
+def publish_volumetric_map_data() -> tuple[str, str, str]:
+    """Publishes volumetric map data.
     Returns (title of update toast, description of update, success status)"""
-    # move each folder in the spatial map depot to shared volume /config
-    p = Path(FD["spatial-map"]["downloads"]["depot"])
+    # move each folder in the volumetric map depot to shared volume /config
+    p = Path(FD["volumetric-map"]["downloads"]["depot"])
     dirs_to_move = [x for x in p.iterdir() if x.is_dir()]
     try:
         for item in dirs_to_move:
-            move_dir(item, f"{FD["spatial-map"]["downloads"]["publish"]}/{item.name}")
+            move_dir(
+                item, f"{FD["volumetric-map"]["downloads"]["publish"]}/{item.name}"
+            )
         # update entries in published downloads.csv
         publish_entries(
-            FD["spatial-map"]["downloads-file"]["depot"],
-            FD["spatial-map"]["downloads-file"]["publish"],
+            FD["volumetric-map"]["downloads-file"]["depot"],
+            FD["volumetric-map"]["downloads-file"]["publish"],
             "Name",
         )
     except FileNotFoundError as err:

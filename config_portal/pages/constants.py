@@ -6,15 +6,18 @@ FILE_DESTINATION = {
             "publish": "/config/image-sets.csv",
         },
     },
-    "spatial-map": {
-        "meta": {"depot": "./depot/spatial-map", "publish": "/config/spatial-map"},
+    "volumetric-map": {
+        "meta": {
+            "depot": "./depot/volumetric-map",
+            "publish": "/config/volumetric-map",
+        },
         "downloads": {
-            "depot": "./depot/spatial-map",
-            "publish": "/config/spatial-map",
+            "depot": "./depot/volumetric-map",
+            "publish": "/config/volumetric-map",
         },
         "downloads-file": {
-            "depot": "./depot/spatial-map/downloads.csv",
-            "publish": "/config/spatial-map/downloads.csv",
+            "depot": "./depot/volumetric-map/downloads.csv",
+            "publish": "/config/volumetric-map/downloads.csv",
         },
     },
     "obj-files": {

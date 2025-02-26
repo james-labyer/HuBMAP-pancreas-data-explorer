@@ -116,12 +116,12 @@ def layout(**kwargs):
                 html.Section(
                     [
                         ui.make_upload_card(
-                            "Update spatial map data",
+                            "Update volumetric map data",
                             [
-                                "Spatial map data file format:",
+                                "Volumetric map data file format:",
                                 "Downloads file format:",
                             ],
-                            "spatial-map",
+                            "volumetric-map",
                             MAX_EXCEL_SIZE,
                             accordion=True,
                             acc_notes=[
@@ -132,9 +132,9 @@ def layout(**kwargs):
                                             html.Li("No files over 150 MB."),
                                             html.Li(
                                                 [
-                                                    "Spatial map data must be in a file named ",
+                                                    "Volumetric map data must be in a file named ",
                                                     html.Strong(
-                                                        "spatial-map-data.xlsx"
+                                                        "volumetric-map-data.xlsx"
                                                     ),
                                                 ]
                                             ),
@@ -146,18 +146,17 @@ def layout(**kwargs):
                                             ),
                                         ]
                                     ),
-                                    # "No files over 150 MB. Spatial map data must be in a file named spatial-map-data.xlsx, and downloads data must be in a file named downloads.xlsx.",
                                 ],
                                 [
                                     "Supported File Types",
                                     ", ".join(validate.VALID_EXTS["excel/vol"]),
                                 ],
                                 [
-                                    "Spatial Map Data Requirements",
+                                    "Volumetric Map Data Requirements",
                                     html.Ul(
                                         [
                                             html.Li(
-                                                "The spatial-map-data.xlsx file must include all of the tabs included in the example workbook"
+                                                "The volumetric-map-data.xlsx file must include all of the tabs included in the example workbook"
                                             ),
                                             html.Li(
                                                 "All of the columns in the example workbook are required except for the value columns from Column I-O in the points_data worksheet"
@@ -193,9 +192,9 @@ def layout(**kwargs):
                             ],
                             upload_multiple=True,
                         ),
-                        dcc.Loading(html.Div(id="output-spatial-map-upload")),
+                        dcc.Loading(html.Div(id="output-volumetric-map-upload")),
                     ],
-                    id="spatial-map-data",
+                    id="volumetric-map-data",
                 ),
                 html.Section(
                     [
@@ -319,31 +318,31 @@ def update_si_block_output(list_of_contents, filename):
             )
 
 
-# Spatial map
+# Volumetric map
 @callback(
-    Output("spatial-map-0-example-dl", "data"),
-    Input("spatial-map-0-example", "n_clicks"),
+    Output("volumetric-map-0-example-dl", "data"),
+    Input("volumetric-map-0-example", "n_clicks"),
     prevent_initial_call=True,
 )
-def send_spatial_map_example(n_clicks):
-    return dcc.send_file("examples/spatial-map-data.xlsx")
+def send_volumetric_map_example(n_clicks):
+    return dcc.send_file("examples/volumetric-map-data.xlsx")
 
 
 @callback(
-    Output("spatial-map-1-example-dl", "data"),
-    Input("spatial-map-1-example", "n_clicks"),
+    Output("volumetric-map-1-example-dl", "data"),
+    Input("volumetric-map-1-example", "n_clicks"),
     prevent_initial_call=True,
 )
-def send_spatial_map_downloads_example(n_clicks):
+def send_volumetric_map_downloads_example(n_clicks):
     return dcc.send_file("examples/downloads.xlsx")
 
 
 @callback(
-    Output("output-spatial-map-upload", "children"),
-    Input("spatial-map-upload", "contents"),
-    Input("spatial-map-upload", "filename"),
+    Output("output-volumetric-map-upload", "children"),
+    Input("volumetric-map-upload", "contents"),
+    Input("volumetric-map-upload", "filename"),
 )
-def upload_spatial_map(list_of_contents, filenames):
+def upload_volumetric_map(list_of_contents, filenames):
     if list_of_contents is not None:
         files_iter = [x for x in range(len(list_of_contents))]
         # make sure downloads.xlsx gets processed first if included
@@ -354,12 +353,12 @@ def upload_spatial_map(list_of_contents, filenames):
                 list_of_contents[idx],
                 filenames[idx],
                 "excel/vol",
-                validate.process_spatial_map_data,
+                validate.process_volumetric_map_data,
                 filenames[idx],
             )
             if not upload_succeeded[0]:
                 return alerts.send_toast(
-                    "Spatial map data not uploaded", upload_succeeded[1], "failure"
+                    "Volumetric map data not uploaded", upload_succeeded[1], "failure"
                 )
             # delete that index from files_iter so it doesn't get re-processed
             files_iter.remove(idx)
@@ -369,16 +368,18 @@ def upload_spatial_map(list_of_contents, filenames):
                     list_of_contents[i],
                     filenames[i],
                     "excel/vol",
-                    validate.process_spatial_map_data,
+                    validate.process_volumetric_map_data,
                     filenames[i],
                 )
                 if not upload_succeeded[0]:
                     return alerts.send_toast(
-                        "Spatial map data not uploaded", upload_succeeded[1], "failure"
+                        "Volumetric map data not uploaded",
+                        upload_succeeded[1],
+                        "failure",
                     )
                 else:
                     return alerts.send_toast(
-                        "Spatial map data uploaded",
+                        "Volumetric map data uploaded",
                         "The files were uploaded successfully.",
                         "success",
                     )
@@ -467,11 +468,11 @@ def update_obj_files_output(list_of_contents, filenames):
     Input("title-publish", "n_clicks"),
     Input("si-block-publish", "n_clicks"),
     Input("sci-images-publish", "n_clicks"),
-    Input("spatial-map-publish", "n_clicks"),
+    Input("volumetric-map-publish", "n_clicks"),
     Input("obj-files-publish", "n_clicks"),
     prevent_initial_call=True,
 )
-def add_modal(title, si_block, sci_images, spatial_map, obj_files):
+def add_modal(title, si_block, sci_images, volumetric_map, obj_files):
     button_clicked = ctx.triggered_id
     publish_buttons = {
         "title-publish": [
@@ -486,9 +487,9 @@ def add_modal(title, si_block, sci_images, spatial_map, obj_files):
             "sci-images",
             "Are you sure you want to update the scientific images? This change will be visible to the public once you restart the display app.",
         ],
-        "spatial-map-publish": [
-            "spatial-map",
-            "Are you sure you want to update the spatial map data? This change will be immediately visible to the public.",
+        "volumetric-map-publish": [
+            "volumetric-map",
+            "Are you sure you want to update the volumetric map data? This change will be immediately visible to the public.",
         ],
         "obj-files-publish": [
             "obj-files",
@@ -511,7 +512,7 @@ def add_modal(title, si_block, sci_images, spatial_map, obj_files):
         Input("confirm-update-title", "n_clicks"),
         Input("confirm-update-si-block", "n_clicks"),
         Input("confirm-update-sci-images", "n_clicks"),
-        Input("confirm-update-spatial-map", "n_clicks"),
+        Input("confirm-update-volumetric-map", "n_clicks"),
         Input("confirm-update-obj-files", "n_clicks"),
         Input("cancel-update", "n_clicks"),
     ],
@@ -521,7 +522,7 @@ def toggle_modal(
     confirm_title,
     confirm_si_block,
     confirm_sci_images,
-    confirm_spatial_map,
+    confirm_volumetric_map,
     confirm_obj_files,
     cancel_update,
     is_open,
@@ -536,8 +537,8 @@ def toggle_modal(
     elif confirm_sci_images:
         results = validate.publish_sci_images()
         return not is_open, alerts.send_toast(results[0], results[1], results[2])
-    elif confirm_spatial_map:
-        results = validate.publish_spatial_map_data()
+    elif confirm_volumetric_map:
+        results = validate.publish_volumetric_map_data()
         return not is_open, alerts.send_toast(results[0], results[1], results[2])
     elif confirm_obj_files:
         results = validate.publish_obj_files()
