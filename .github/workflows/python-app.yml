@@ -39,12 +39,14 @@ jobs:
     - name: create docker volume
       run: |
         docker volume create config-data
-    - name: build docker container
-      run: |
-        docker compose -f docker-compose-dev.yaml up
     - name: copy starter data into docker volume
       run : |
-        docker cp -a ./start/ hubmap-pancreas-data-explorer-display-app-1:/app/assets/config/
+        docker run --name temp -v config-data:/data busybox
+        docker cp -a ./start/ temp:/data/
+        docker stop temp
+    - name: build and run docker container
+      run: |
+        docker compose -f docker-compose-dev.yaml up
     - name: run tests
       run: |
         docker exec hubmap-pancreas-data-explorer-display-app-1 pytest
