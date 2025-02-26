@@ -46,8 +46,8 @@ __pycache__*
 **/scripts/t-out
 
 # config files
-**/blocks.csv
-**/image-sets.csv
+**/config//blocks.csv
+**/config/image-sets.csv
 **/config/labels.csv
 
 # depot

@@ -1,0 +1,12 @@
+Tissue Block,Organ ID,Organ Description,Order,Anatomical region,Images,Reports,Proteomics
+P1-4A,P1,Pancreas 1,2,Pancreatic head,/scientific-images-list/P1-4A, , 
+P1-7A,P1,Pancreas 1,3,Pancreatic neck, , , 
+P1-9,P1,Pancreas 1,4,Pancreatic neck, , , 
+P1-14A,P1,Pancreas 1,5,Pancreatic body, , , 
+P1-19A,P1,Pancreas 1,6,Pancreatic tail, , , 
+P1-20C,P1,Pancreas 1,9,Pancreatic tail, , ,/spatial-map/P1-20C
+P1-21,P1,Pancreas 1,10,Pancreatic tail, , , 
+P2-1A,P2,Pancreas 2,1,Pancreatic head, , , 
+P2-7A,P2,Pancreas 2,2,Pancreatic neck, , , 
+P2-13A,P2,Pancreas 2,3,Pancreatic body,/scientific-images-list/P2-13A, , 
+P2-19A,P2,Pancreas 2,4,Pancreatic tail, , , 
