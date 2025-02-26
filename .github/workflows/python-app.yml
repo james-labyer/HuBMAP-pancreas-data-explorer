@@ -44,7 +44,7 @@ jobs:
         docker run --name temp -v config-data:/data busybox
     - name: copy starter data into docker volume
       run : |
-        docker cp -a ./start/ temp:/data/
+        docker cp ./start/. temp:/data/
     - name: stop temp container
       run : |
         docker stop temp
