@@ -50,7 +50,7 @@ jobs:
         docker stop temp
     - name: build and run app docker containers
       run: |
-        docker compose -f docker-compose-dev.yaml up
+        docker compose -f docker-compose-dev.yaml up --detach
     - name: run tests for display app
       run: |
         docker exec hubmap-pancreas-data-explorer-display-app-1 pytest
