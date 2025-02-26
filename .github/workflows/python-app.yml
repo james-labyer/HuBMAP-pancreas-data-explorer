@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./app
+        working-directory: ./
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.13
@@ -34,9 +34,9 @@ jobs:
         poetry install --with dev,config
     - name: Lint with ruff
       uses: astral-sh/ruff-action@v2
-    - name: move up one directory
+    - name: print contents of current directory
       run: |
-        cd ..
+        ls
     - name: build and run docker container
       run: |
         docker compose -f docker-compose-dev.yaml up
