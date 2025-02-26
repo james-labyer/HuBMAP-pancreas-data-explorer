@@ -28,7 +28,7 @@ def test_links():
             pass
             # pancreas = blocks["Reports"][j].split("/")[-1]
             # assert pancreas in reports["pancreas"].values
-    for k in range(blocks["Proteomics"].size):
-        if blocks["Proteomics"][k] != " ":
+    for k in range(blocks["Volumetric Map"].size):
+        if blocks["Volumetric Map"][k] != " ":
             pass
             # assert blocks["Proteomics"][k] in relative_paths

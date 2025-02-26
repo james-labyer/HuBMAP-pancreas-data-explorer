@@ -74,10 +74,9 @@
 }
 
 /* Downloads */
-.download-button {
-    margin-top: .75rem;
-    margin-right: .75rem;
-    margin-bottom: .75rem;
+
+.download-button-container {
+    padding-top: .75rem;
 }
 
 /* Misc */

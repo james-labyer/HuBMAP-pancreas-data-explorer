@@ -16,7 +16,6 @@ from pathlib import Path
 from pages.constants import FILE_DESTINATION as FD
 from components import alerts
 import pages.ui as ui
-import json
 import math
 
 app_logger = logging.getLogger(__name__)
@@ -148,9 +147,6 @@ def layout(block=None, **kwargs):
                     dcc.Store(id="value-range-store", data=value_min_max),
                     dcc.Store(id="axes-store", data=axes),
                     dcc.Store(id="block-store", data=block),
-                    html.Div(id="test-div"),
-                    html.Div(id="test-div-cube"),
-                    html.Div(id="test-div-point"),
                 ],
             ),
             html.Section(id="download-dataset", children=download_content),
@@ -342,33 +338,6 @@ def update_fig(
             layer=settings["layer"],
             category_opt=settings["category_selected"],
         )
-
-
-@callback(
-    Output("test-div-point", "children"),
-    Input("point-opacity-store-sm", "data"),
-)
-def update_test_point(data):
-    result = json.dumps(data)
-    return result
-
-
-@callback(
-    Output("test-div-cube", "children"),
-    Input("cube-opacity-store-sm", "data"),
-)
-def update_test_cube(data):
-    result = json.dumps(data)
-    return result
-
-
-@callback(
-    Output("test-div", "children"),
-    Input("category-selected", "data"),
-)
-def update_test(data):
-    result = json.dumps(data)
-    return result
 
 
 @callback(

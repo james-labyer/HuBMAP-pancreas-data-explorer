@@ -1,5 +1,4 @@
 import logging
-import sys
 import dash_bootstrap_components as dbc
 import numpy as np
 import pandas as pd
@@ -107,18 +106,8 @@ def make_mesh_fig(organ=1):
                 fig.add_trace(go.Mesh3d(data[0]))
                 name = data[0]["name"]
                 app_logger.debug(f"Added trace for {name} to 3D Model of {organ}")
-            print(
-                f"trace added for {organ_traces.at[i, "File"]}",
-                file=sys.stdout,
-                flush=True,
-            )
         except FileNotFoundError:
             # try to add the other traces
-            print(
-                f"trace not added for {organ_traces.at[i, "File"]}",
-                file=sys.stdout,
-                flush=True,
-            )
             continue
     try:
         fig.update_layout(
@@ -175,7 +164,6 @@ def make_graph_layout(organ=1, idx=0):
 def layout(**kwargs):
     # get unique organs from traces
     organs = list(traces["Organ"].unique())
-    print("organs:", organs, file=sys.stdout, flush=True)
     if len(organs) == 0:
         return html.Div("No 3D models have been loaded.")
     # add a model for each
@@ -190,7 +178,6 @@ def layout(**kwargs):
     Input({"type": "organ-graph", "index": ALL}, "clickData"),
 )
 def display_click_data(click_data):
-    print("click_data:", click_data, file=sys.stdout, flush=True)
     if click_data[0] and click_data[0]["points"][0]["curveNumber"] > 3:
         row = blocks.loc[
             blocks["Tissue Block"]
@@ -206,7 +193,7 @@ def display_click_data(click_data):
                 "value": row.iloc[0]["Images"],
             },
             {"label": "View reports", "value": row.iloc[0]["Reports"]},
-            {"label": "View volumetric map", "value": row.iloc[0]["Proteomics"]},
+            {"label": "View volumetric map", "value": row.iloc[0]["Volumetric Map"]},
         ]
         card_content = []
         card_body_content = []

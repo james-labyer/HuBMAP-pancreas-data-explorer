@@ -84,7 +84,7 @@ REQUIRED_HEADERS = {
             "Anatomical region",
             "Images",
             "Reports",
-            "Proteomics",
+            "Volumetric Map",
         ],
         "si-files": [
             "Tissue Block",
@@ -186,14 +186,14 @@ def check_html_helper(some_text):
 
 
 def update_links(column, df):
-    link_columns = ["Images", "Reports", "Proteomics"]
+    link_columns = ["Images", "Reports", "Volumetric Map"]
     i = 0
     if column in link_columns:
         while i < df[column].size:
             links = {
                 "Images": f"/scientific-images-list/{df["Tissue Block"].at[i]}",
                 "Reports": "/reports",
-                "Proteomics": f"volumetric-map/{df["Tissue Block"].at[i]}",
+                "Volumetric Map": f"volumetric-map/{df["Tissue Block"].at[i]}",
             }
             if not (df[column].at[i] == " "):
                 df[column].at[i] = links[column]
@@ -256,7 +256,7 @@ def process_si_block_file(file: bytes, which_headers: str) -> tuple[bool, str, o
     if header_check[0]:
         for key in REQUIRED_HEADERS[which_headers].keys():
             if key == "block-data":
-                for col in ["Images", "Reports", "Proteomics"]:
+                for col in ["Images", "Reports", "Volumetric Map"]:
                     if (
                         col in header_check[2][key].columns
                         and header_check[2][key].dtypes[col] != "object"

@@ -1,4 +1,3 @@
-import sys
 from dash import (
     html,
     register_page,
@@ -452,7 +451,6 @@ def update_obj_files_output(list_of_contents, filenames):
                 validate.process_obj_files,
                 filenames[i],
             )
-            print("upload_succeeded:", upload_succeeded, file=sys.stdout, flush=True)
             if not upload_succeeded[0]:
                 return alerts.send_toast(
                     "Model files not uploaded", upload_succeeded[1], "failure"

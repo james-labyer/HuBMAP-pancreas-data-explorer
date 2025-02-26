@@ -83,10 +83,12 @@ def make_download_section(filename):
         children=[
             html.H2("Download original file", className="download-header"),
             html.P(filename),
-            dbc.Button(
-                "Download",
-                id="btn-download-si",
-                className="download-button",
+            html.Div(
+                dbc.Button(
+                    "Download",
+                    id="btn-download-si",
+                ),
+                className="download-button-container",
             ),
             dcc.Download(id="download-si"),
         ],

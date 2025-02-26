@@ -65,7 +65,7 @@ def make_volumetric_map_filters(defaults: dict, layers: dict, values: list):
             ),
         ),
         color="light",
-        class_name="proteomics-filter",
+        class_name="volumetric-map-filter",
     )
 
 
@@ -247,7 +247,7 @@ def make_point_fig(
     value="",
     layer="All",
 ):
-    """Create figure for point view of proteomics data"""
+    """Create figure for point view of volumetric map data"""
     df4 = select_layer(layer, df, axes["Z"])
     X = df4.loc[:, "X Center"]
     Y = df4.loc[:, "Y Center"]
@@ -281,7 +281,7 @@ def make_layer_fig(
     value="",
     layer="All",
 ):
-    """Create figure for layer view of proteomics data"""
+    """Create figure for layer view of volumetric map data"""
     data = []
 
     if layer == "All":
@@ -364,7 +364,7 @@ def make_sphere_fig(
     layer="All",
     category_opt="All",
 ):
-    """Create figure for sphere view of proteomics data"""
+    """Create figure for sphere view of volumetric map data"""
     res = 5
     data = []
 
@@ -430,7 +430,7 @@ def make_cube_fig(
     layer="All",
     category_opt="All",
 ):
-    """Create figure for cube view of proteomics data"""
+    """Create figure for cube view of volumetric map data"""
     df2 = select_layer(layer, df, axes["Z"])
     df3 = select_category(category_opt, category_labels, df2)
 

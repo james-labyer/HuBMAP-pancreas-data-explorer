@@ -52,14 +52,14 @@ def layout():
         {"field": "Anatomical region"},
         {"field": "Images", "cellRenderer": "dsLink"},
         {"field": "Reports", "cellRenderer": "dsLink"},
-        {"field": "Proteomics", "cellRenderer": "dsLink"},
+        {"field": "Volumetric Map", "cellRenderer": "dsLink"},
     ]
 
     # if no rows have a value for a certain content type, leave that column out
     with_content = [
         blocks.loc[blocks["Images"] != " "],
         blocks.loc[blocks["Reports"] != " "],
-        blocks.loc[blocks["Proteomics"] != " "],
+        blocks.loc[blocks["Volumetric Map"] != " "],
     ]
 
     k = 0
