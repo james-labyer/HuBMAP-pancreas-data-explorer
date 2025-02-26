@@ -37,6 +37,9 @@ jobs:
     - name: print contents of current directory
       run: |
         ls
+    - name: create docker volume
+      run: |
+        docker volume create config-data
     - name: build and run docker container
       run: |
         docker compose -f docker-compose-dev.yaml up
