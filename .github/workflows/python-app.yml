@@ -39,15 +39,19 @@ jobs:
     - name: create docker volume
       run: |
         docker volume create config-data
-    - name: copy starter data into docker volume
+    - name: make temp container to copy data into docker volume
       run : |
         docker run --name temp -v config-data:/data busybox
+    - name: copy starter data into docker volume
+      run : |
         docker cp -a ./start/ temp:/data/
+    - name: stop temp container
+      run : |
         docker stop temp
-    - name: build and run docker container
+    - name: build and run app docker containers
       run: |
         docker compose -f docker-compose-dev.yaml up
-    - name: run tests
+    - name: run tests for display app
       run: |
         docker exec hubmap-pancreas-data-explorer-display-app-1 pytest
         
