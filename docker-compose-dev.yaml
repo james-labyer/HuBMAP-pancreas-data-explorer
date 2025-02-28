@@ -20,8 +20,6 @@ services:
         source: ./styles
         target: /app/assets/styles
       - config-data:/config
-    # networks:
-    #   - inside
   display-app:
     build: 
       context: .
@@ -43,11 +41,6 @@ services:
         source: ./styles
         target: /app/assets/styles
       - config-data:/app/assets/config
-#     networks:
-#       - inside
-# networks:
-#   inside:
-#     internal: true
 volumes:
   config-data:
     external: true

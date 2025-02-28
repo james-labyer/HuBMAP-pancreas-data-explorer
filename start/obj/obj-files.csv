@@ -1,13 +1,2 @@
 Organ,Name,File,Color,Opacity
-P1,Body,body_invert.obj,#EC8728,1.0
-P1,Neck,neck_invert.obj,#EF9846,1.0
-P1,Head,head_invert.obj,#F6AA63,1.0
-P1,Tail,tail_invert.obj,#ED780B,1.0
-P1,P1-4A,P1_Pancreas_Head_4A.obj,#067BC2,0.6
-P1,P1-7A,P1_Pancreas_Neck_7A.obj,#067BC2,0.6
-P1,P1-9,P1_Pancreas_Neck_9.obj,#067BC2,0.6
-P1,P1-14A,P1_Pancreas_Body_14A.obj,#067BC2,0.6
-P1,P1-19A,P1_Pancreas_Tail_19A.obj,#067BC2,0.6
-P1,P1-20C,P1_Pancreas_Tail_20C.obj,#067BC2,0.6
-P1,P1-21,P1_Pancreas_Tail_21.obj,#067BC2,0.6
-P1,P1-4A proteomics subsection,P1_20c_subselection.obj,#067BC2,0.6
+P1,Body,sphere.obj,#067BC2,1

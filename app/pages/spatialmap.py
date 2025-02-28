@@ -34,7 +34,6 @@ def title(block=None):
 register_page(
     __name__,
     path_template="/volumetric-map/<block>",
-    path="/volumetric-map/1",
     title=title,
 )
 

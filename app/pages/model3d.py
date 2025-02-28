@@ -178,11 +178,22 @@ def layout(**kwargs):
     Input({"type": "organ-graph", "index": ALL}, "clickData"),
 )
 def display_click_data(click_data):
-    if click_data[0] and click_data[0]["points"][0]["curveNumber"] > 3:
+    blank_content = "Click on a block to view available datasets"
+    blank_card_content = [
+        dbc.CardHeader("Block Data"),
+        dbc.CardBody(
+            [
+                html.P(blank_content),
+            ],
+        ),
+    ]
+    if click_data and click_data[0]:
         row = blocks.loc[
             blocks["Tissue Block"]
             == traces.loc[click_data[0]["points"][0]["curveNumber"], "Name"]
         ]
+        if row.empty:
+            return blank_card_content
         block_name = row.iloc[0]["Tissue Block"]
         app_logger.debug(f"Displaying click data for {block_name}")
         item_data = [
@@ -216,13 +227,4 @@ def display_click_data(click_data):
         card_content.append(dbc.CardBody(card_body_content))
         return card_content
     else:
-        content = "Click on a block to view available datasets"
-        card_content = [
-            dbc.CardHeader("Block Data"),
-            dbc.CardBody(
-                [
-                    html.P(content),
-                ],
-            ),
-        ]
-        return card_content
+        return blank_card_content

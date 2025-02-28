@@ -1,0 +1,14 @@
+services:
+  display:
+    extends:
+      file: docker-compose-dev.yaml
+      service: display-app
+    # ports:
+    # - "8051:8051"
+    # expose:
+    #   - "8051"
+    volumes:
+    - config-data-test:/app/assets/config
+volumes:
+  config-data-test:
+    external: true

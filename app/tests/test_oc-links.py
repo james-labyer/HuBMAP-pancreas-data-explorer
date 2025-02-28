@@ -12,9 +12,10 @@ thumbnails = pd.read_csv(FD["thumbnails"]["catalog"])
 
 
 def test_oc_page_links():
-    # check that each link in on the oc file summary pages references an oc that exists in ocpage
+    # check that each link on the images summary pages references an image set in ocpage
     for i in range(thumbnails["Link"].size):
-        link_oc = thumbnails.at[i, "Link"].split("/")[-1]
-        link_block = thumbnails.at[i, "Link"].split("/")[-2]
-        assert link_oc in s_imgs["Image Set"].values
+        link_data = thumbnails.at[i, "Link"].split("/")
+        link_si = link_data[-1]
+        link_block = link_data[-2]
+        assert link_si in s_imgs["Image Set"].values
         assert link_block in s_imgs["Tissue Block"].values

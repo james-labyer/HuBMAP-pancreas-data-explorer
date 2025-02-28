@@ -66,32 +66,34 @@ def test_make_mesh_data():
 
 
 def test_make_mesh_fig():
-    fig1 = make_mesh_fig(1)
-    assert len(fig1["data"]) == 12
+    fig1 = make_mesh_fig("P1")
+    assert len(fig1["data"]) == 1
     assert fig1["layout"]["height"] == 500
 
 
 def test_display_click_data():
-    click1 = {
-        "points": [
-            {
-                "x": -392,
-                "y": 1749.50244140625,
-                "z": 746,
-                "curveNumber": 3,
-                "pointNumber": 52662,
-                "i": 28916,
-                "j": 28769,
-                "k": 28768,
-                "bbox": {
-                    "x0": 539.0667184592023,
-                    "x1": 539.0667184592023,
-                    "y0": 401.4491349814796,
-                    "y1": 401.4491349814796,
-                },
-            }
-        ]
-    }
+    click1 = [
+        {
+            "points": [
+                {
+                    "x": -392,
+                    "y": 1749.50244140625,
+                    "z": 746,
+                    "curveNumber": 0,
+                    "pointNumber": 52662,
+                    "i": 28916,
+                    "j": 28769,
+                    "k": 28768,
+                    "bbox": {
+                        "x0": 539.0667184592023,
+                        "x1": 539.0667184592023,
+                        "y0": 401.4491349814796,
+                        "y1": 401.4491349814796,
+                    },
+                }
+            ]
+        }
+    ]
     layout1 = json.loads(
         json.dumps(display_click_data(click1), cls=plotly.utils.PlotlyJSONEncoder)
     )
